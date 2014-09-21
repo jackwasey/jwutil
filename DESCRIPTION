@@ -1,0 +1,11 @@
+Package: jwutil
+Title: What the package does (short line)
+Version: 0.1
+Authors@R: person("Jack O. Wasey", "Creator", role=c("aut", "cre"), email="jack@jackwasey.com")
+Description: small set of simple utilities for common data manipulation tasks,
+    primarily of data frames. The goal is typically to use built-in tools well,
+    without bringing in huge dependencies.
+Depends:
+    R (>= 3.1.1)
+License: What license is it under?
+LazyData: true
