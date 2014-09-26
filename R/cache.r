@@ -1,4 +1,5 @@
 #' @title Cache an R object
+#' @rdname cache
 #' @description There are various memoise and cache functions in R but none did what I wanted. These functions allow
 #' a package to cache data in a standard place, or specified directory.
 #' @param varName char
@@ -8,19 +9,19 @@ saveToCache <- function(varName, cacheDir = file.path(getwd(), "cache")) {
   save(list = varName, envir = parent.frame(), file = file.path(cacheDir, paste0(varName, ".RData")), compress = "xz") 
 }
 
-#' @rdname saveToCache
+#' @rdname cache
 #' @export
 lsCache <- function( cacheDir = file.path(getwd(), "cache")) {
   list.files(path = cacheDir)
 }
 
-#' @rdname saveToCache
+#' @rdname cache
 #' @export
 loadFromCache <- function(varName, cacheDir = file.path(getwd(), "cache")) {
   load(file =  file.path(cacheDir, paste0(varName, ".RData")), envir = parent.frame())
 }
 
-#' @rdname saveTocache
+#' @rdname cache
 #' @export
 getFromCache <- function(varName, cacheDir = file.path(getwd(), "cache")) {
   te = new.env()
