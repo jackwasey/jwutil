@@ -303,7 +303,7 @@ listTrim  <-  function(x){   # delele null/empty entries in a list
 saveInDataDir <- function(varName, suffix) {
   save(list = varName,
        envir = parent.frame(),
-       file = file.path('data', paste0(varName, suffix, '.RData')),
+       file = file.path('data', strip(paste0(varName, suffix, '.RData'))),
        compress = "bzip2"
   )
 }
