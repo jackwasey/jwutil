@@ -6,7 +6,7 @@
 #' @param cacheDir char
 #' @export
 saveToCache <- function(varName, cacheDir = file.path(getwd(), "cache")) {
-  save(list = varName, envir = parent.frame(), file = file.path(cacheDir, paste0(varName, ".RData")), compress = "xz") 
+  save(list = varName, envir = parent.frame(), file = file.path(cacheDir, paste0(varName, ".RData")), compress = "xz")
 }
 
 #' @rdname cache
@@ -18,7 +18,12 @@ lsCache <- function( cacheDir = file.path(getwd(), "cache")) {
 #' @rdname cache
 #' @export
 loadFromCache <- function(varName, cacheDir = file.path(getwd(), "cache")) {
-  load(file =  file.path(cacheDir, paste0(varName, ".RData")), envir = parent.frame())
+  fp <- file.path(cacheDir, paste0(varName, ".RData"))
+  if (file.exists(fp)) invisible(load(file =  fp, envir = parent.frame()))
+  fp <- file.path(getwd(), "cache", paste0(varName, ".RData"))
+  if (file.exists(fp)) invisible(load(file =  fp, envir = parent.frame()))
+  fp <- file.path(getwd(), "..", "cache", paste0(varName, ".RData"))
+  if (file.exists(fp)) invisible(load(file = fp, envir = parent.frame()))
 }
 
 #' @rdname cache
