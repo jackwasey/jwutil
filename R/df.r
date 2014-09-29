@@ -216,11 +216,11 @@ mergeBetter <- function(x, y,
   rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
   leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
   if (leftMergeDrops>0 | rightMergeDrops>0) {
-    message(name="jh.mergeBetter", paste("mergeBetter: would drop ",leftMergeDrops, " out of ", nrow(y),
-                                         " from the new table, and  ", rightMergeDrops, "out of ", nrow(x),
-                                         " from the existing data."))
+    message("mergeBetter: would drop",leftMergeDrops, "out of", nrow(y),
+                                         "from the new table, and", rightMergeDrops, "out of", nrow(x),
+                                         "from the existing data."))
   } else {
-    message(name="jh.mergeBetter", "no rows will be dropped in the merge - keys match exactly")
+    message("no rows will be dropped in the merge - keys match exactly")
   }
 
   # find duplicate field names
@@ -231,9 +231,12 @@ mergeBetter <- function(x, y,
     for (n in duplicateFieldNames) {
       if (identical(x[n], y[n])) {
         y[n] <- NULL # drop the field if it is identical to another one with the same name
-        message(name="jh.mergeBetter", "dropping identical field: ", n) # and warn?
+        message("dropping identical field: ", n) # and warn?
       } else { # rename individual conflicting fields
-        if (ifConflict == "suffix") newName <- paste(n, affix, sep=".") else newName <- paste(affix, n, sep=".")
+        if (ifConflict == "suffix")
+          newName <- paste(n, affix, sep=".")
+        else
+          newName <- paste(affix, n, sep=".")
         names(y)[which(names(y) == n)] <- newName
       }
     }
