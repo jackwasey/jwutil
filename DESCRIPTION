@@ -8,5 +8,12 @@ Description: small set of simple utilities for common data manipulation tasks,
     without bringing in huge dependencies.
 Depends:
     R (>= 3.1.1)
+Imports:
+    devtools,
+    roxygen2,
+    testthat,
+    magrittr,
+    Rcpp,
+    icd9
 License: GPL-3
 LazyData: true
