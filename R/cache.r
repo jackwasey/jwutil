@@ -41,12 +41,22 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
 
   # load into parent frame with its own varName, then return the data. This way
   # it is memory-cached also for future gets.
-  load(file =  findCacheFilePath(varName, cacheDir), envir = parent.Frame())
+  load(file =  findCacheFilePath(varName, cacheDir), envir = parent.frame())
   get(varName)
 }
 
+#' @title find path to the cache directory
+#' @description Searches a few likely places:
+#'  - directory specified in \code{cacheDir}
+#'  - session-wide R option "cacheDir"
+#'  - 'cache' directory within the working directory
+#'  - 'cache' directory within the parent directory
+#'  Fail with error if we have still not found it.
+#' @param varName char
+#' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL} and doesn't exist, stop with error.
+#' @export
 findCacheDir <- function(cacheDir = NULL) {
-  if (!is.null(cacheDir) && file.exists(file.path(getwd(), "cache"))) return(cacheDir)
+  if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
   td <- file.path(getwd(), "cache")
   if (file.exists(td)) return(td)
@@ -55,8 +65,28 @@ findCacheDir <- function(cacheDir = NULL) {
   stop("Could not find cache directory in working directory:", getwd())
 }
 
+#' @title find path to a file in cache directory
+#' @param varName char
+#' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist, stop with error.
+#' @export
 findCacheFilePath <- function(varName, cacheDir = NULL) {
-  fp <- file.path(findCacheDir(cacheDir), paste0(varName, ".RData"))
-  if (!file.exists(fp)) stop("could not find:", varName, "in path:", fp)
-  fp
+  cacheDir <- findCacheDir(cacheDir)
+  if (!file.exists(cacheDir)) stop("could not find cache directory: ", cacheDir)
+  file.path(cacheDir, paste0(varName, ".RData"))
+}
+
+#' @title save data compressed in data folder
+#' @description xz appears to fail on Windows, so use bzip2
+#'
+#' tools::checkRdaFiles(file.path("data", list.files(path = "data")))
+#' tools::resaveRdaFiles(file.path("data", list.files(path = "data")), compress = "xz")
+#' @param varName char name of the variable in the calling frame to save
+#' @param suffix char additional characters before ".RData"
+#' @export
+saveInDataDir <- function(varName, suffix) {
+  save(list = varName,
+       envir = parent.frame(),
+       file = file.path('data', strip(paste0(varName, suffix, '.RData'))),
+       compress = "bzip2"
+  )
 }
