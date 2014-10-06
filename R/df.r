@@ -213,12 +213,19 @@ mergeBetter <- function(x, y,
   ifConflict <- match.arg(ifConflict)
   doRename <- match.arg(doRename)
 
+  if (class(x) != class(y))
+    warning(
+      sprintf("x & y are different classes.
+              They will be cast implicitly by the merge.
+              Classes are: %s and %s", class(x), class(y))
+    )
+
   rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
   leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
   if (leftMergeDrops>0 | rightMergeDrops>0) {
     message("mergeBetter: would drop",leftMergeDrops, "out of", nrow(y),
-                                         "from the new table, and", rightMergeDrops, "out of", nrow(x),
-                                         "from the existing data.")
+            "from the new table, and", rightMergeDrops, "out of", nrow(x),
+            "from the existing data.")
   } else {
     message("no rows will be dropped in the merge - keys match exactly")
   }
