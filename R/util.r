@@ -291,19 +291,3 @@ isValidTime <- function(tms) {
 listTrim  <-  function(x){   # delele null/empty entries in a list
   x[unlist(lapply(x, length) != 0)]
 }
-
-#' @title save data compressed in data folder
-#' @description xz appears to fail on Windows, so use bzip2
-#'
-#' tools::checkRdaFiles(file.path("data", list.files(path = "data")))
-#' tools::resaveRdaFiles(file.path("data", list.files(path = "data")), compress = "xz")
-#' @param varName char name of the variable in the calling frame to save
-#' @param suffix char additional characters before ".RData"
-#' @export
-saveInDataDir <- function(varName, suffix) {
-  save(list = varName,
-       envir = parent.frame(),
-       file = file.path('data', strip(paste0(varName, suffix, '.RData'))),
-       compress = "bzip2"
-  )
-}
