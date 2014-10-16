@@ -215,10 +215,12 @@ mergeBetter <- function(x, y,
 
   rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
   leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
-  if (leftMergeDrops>0 | rightMergeDrops>0) {
-    message("mergeBetter: would drop",leftMergeDrops, "out of", nrow(y),
-                                         "from the new table, and", rightMergeDrops, "out of", nrow(x),
-                                         "from the existing data.")
+  if (leftMergeDrops > 0 | rightMergeDrops > 0) {
+    message(
+      sprintf("mergeBetter: would drop %d out of %d from the new table, and %d out of %d from the existing data",
+              leftMergeDrops, nrow(y), rightMergeDrops, nrow(x)
+              )
+    )
   } else {
     message("no rows will be dropped in the merge - keys match exactly")
   }
@@ -227,7 +229,7 @@ mergeBetter <- function(x, y,
   duplicateFieldNames <- names(x)[ names(x) %in% names(y) & !names(x) == by.y ]
 
   if (length(duplicateFieldNames)>0 && doRename=="no") {
-    message("there are conflicting field names in the merge but no prefix or suffix was requested:", duplicateFieldNames)
+    message("there are conflicting field names in the merge but no prefix or suffix was requested: ", duplicateFieldNames)
     for (n in duplicateFieldNames) {
       if (identical(x[n], y[n])) {
         y[n] <- NULL # drop the field if it is identical to another one with the same name
@@ -252,7 +254,7 @@ mergeBetter <- function(x, y,
     by.y = by.y,
     all.x = all.x,
     all.y = all.y,
-    suffixes = c("",paste0(".",fix)) # if we didn't already rename, then allow merge itself to rename if conflict.
+    suffixes = c("", paste0(".",fix)) # if we didn't already rename, then allow merge itself to rename if conflict.
   )
   #sprintf(name="jh.mergeBetter", "merged names after merge: %s", names(merged), capture=T)
   merged
