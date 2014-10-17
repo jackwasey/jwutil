@@ -62,6 +62,8 @@ findCacheDir <- function(cacheDir = NULL) {
   if (file.exists(td)) return(td)
   td <- file.path(getwd(), "..", "cache") # this is good when stuck in vignette sub-directory of a project
   if (file.exists(td)) return(td)
+  td <- file.path(getwd(), "../..", "cache") # this is good when stuck in vignette sub-directory of a project
+  if (file.exists(td)) return(td)
   stop("Could not find cache directory in working directory:", getwd())
 }
 
