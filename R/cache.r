@@ -30,7 +30,8 @@ loadFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
   if (!force && exists(varName)) invisible(varName)
 
   fp <- findCacheFilePath(varName, cacheDir)
-  if (file.exists(fp)) invisible(load(file =  fp, envir = parent.frame()))
+  if (file.exists(fp)) load(file =  fp, envir = parent.frame())
+  get(varName)
 
 }
 
