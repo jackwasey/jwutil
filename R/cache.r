@@ -5,8 +5,9 @@ optName = "cachedir"
 
 #' @title Cache an R object
 #' @rdname cache
-#' @description There are various memoise and cache functions in R but none did what I wanted. These functions allow
-#' a package to cache data in a standard place, or specified directory.
+#' @description There are various memoise and cache functions in R but none did
+#'   what I wanted. These functions allow a package to cache data in a standard
+#'   place, or specified directory.
 #' @param varName char
 #' @param cacheDir char
 #' @param force logical - reload data even if already available
@@ -27,11 +28,14 @@ lsCache <- function(cacheDir = NULL) {
 #' @rdname cache
 #' @export
 loadFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
-  if (!force && exists(varName)) invisible(varName)
+  if (!force && exists(varName)) return(invisible(get(varName, envir = parent.frame())))
 
   fp <- findCacheFilePath(varName, cacheDir)
-  if (file.exists(fp)) invisible(load(file =  fp, envir = parent.frame()))
-
+  if (file.exists(fp)) {
+    load(file =  fp, envir = parent.frame())
+    return(invisible(get(varName, envir = parent.frame())))
+  }
+  stop("couldn't find '", varName, "' in path ", fp)
 }
 
 #' @rdname cache
@@ -40,8 +44,8 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
   if (!force && exists(varName)) return(get(varName))
 
   # load into parent frame with its own varName, then return the data. This way
-  # it is memory-cached also for future gets.
-  load(file =  findCacheFilePath(varName, cacheDir), envir = parent.frame())
+  # it is memory-cached also for future gets. Alternative is to memoise.
+  load(file =  findCacheFilePath(varName, cacheDir), envir = .GlobalEnv) # or parent.frame() ???
   get(varName)
 }
 
@@ -53,23 +57,25 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
 #'  - 'cache' directory within the parent directory
 #'  Fail with error if we have still not found it.
 #' @param varName char
-#' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL} and doesn't exist, stop with error.
+#' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL}
+#'   and doesn't exist, stop with error.
 #' @export
 findCacheDir <- function(cacheDir = NULL) {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
   td <- file.path(getwd(), "cache")
   if (file.exists(td)) return(td)
-  td <- file.path(getwd(), "..", "cache") # this is good when stuck in vignette sub-directory of a project
+  td <- file.path(dirname(getwd()), "cache") # this is good when stuck in vignette sub-directory of a project
   if (file.exists(td)) return(td)
-  td <- file.path(getwd(), "../..", "cache") # this is good when stuck in vignette sub-directory of a project
+  td <- file.path(dirname(dirname(getwd())), "cache") # parent of parent
   if (file.exists(td)) return(td)
   stop("Could not find cache directory in working directory:", getwd())
 }
 
 #' @title find path to a file in cache directory
 #' @param varName char
-#' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist, stop with error.
+#' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist,
+#'   stop with error.
 #' @export
 findCacheFilePath <- function(varName, cacheDir = NULL) {
   cacheDir <- findCacheDir(cacheDir)
@@ -80,8 +86,9 @@ findCacheFilePath <- function(varName, cacheDir = NULL) {
 #' @title save data compressed in data folder
 #' @description xz appears to fail on Windows, so use bzip2
 #'
-#' tools::checkRdaFiles(file.path("data", list.files(path = "data")))
-#' tools::resaveRdaFiles(file.path("data", list.files(path = "data")), compress = "xz")
+#'   tools::checkRdaFiles(file.path("data", list.files(path = "data")))
+#'   tools::resaveRdaFiles(file.path("data", list.files(path = "data")),
+#'   compress = "xz")
 #' @param varName char name of the variable in the calling frame to save
 #' @param suffix char additional characters before ".RData"
 #' @export
