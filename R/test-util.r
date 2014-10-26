@@ -92,19 +92,19 @@ lsf <- function(pkg) {
 shuffle <- function(x)
   sample(x, length(x), replace = FALSE, prob = NULL)
 
-numbers_to_long_and_float <- function(..., na.rm=TRUE) {
+numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   #browser()
   x <- flatten_list(list(...))
-  # drop any NA values:
-  suppressWarnings( # very big numbers not representable by 32 bit integers, give NA with warning
-    x <- flatten_list(list(as.integer(x)), list(as.double(x)), na.rm=na.rm)
+  # drop any NA values. Very big numbers not representable by 32 bit integers,
+  # give NA with warning. For test case generation, usually we will want to
+  # remove NAs.
+  suppressWarnings(
+    x <- flatten_list(list(as.integer(x)), list(as.double(x)), na.rm = na.rm)
   )
   x
 }
 
 zeroes <- list(0L, 0.0) # long integer and double float
-
-.n_random_to_gen <- 3
 
 bad_input <- c(
   list(c(), NA, list()),
@@ -131,21 +131,26 @@ bad_input <- c(
 #' @return vector length 5n+1 containing variety of difficult numbers for
 #'   testing purposes
 #' @export
-random_test_numbers <- function(n = .n_random_to_gen, min=NULL, max=NULL, hole=NULL) {
-  x <- c(0, pi, sqrt(2),
+random_test_numbers <- function(n = 100,
+                                min = NULL,
+                                max = NULL,
+                                hole = NULL) {
+  x <- c(0,
+         pi,
+         sqrt(2),
          runif(n),
-         runif(n, min=-1, max=0),
-         runif(n, max=.Machine$double.xmax),
-         runif(n, min=-.Machine$double.xmax),
-         runif(n, min=-n*.Machine$double.xmin, max = n*.Machine$double.xmin)
+         runif(n, min = -1, max = 0),
+         runif(n, max = .Machine$double.xmax),
+         runif(n, min = -.Machine$double.xmax),
+         runif(n, min = -n * .Machine$double.xmin, max = n * .Machine$double.xmin)
   )
   #drop any generated numbers that didn't match the constraints
-  if (!is.null(min)) { x <- x[x>=min] }
-  if (!is.null(max)) { x <- x[x<=max] }
+  if (!is.null(min)) { x <- x[x >= min] }
+  if (!is.null(max)) { x <- x[x <= max] }
 
   #punch a hole in the range, if provided:
-  if (!is.null(hole) && length(hole)==2) {
-    x <- x[!(x>=hole[1] & x<=hole[2])]
+  if (!is.null(hole) && length(hole) == 2) {
+    x <- x[!(x >= hole[1] & x <= hole[2])]
   }
   x
 }
@@ -155,8 +160,10 @@ random_test_numbers <- function(n = .n_random_to_gen, min=NULL, max=NULL, hole=N
 #' @param dayspread integer number of days either side of origin to pick random dates from
 #' @return vector of Dates
 #' @export
-random_test_dates <- function(n = .n_random_to_gen, origin=as.Date("2000-01-01"), dayspread=365*150) {
-  as.Date(runif(n, min=-dayspread, max=dayspread), origin)
+random_test_dates <- function(n = 100,
+                              origin=as.Date("2000-01-01"),
+                              dayspread = 365*150) {
+  as.Date(runif(n, min = -dayspread, max = dayspread), origin)
 }
 
 #' @rdname random_test_numbers
@@ -164,14 +171,16 @@ random_test_dates <- function(n = .n_random_to_gen, origin=as.Date("2000-01-01")
 #' @param dayspread integer number of days either side of origin to pick random dates from
 #' @return vector of Dates
 #' @export
-random_test_posixlt_datetimes <- function(n = .n_random_to_gen, origin=as.Date("2000-01-01"), dayspread=365*150) {
-  as.POSIXlt(as.POSIXlt(random_test_dates(n, origin, dayspread)) + runif(1, min=0, max=24*60*60))
+random_test_posixlt_datetimes <- function(n = 100,
+                                          origin = as.Date("2000-01-01"),
+                                          dayspread = 365*150) {
+  as.POSIXlt(as.POSIXlt(random_test_dates(n, origin, dayspread)) + runif(1, min = 0, max=24*60*60))
 }
 
 #' @rdname random_test_numbers
 #' @export
-random_test_letters <- function(n = .n_random_to_gen, maxlen = 257) {
-  paste(sample(c(LETTERS,letters, 0:9), runif(n, min=0, max=maxlen), replace = TRUE), collapse="")
+random_test_letters <- function(n = 100, maxlen = 257) {
+  paste(sample(c(LETTERS,letters, 0:9), runif(n, min = 0, max = maxlen), replace = TRUE), collapse = "")
 }
 
 extreme_numbers <- c(
