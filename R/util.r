@@ -291,3 +291,19 @@ isValidTime <- function(tms) {
 listTrim  <-  function(x){   # delele null/empty entries in a list
   x[unlist(lapply(x, length) != 0)]
 }
+
+#' @title flatten a list
+#' @description unlike unlist, this function returns a list of objects of different data types, but removes any depth
+#' @param ... list or any set of objects which will be made into a list, may include lists and nested lists
+#' @param na.rm will drop NA values if TRUE
+#' @return list without nested lists, objects with preserved data types
+#' @source https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
+flatten_list <- function(..., na.rm=FALSE) {
+  x <- list(...)
+  y <- list()
+  rapply(x, function(x) y <<- c(y,x))
+  if (na.rm)
+    return(y[!is.na(y)])
+  else
+    return(y)
+}
