@@ -81,7 +81,6 @@ lsf <- function(pkg) {
   funcs
 }
 
-
 #' @title shuffle
 #' @description shuffle the order of a vector or list. This is to improve
 #'   quality of bad data to throw at functions when testing.
@@ -92,6 +91,12 @@ lsf <- function(pkg) {
 shuffle <- function(x)
   sample(x, length(x), replace = FALSE, prob = NULL)
 
+#' @title convert numbers to long and float types
+#' @description intended for generating values for stress testing functions
+#' @param ... list of values to convert to long and double
+#' @param na.rm logical, defaults to TRUE, so output contains only long and float values.
+#' @return list of long and double versions of convertable values from the input
+#' @export
 numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   #browser()
   x <- flatten_list(list(...))
@@ -104,8 +109,16 @@ numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   x
 }
 
+#' @title zeroes
+#' @description long and float types
+#' @keywords sysdata
+#' @export
 zeroes <- list(0L, 0.0) # long integer and double float
 
+#' @title bad input data for tests
+#' @description a variety of horrible data
+#' @keywords sysdata
+#' @export
 bad_input <- c(
   list(c(), NA, list()),
   c(),
@@ -168,7 +181,8 @@ random_test_dates <- function(n = 100,
 
 #' @rdname random_test_numbers
 #' @param origin Date defaults to Jan 1, 2000.
-#' @param dayspread integer number of days either side of origin to pick random dates from
+#' @param dayspread integer number of days either side of origin to pick random
+#'   dates from
 #' @return vector of Dates
 #' @export
 random_test_posixlt_datetimes <- function(n = 100,
@@ -183,6 +197,11 @@ random_test_letters <- function(n = 100, maxlen = 257) {
   paste(sample(c(LETTERS,letters, 0:9), runif(n, min = 0, max = maxlen), replace = TRUE), collapse = "")
 }
 
+#' @title extreme numbers
+#' @description very biggest and smallest non-zero numbers the current machine
+#'   can handle, positive and negative.
+#' @keywords sysdata
+#' @export
 extreme_numbers <- c(
   .Machine$integer.max,
   -.Machine$integer.max,

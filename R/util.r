@@ -298,12 +298,12 @@ listTrim  <-  function(x){   # delele null/empty entries in a list
 #' @param na.rm will drop NA values if TRUE
 #' @return list without nested lists, objects with preserved data types
 #' @source https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
-flatten_list <- function(..., na.rm=FALSE) {
+#' @export
+flatten_list <- function(..., na.rm = FALSE) {
   x <- list(...)
   y <- list()
   rapply(x, function(x) y <<- c(y,x))
   if (na.rm)
     return(y[!is.na(y)])
-  else
-    return(y)
+  y
 }
