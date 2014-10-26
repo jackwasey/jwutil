@@ -186,40 +186,44 @@ dropRowsWithNAField <- function(dat, ...) {
 #' @description apply built-in R merge but with additional features:
 #' @param x data frame
 #' @param y data frame
-#' @param by.x field in x to merge on
-#' @param by.y field in y to merge on
+#' @param by.x field in x to merge on. Unlike \code{merge}, this is compulsory.
+#' @param by.y field in y to merge on. Unlike \code{merge}, this is compulsory.
 #' @param all.x outer join to keep all x values
 #' @param all.y outer join to keep all y values
-#' @param affix either prefix or suffix to disambiguate files. typically this is
-#'   the source table name
+#' @param affix either prefix or suffix to disambiguate files. By default, this
+#'   is the name of the table specified in \code{y}. In all other respects in
+#'   this function, \code{x} and \code{y} are symmetric.
 #' @param ifConflict - determines whether prefix or suffix is added to
-#'   disambiguate conflicting column names. Value can be "suffix" (default) or
-#'   "prefix"
+#'   disambiguate conflicting column names. Value can be "suffix", "prefix". Suffix is the default.
 #' @param doRename - regardless of column name clashes, "prefix" or "suffix"
-#'   with every field with original table name, or "no" for neither 1. check
-#'   whether matching name fields are identical, and if so, don't duplicate in
-#'   merge output 2. more sophisticated renaming of conflicting fields 3.
-#'   logging of the overlap between the data sets 4. limit just to left outer
-#'   join
+#'   with every field with original table name, or "no" for neither
+#'
+#'   1. check whether matching name fields are identical, and if so, don't
+#'   duplicate in merge output
+#'
+#'   2. more sophisticated renaming of conflicting fields
+#'
+#'   3. logging of the overlap between the data sets
+#'
+#'   4. limit just to left outer join
 #' @return merged data frame
 #' @export
 mergeBetter <- function(x, y,
-                        by.x = NULL, by.y = NULL,
+                        by.x, by.y,
                         all.x = FALSE, all.y = FALSE,
-                        affix = deparse(substitute(x)),
+                        affix = deparse(substitute(y)),
                         ifConflict = c("suffix", "prefix"),
                         doRename = c("no", "suffix", "prefix")) {
 
   ifConflict <- match.arg(ifConflict)
   doRename <- match.arg(doRename)
 
-  if (class(x) != class(y))
-    warning(
+  if (class(x) != class(y)) warning(
       sprintf("x & y are different classes.
               They will be cast implicitly by the merge.
-              Classes are: %s and %s", class(x), class(y))
-    )
+              Classes are: %s and %s", class(x), class(y)))
 
+  # this informational step could itself be slow in a big merge
   rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
   leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
   if (leftMergeDrops > 0 | rightMergeDrops > 0) {
@@ -229,23 +233,26 @@ mergeBetter <- function(x, y,
               )
     )
   } else {
-    message("no rows will be dropped in the merge - keys match exactly")
+    message("no rows will be dropped in the merge - keys match exactly.
+            There may still be data differences in the two data frames.")
   }
 
-  # find duplicate field names
-  duplicateFieldNames <- names(x)[ names(x) %in% names(y) & !names(x) == by.y ]
+  # find duplicate field names, ignoring the field we are merging on.
+  duplicateFieldNames <- names(x)[ names(x) %in% names(y) & !names(x) == by.y]
 
-  if (length(duplicateFieldNames)>0 && doRename=="no") {
-    message("there are conflicting field names in the merge but no prefix or suffix was requested: ", duplicateFieldNames)
+  if (length(duplicateFieldNames) > 0 && doRename == "no") {
+    message("there are conflicting field names in the merge but
+            no prefix or suffix was requested: ", duplicateFieldNames)
     for (n in duplicateFieldNames) {
       if (identical(x[n], y[n])) {
         y[n] <- NULL # drop the field if it is identical to another one with the same name
         message("dropping identical field: ", n) # and warn?
       } else { # rename individual conflicting fields
-        if (ifConflict == "suffix")
+        if (ifConflict == "suffix") {
           newName <- paste(n, affix, sep=".")
-        else
+        } else if (ifConflict == "prefix") {
           newName <- paste(affix, n, sep=".")
+        }
         names(y)[which(names(y) == n)] <- newName
       }
     }
@@ -261,7 +268,7 @@ mergeBetter <- function(x, y,
     by.y = by.y,
     all.x = all.x,
     all.y = all.y,
-    suffixes = c("", paste0(".",fix)) # if we didn't already rename, then allow merge itself to rename if conflict.
+    suffixes = c("", paste0(".", affix)) # if we didn't already rename, then allow merge itself to rename if conflict.
   )
   #sprintf(name="jh.mergeBetter", "merged names after merge: %s", names(merged), capture=T)
   merged

@@ -50,26 +50,27 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
 }
 
 #' @title find path to the cache directory
-#' @description Searches a few likely places:
-#'  - directory specified in \code{cacheDir}
-#'  - session-wide R option "cacheDir"
-#'  - 'cache' directory within the working directory
-#'  - 'cache' directory within the parent directory
-#'  Fail with error if we have still not found it.
+#' @description Searches a few likely places: - directory specified in
+#'   \code{cacheDir} - session-wide R option "cacheDir" - 'cache' directory
+#'   within the working directory - 'cache' directory within the parent
+#'   directory Fail with error if we have still not found it.
 #' @param varName char
 #' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL}
 #'   and doesn't exist, stop with error.
+#' @param cacheDirName single character string, defaults to 'jwcache'. 'cache'
+#'   alone is not distinctive, and conflicts with other things, such as the
+#'   cache directory in the vignettes directory.
 #' @export
-findCacheDir <- function(cacheDir = NULL) {
+findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
-  td <- file.path(getwd(), "cache")
+  td <- file.path(getwd(), cacheDirName)
   if (file.exists(td)) return(td)
-  td <- file.path(dirname(getwd()), "cache") # this is good when stuck in vignette sub-directory of a project
+  td <- file.path(dirname(getwd()), cacheDirName) # this is good when stuck in vignette sub-directory of a project
   if (file.exists(td)) return(td)
-  td <- file.path(dirname(dirname(getwd())), "cache") # parent of parent
+  td <- file.path(dirname(dirname(getwd())), cacheDirName) # parent of parent
   if (file.exists(td)) return(td)
-  stop("Could not find cache directory in working directory:", getwd())
+  stop("Could not find cache directory starting from working directory:", getwd())
 }
 
 #' @title find path to a file in cache directory
