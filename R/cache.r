@@ -5,8 +5,9 @@ optName = "cachedir"
 
 #' @title Cache an R object
 #' @rdname cache
-#' @description There are various memoise and cache functions in R but none did what I wanted. These functions allow
-#' a package to cache data in a standard place, or specified directory.
+#' @description There are various memoise and cache functions in R but none did
+#'   what I wanted. These functions allow a package to cache data in a standard
+#'   place, or specified directory.
 #' @param varName char
 #' @param cacheDir char
 #' @param force logical - reload data even if already available
@@ -27,12 +28,14 @@ lsCache <- function(cacheDir = NULL) {
 #' @rdname cache
 #' @export
 loadFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
-  if (!force && exists(varName)) invisible(varName)
+  if (!force && exists(varName)) return(invisible(get(varName, envir = parent.frame())))
 
   fp <- findCacheFilePath(varName, cacheDir)
-  if (file.exists(fp)) load(file =  fp, envir = parent.frame())
-  get(varName)
-
+  if (file.exists(fp)) {
+    load(file =  fp, envir = parent.frame())
+    return(invisible(get(varName, envir = parent.frame())))
+  }
+  stop("couldn't find '", varName, "' in path ", fp)
 }
 
 #' @rdname cache
@@ -41,36 +44,59 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
   if (!force && exists(varName)) return(get(varName))
 
   # load into parent frame with its own varName, then return the data. This way
-  # it is memory-cached also for future gets.
-  load(file =  findCacheFilePath(varName, cacheDir), envir = parent.frame())
+  # it is memory-cached also for future gets. Alternative is to memoise.
+  load(file =  findCacheFilePath(varName, cacheDir), envir = .GlobalEnv) # or parent.frame() ???
   get(varName)
 }
 
 #' @title find path to the cache directory
-#' @description Searches a few likely places:
-#'  - directory specified in \code{cacheDir}
-#'  - session-wide R option "cacheDir"
-#'  - 'cache' directory within the working directory
-#'  - 'cache' directory within the parent directory
-#'  Fail with error if we have still not found it.
+#' @description Searches a few likely places: - directory specified in
+#'   \code{cacheDir} - session-wide R option "cacheDir" - 'cache' directory
+#'   within the working directory - 'cache' directory within the parent
+#'   directory Fail with error if we have still not found it.
 #' @param varName char
-#' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL} and doesn't exist, stop with error.
+#' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL}
+#'   and doesn't exist, stop with error.
+#' @param cacheDirName single character string, defaults to 'jwcache'. 'cache'
+#'   alone is not distinctive, and conflicts with other things, such as the
+#'   cache directory in the vignettes directory.
 #' @export
-findCacheDir <- function(cacheDir = NULL) {
+findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
-  td <- file.path(getwd(), "cache")
+  td <- file.path(getwd(), cacheDirName)
   if (file.exists(td)) return(td)
-  td <- file.path(getwd(), "..", "cache") # this is good when stuck in vignette sub-directory of a project
+  td <- file.path(dirname(getwd()), cacheDirName) # this is good when stuck in vignette sub-directory of a project
   if (file.exists(td)) return(td)
-  td <- file.path(getwd(), "../..", "cache") # this is good when stuck in vignette sub-directory of a project
+  td <- file.path(dirname(dirname(getwd())), cacheDirName) # parent of parent
   if (file.exists(td)) return(td)
-  stop("Could not find cache directory in working directory:", getwd())
+
+  # now we've looked where it should be, and still not found it, let's keep
+  # stepping up directories and recursively searching down
+  pwd <- getwd()
+  lastwd <- pwd
+  repeat {
+    message("searching path: ", pwd)
+    td <- list.dirs(path = pwd, recursive = T) %>% grep(pattern = cacheDirName, value = TRUE)
+    if (length(td) == 1) return(td)
+    if (length(td)  > 1) {
+      warning("found multiple matching cache paths:", td)
+      return(td[1])
+    }
+    # length = 0 i.e. no subdirs in pwd matching the cache dir name
+    lastwd <- pwd
+    pwd <- dirname(pwd)
+    # can't go higher than root. Probably undesirable to search all the way up
+    # to root...
+    if (pwd == lastwd) break
+  }
+  stop("Could not find cache directory starting from working directory:", getwd())
 }
 
 #' @title find path to a file in cache directory
 #' @param varName char
-#' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist, stop with error.
+#' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist,
+#'   stop with error.
 #' @export
 findCacheFilePath <- function(varName, cacheDir = NULL) {
   cacheDir <- findCacheDir(cacheDir)
@@ -81,8 +107,9 @@ findCacheFilePath <- function(varName, cacheDir = NULL) {
 #' @title save data compressed in data folder
 #' @description xz appears to fail on Windows, so use bzip2
 #'
-#' tools::checkRdaFiles(file.path("data", list.files(path = "data")))
-#' tools::resaveRdaFiles(file.path("data", list.files(path = "data")), compress = "xz")
+#'   tools::checkRdaFiles(file.path("data", list.files(path = "data")))
+#'   tools::resaveRdaFiles(file.path("data", list.files(path = "data")),
+#'   compress = "xz")
 #' @param varName char name of the variable in the calling frame to save
 #' @param suffix char additional characters before ".RData"
 #' @export
