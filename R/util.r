@@ -218,7 +218,7 @@ lsp <- function(package, all.names = TRUE, pattern) {
 #'   integer, with or without trailing zeros
 #' @return vector of POSIXlt date-times
 #' @export
-add_time_to_date <- function(tms, dts) {
+add_time_to_date <- function(tms, dts, verbose = FALSE) {
 
   if (length(dts) != length(tms))
     stop("must have matching lengths of date and time vectors. I got: %d and %d",
@@ -232,6 +232,7 @@ add_time_to_date <- function(tms, dts) {
     warning("suspect time is given with date, which invalidates this entire function. e.g. %s",
             dts[grepl(pattern="\\S\\s\\S", dts)][1])
 
+  # convert an error to a warning if cannot cast to Date
   dts <- tryCatch( {
     as.Date(dts) },
     error = function(cond) {
@@ -259,7 +260,7 @@ add_time_to_date <- function(tms, dts) {
   # drop colons, if any
   if (class(tms) == "character")  tms <- gsub(":", "", tms, fixed = TRUE)
 
-  message("working with times:", tms, capture = TRUE)
+  if (verbose) message(paste("working with times:", tms, collapse = ", ", sep = ", "), capture = TRUE)
 
   # convert to integer, then back to string later. THis is horrible.
   tms <- asIntegerNoWarn(tms)

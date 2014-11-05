@@ -1,3 +1,6 @@
+nTestNumes <- 10
+# increasing will (randomly) cover more test cases, but quickly slow down the test suite.
+
 #' @title test coverage
 #' @description This function searches for all functions in a package, traces
 #'   them all (just to see function entry, not all code paths), and parses the
@@ -144,7 +147,7 @@ bad_input <- c(
 #' @return vector length 5n+1 containing variety of difficult numbers for
 #'   testing purposes
 #' @export
-random_test_numbers <- function(n = 100,
+random_test_numbers <- function(n = nTestNumes,
                                 min = NULL,
                                 max = NULL,
                                 hole = NULL) {
@@ -173,7 +176,7 @@ random_test_numbers <- function(n = 100,
 #' @param dayspread integer number of days either side of origin to pick random dates from
 #' @return vector of Dates
 #' @export
-random_test_dates <- function(n = 100,
+random_test_dates <- function(n = nTestNumes,
                               origin=as.Date("2000-01-01"),
                               dayspread = 365*150) {
   as.Date(runif(n, min = -dayspread, max = dayspread), origin)
@@ -185,7 +188,7 @@ random_test_dates <- function(n = 100,
 #'   dates from
 #' @return vector of Dates
 #' @export
-random_test_posixlt_datetimes <- function(n = 100,
+random_test_posixlt_datetimes <- function(n = nTestNumes,
                                           origin = as.Date("2000-01-01"),
                                           dayspread = 365*150) {
   as.POSIXlt(as.POSIXlt(random_test_dates(n, origin, dayspread)) + runif(1, min = 0, max=24*60*60))
@@ -193,7 +196,7 @@ random_test_posixlt_datetimes <- function(n = 100,
 
 #' @rdname random_test_numbers
 #' @export
-random_test_letters <- function(n = 100, maxlen = 257) {
+random_test_letters <- function(n = nTestNumes, maxlen = 257) {
   paste(sample(c(LETTERS,letters, 0:9), runif(n, min = 0, max = maxlen), replace = TRUE), collapse = "")
 }
 

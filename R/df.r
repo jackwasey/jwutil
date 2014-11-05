@@ -36,7 +36,7 @@ logicalToBinary <- function(dframe) {
 #'   the data frame columns names
 #' @return data.frame with columns of logicals
 #' @export
-factorToCols <- function(fctr, prefix = "f") {
+factorToCols <- function(fctr, prefix = "f", verbose = FALSE) {
 
   if (is.null(fctr)) { stop("factorToCols: NULL passed instead of factor") }
   if (class(fctr) != "factor") { stop(paste("input data is class ", class(fctr))) }
@@ -52,7 +52,7 @@ factorToCols <- function(fctr, prefix = "f") {
   newdframe <- data.frame(fctr)
   names(newdframe) <- c('tempdeleteme')
 
-  message("looping to extract logical vectors from the provided factor")
+  if (verbose) message("looping to extract logical vectors from the provided factor")
   for (i in 1:length(levels(fctr))) {
     newColName = paste(prefix, levels(fctr)[i], sep=".")
     #message("factorToCols: creating new columns name: %s", newColName)
@@ -68,8 +68,8 @@ factorToCols <- function(fctr, prefix = "f") {
 #'   consider. Defaults to all fields
 #' @return data.frame with factors converted to multiple binary fields
 #' @export
-expandFactors <- function (dframe, considerFactors = names(dframe)) {
-  message("exFactor: converting factors in a data frame into logical vectors")
+expandFactors <- function (dframe, considerFactors = names(dframe), verbose = FALSE) {
+  if (verbose) message("exFactor: converting factors in a data frame into logical vectors")
 
   #message("considerFactors: %s", paste(considerFactors, collapse=', '))
 
@@ -80,7 +80,7 @@ expandFactors <- function (dframe, considerFactors = names(dframe)) {
 
   newCols <- vector()
   if (length(factorNames)>0) {
-    message("there are factors to be converted into values", paste(factorNames, collapse=", "))
+    if (verbose) message("there are factors to be converted into values", paste(factorNames, collapse=", "))
     for (mf in 1:length(factorNames)) {
       mfName = factorNames[mf]
       # simplify problem by removing unused factor levels (because we have
@@ -103,11 +103,11 @@ expandFactors <- function (dframe, considerFactors = names(dframe)) {
       dframe[,mfName]<-NULL
     }
   } else {
-    message("no factors found to convert in exFactor")
+    if (verbose) message("no factors found to convert in exFactor")
   }
   if (length(newCols) == 0) newCols <- NULL
 
-  message("newFields: %s", paste(newCols, collapse=", "))
+  if (verbose) message("newFields: %s", paste(newCols, collapse=", "))
 
   list(dat = dframe, newFields = newCols)
 }
@@ -213,7 +213,8 @@ mergeBetter <- function(x, y,
                         all.x = FALSE, all.y = FALSE,
                         affix = deparse(substitute(y)),
                         ifConflict = c("suffix", "prefix"),
-                        doRename = c("no", "suffix", "prefix")) {
+                        doRename = c("no", "suffix", "prefix"),
+                        verbose = FALSE) {
 
   ifConflict <- match.arg(ifConflict)
   doRename <- match.arg(doRename)
@@ -227,13 +228,13 @@ mergeBetter <- function(x, y,
   rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
   leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
   if (leftMergeDrops > 0 | rightMergeDrops > 0) {
-    message(
+    if (verbose) message(
       sprintf("mergeBetter: would drop %d out of %d from the new table, and %d out of %d from the existing data",
               leftMergeDrops, nrow(y), rightMergeDrops, nrow(x)
               )
     )
   } else {
-    message("no rows will be dropped in the merge - keys match exactly.
+    if (verbose) message("no rows will be dropped in the merge - keys match exactly.
             There may still be data differences in the two data frames.")
   }
 
@@ -241,12 +242,12 @@ mergeBetter <- function(x, y,
   duplicateFieldNames <- names(x)[ names(x) %in% names(y) & !names(x) == by.y]
 
   if (length(duplicateFieldNames) > 0 && doRename == "no") {
-    message("there are conflicting field names in the merge but
+    if (verbose) message("there are conflicting field names in the merge but
             no prefix or suffix was requested: ", duplicateFieldNames)
     for (n in duplicateFieldNames) {
       if (identical(x[n], y[n])) {
         y[n] <- NULL # drop the field if it is identical to another one with the same name
-        message("dropping identical field: ", n) # and warn?
+        if (verbose) message("dropping identical field: ", n) # and warn?
       } else { # rename individual conflicting fields
         if (ifConflict == "suffix") {
           newName <- paste(n, affix, sep=".")
@@ -258,7 +259,12 @@ mergeBetter <- function(x, y,
     }
   }
 
-  names(y) <- affixFields(names(y), by.y, affix, doRename)
+  names(y) <- affixFields(fieldNames = names(y),
+                          skipFields = by.y,
+                          affix = affix,
+                          doRename = doRename,
+                          # sep = default (".")
+                          verbose = verbose)
 
   #sprintf(name="jh.mergeBetter", "merging table '%s' using merged id field: %s, and new id field: %s", t, by,x, by.y)
   merged <- merge(
@@ -281,18 +287,23 @@ mergeBetter <- function(x, y,
 #' @param affix character
 #' @param doRename should be "suffix" or "prefix"
 #' @param sep default '.'
+#' @param verbose whether to display any informative messages
 #' @return character vector, same length as fieldNames
 #' @export
-affixFields <- function(fieldNames, skipFields, affix, doRename, sep=".") {
+affixFields <- function(fieldNames, skipFields, affix,
+                        doRename = c("no", "suffix", "prefix"),
+                        sep = ".", verbose = FALSE) {
+
+  doRename <- match.arg(doRename)
 
   if (doRename == "suffix") {
-    message("renaming first table field names with suffix")
-    fieldNames[fieldNames %nin% skipFields] <- paste(fieldNames[fieldNames %nin% skipFields], affix, sep=sep)
+    if (verbose) message("renaming first table field names with suffix")
+    fieldNames[fieldNames %nin% skipFields] <- paste(fieldNames[fieldNames %nin% skipFields], affix, sep = sep)
   } else if (doRename == "prefix") {
-    message("renaming first table field names with prefix")
-    fieldNames[fieldNames %nin% skipFields] <- paste(affix, fieldNames[fieldNames %nin% skipFields], sep=sep)
+    if (verbose) message("renaming first table field names with prefix")
+    fieldNames[fieldNames %nin% skipFields] <- paste(affix, fieldNames[fieldNames %nin% skipFields], sep = sep)
   } else {
-    message(name="not adding prefix or suffix to first table because doRename = ", doRename)
+    if (verbose) message(name="not adding prefix or suffix to first table because doRename = ", doRename)
   }
   fieldNames
 }

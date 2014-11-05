@@ -110,12 +110,12 @@ test_that("Converting separate dates and times", {
     }
   })
 
-  expect_true(is.na(add_time_to_date(NA,NA)))
+  expect_true(is.na(add_time_to_date(NA, NA)))
   #expect_true(is.na(add_time_to_date(as.POSIXlt(NA),NA)))
   #expect_true(is.na(add_time_to_date(NA,as.POSIXlt(NA))))
   #expect_true(is.na(add_time_to_date(as.POSIXlt(NA),as.POSIXlt(NA))))
 
-  expect_error(add_time_to_date(dts=7.7, tms="2020")) # numeric class should error for Date
+  expect_error(add_time_to_date(dts = 7.7, tms = "2020")) # numeric class should error for Date
 
   test_that("bad dates, give warnings regardless of time input", {
     for (jd in invalid_dates) {
@@ -140,7 +140,18 @@ test_that("Converting separate dates and times", {
   test_that("good inputs don't give errors, including NA", {
     for (jd in c(valid_dates, NA)) {
       for (jt in c(valid_times, NA)) {
-        expect_that(add_time_to_date(dts=jd, tms=jt), not(throws_error()), info=paste("classes: ", class(jd), class(jt), jd, jt, collapse=", ", sep=" "))
+        add_time_to_date(
+          dts = jd,
+          tms = jt
+        )
+        expect_that(
+          add_time_to_date(
+            dts = jd,
+            tms = jt
+            ),
+          #not(throws_error()), # not(throws_error()) appears to be a bug in testthat right now.
+          is_a("POSIXlt"),
+          info = paste("classes: ", class(jd), class(jt), jd, jt, collapse = ", ", sep=", "))
       }
     }
   })

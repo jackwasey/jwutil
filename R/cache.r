@@ -51,9 +51,20 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
 
 #' @title find path to the cache directory
 #' @description Searches a few likely places: - directory specified in
-#'   \code{cacheDir} - session-wide R option "cacheDir" - 'cache' directory
-#'   within the working directory - 'cache' directory within the parent
-#'   directory Fail with error if we have still not found it.
+#'   \code{cacheDir} - session-wide R option "cacheDir" - \code{cache} directory
+#'   within the working directory - \code{cache} directory within the parent
+#'   directory Fail with error if we have still not found it. Walking up the
+#'   directory tree is both time consuming, low yield, and unreliable, so this
+#'   is no longer done. Instead, a fall-back cache directory is used based on an
+#'   /code{options} setting jwutil.fallbackCacheDir, which defaults to ~/jwutil.
+#'   Would prefer to use /tmp but this doesn't exist on Windows, and using the R
+#'   built-in to generate a temporary directory is not possible with a static
+#'   option. Generating it on-the-fly would need passing the cache dir around
+#'   between functions or creating a singleton, all of which get too complicated
+#'   for this corner case. Of note, R CMD check creates a distinct directory
+#'   tree with all the testing files, and may not include the \code{cache}
+#'   directory from the working tree, e.g. if the cache directory is in
+#'   \code{.Rbuildignore}.
 #' @param varName char
 #' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL}
 #'   and doesn't exist, stop with error.
@@ -72,25 +83,34 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   if (file.exists(td)) return(td)
 
   # now we've looked where it should be, and still not found it, let's keep
-  # stepping up directories and recursively searching down
-  pwd <- getwd()
-  lastwd <- pwd
-  repeat {
-    message("searching path: ", pwd)
-    td <- list.dirs(path = pwd, recursive = T) %>% grep(pattern = cacheDirName, value = TRUE)
-    if (length(td) == 1) return(td)
-    if (length(td)  > 1) {
-      warning("found multiple matching cache paths:", td)
-      return(td[1])
-    }
-    # length = 0 i.e. no subdirs in pwd matching the cache dir name
-    lastwd <- pwd
-    pwd <- dirname(pwd)
-    # can't go higher than root. Probably undesirable to search all the way up
-    # to root...
-    if (pwd == lastwd) break
-  }
-  stop("Could not find cache directory starting from working directory:", getwd())
+  # stepping up directories and recursively searching down. This is a terrible idea, very slow.
+  #   pwd <- getwd()
+  #   lastwd <- pwd
+  #   repeat {
+  #     if ()
+  #     message("searching path: ", pwd)
+  #     td <- list.dirs(path = pwd, recursive = T) %>% grep(pattern = cacheDirName, value = TRUE)
+  #     if (length(td) == 1) return(td)
+  #     if (length(td)  > 1) {
+  #       warning("found multiple matching cache paths:", td)
+  #       return(td[1])
+  #     }
+  #     # length = 0 i.e. no subdirs in pwd matching the cache dir name
+  #     lastwd <- pwd
+  #     pwd <- dirname(pwd)
+  #     # can't go higher than root. Probably undesirable to search all the way up
+  #     # to root...
+  #     if (pwd == lastwd) break
+  #   }
+  message("Could not find cache directory starting from working directory: ", getwd())
+  message(paste(system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE), sep=", ", collapse=", "))
+  message("You can use the cacheDir= argument to specify it directly,
+          or check the cache was created in the correct place")
+  fb <- options("jwutil.fallbackCacheDir")
+  message("using fallback cache directory: ")
+  td <- getOption("jwutil.fallbackCacheDir")
+  if (!file.exists(td)) dir.create(td)
+  td
 }
 
 #' @title find path to a file in cache directory
