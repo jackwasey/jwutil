@@ -12,9 +12,9 @@ optName = "cachedir"
 #' @param cacheDir char
 #' @param force logical - reload data even if already available
 #' @export
-saveToCache <- function(varName, cacheDir = NULL) {
+saveToCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
   save(list = varName,
-       envir = parent.frame(),
+       envir = envir,
        file = findCacheFilePath(varName, cacheDir),
        compress = "xz")
 }
@@ -27,8 +27,8 @@ lsCache <- function(cacheDir = NULL) {
 
 #' @rdname cache
 #' @export
-loadFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
-  if (!force && exists(varName)) return(invisible(get(varName, envir = parent.frame())))
+loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = parent.frame()) {
+  if (!force && exists(varName)) return(invisible(get(varName, envir = envir)))
 
   fp <- findCacheFilePath(varName, cacheDir)
   if (file.exists(fp)) {
