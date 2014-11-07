@@ -8,9 +8,17 @@ optName = "cachedir"
 #' @description There are various memoise and cache functions in R but none did
 #'   what I wanted. These functions allow a package to cache data in a standard
 #'   place, or specified directory.
+#'
+#'   Global environment is used by default to save
 #' @param varName char
 #' @param cacheDir char
 #' @param force logical - reload data even if already available
+#' @param envir environment to start searching for the cached data (it may
+#'   already be in memory). Starts off with \code{parent.frame()} by default, and
+#'   /code{inherits}, so should find already loaded cache files in .GlobalEnv
+#'   eventually.
+#' @param load_envir target environment in which to load given cached data.
+#'   Default is \code{envir}
 #' @export
 saveToCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
   save(list = varName,
@@ -27,26 +35,29 @@ lsCache <- function(cacheDir = NULL) {
 
 #' @rdname cache
 #' @export
-loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = parent.frame()) {
-  if (!force && exists(varName)) return(invisible(get(varName, envir = envir)))
+loadFromCache <- function(varName, cacheDir = NULL, force = FALSE,
+                          envir = .GlobalEnv, load_envir = envir) {
+  if (!force && exists(varName))
+    return(invisible(get(varName, envir = envir, inherits = TRUE)))
 
   fp <- findCacheFilePath(varName, cacheDir)
   if (file.exists(fp)) {
-    load(file =  fp, envir = parent.frame())
-    return(invisible(get(varName, envir = parent.frame())))
+    load(file =  fp, envir = load_envir)
+    return(invisible(get(varName, envir = load_envir)))
   }
   stop("couldn't find '", varName, "' in path ", fp)
 }
 
 #' @rdname cache
 #' @export
-getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
-  if (!force && exists(varName)) return(get(varName))
+getFromCache <- function(varName, cacheDir = NULL, force = FALSE,
+                         load_envir = .GlobalEnv) {
+  if (!force && exists(varName)) return(get(varName, envir = load_envir, inherits = TRUE))
 
   # load into parent frame with its own varName, then return the data. This way
   # it is memory-cached also for future gets. Alternative is to memoise.
-  load(file =  findCacheFilePath(varName, cacheDir), envir = .GlobalEnv) # or parent.frame() ???
-  get(varName)
+  load(file = findCacheFilePath(varName, cacheDir), envir = load_envir) # or parent.frame() ???
+  get(varName, envir = load_envir)
 }
 
 #' @title find path to the cache directory
@@ -103,7 +114,9 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   #     if (pwd == lastwd) break
   #   }
   message("Could not find cache directory starting from working directory: ", getwd())
-  message(paste(system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE), sep=", ", collapse=", "))
+  if (platformIsLinux())
+    system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%
+    paste(sep=", ", collapse=", ") %>% message
   message("You can use the cacheDir= argument to specify it directly,
           or check the cache was created in the correct place")
   fb <- options("jwutil.fallbackCacheDir")
