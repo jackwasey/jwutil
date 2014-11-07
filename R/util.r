@@ -308,3 +308,17 @@ flatten_list <- function(..., na.rm = FALSE) {
     return(y[!is.na(y)])
   y
 }
+
+#' Are we running on Linux or Windows?
+#'
+#' @return logical
+#' @export
+platformIsLinux <- function() {
+  Sys.info()[["sysname"]] == "Linux"
+}
+
+#' @rdname platformIsLinux
+#' @export
+platformIsWindows <- function() {
+  Sys.info()[["sysname"]] == "Windows"
+}
