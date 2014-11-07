@@ -18,6 +18,8 @@ strip <- function (x, pattern = " ") {
 #' @return character vector
 #' @export
 trim <- function(x) {
+  if (class(x) == "data.frame") { stop("trimming data.frame gives unpredictable results.
+                                       Try trimming a column at a time using [s]apply.")}
   gsub("^\\s+|\\s+$", "", x)
 }
 
