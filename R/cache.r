@@ -40,23 +40,19 @@ loadFromCache <- function(varName, cacheDir = NULL, force = FALSE,
   if (!force && exists(varName))
     return(invisible(get(varName, envir = envir, inherits = TRUE)))
 
+
   fp <- findCacheFilePath(varName, cacheDir)
-  if (file.exists(fp)) {
-    load(file =  fp, envir = load_envir)
-    return(invisible(get(varName, envir = load_envir)))
-  }
-  stop("couldn't find '", varName, "' in path ", fp)
+  if (!file.exists(fp)) stop(sprintf("%s doesn't exist when trying to access cache", fp))
+  load(file =  fp, envir = load_envir)
+  invisible(get(varName, envir = load_envir))
 }
 
 #' @rdname cache
 #' @export
 getFromCache <- function(varName, cacheDir = NULL, force = FALSE,
                          load_envir = .GlobalEnv) {
-  if (!force && exists(varName)) return(get(varName, envir = load_envir, inherits = TRUE))
-
-  # load into parent frame with its own varName, then return the data. This way
-  # it is memory-cached also for future gets. Alternative is to memoise.
-  load(file = findCacheFilePath(varName, cacheDir), envir = load_envir) # or parent.frame() ???
+  loadFromCache(varName = varName, cacheDir = cacheDir, force = force,
+                envir = load_envir, load_envir = load_envir)
   get(varName, envir = load_envir)
 }
 
@@ -82,15 +78,24 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE,
 #' @param cacheDirName single character string, defaults to 'jwcache'. 'cache'
 #'   alone is not distinctive, and conflicts with other things, such as the
 #'   cache directory in the vignettes directory.
+#' @import magrittr
 #' @export
 findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
   td <- file.path(getwd(), cacheDirName)
   if (file.exists(td)) return(td)
-  td <- file.path(dirname(getwd()), cacheDirName) # this is good when stuck in vignette sub-directory of a project
+
+  # parents: this is good when stuck e.g. in vignette sub-directory of a project
+  td <- getwd() %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
-  td <- file.path(dirname(dirname(getwd())), cacheDirName) # parent of parent
+  td <- getwd() %>% dirname %>% dirname %>% file.path(cacheDirName) #parent of parent
+  if (file.exists(td)) return(td)
+  td <- getwd() %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName) # parent of parent of parent
+  if (file.exists(td)) return(td)
+  td <- getwd() %>%
+    dirname %>% dirname %>% dirname %>% dirname %>%
+    file.path(cacheDirName) # parent of parent of parent of parent (believe it or not, this has use cases)
   if (file.exists(td)) return(td)
 
   # now we've looked where it should be, and still not found it, let's keep
