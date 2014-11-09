@@ -1,4 +1,4 @@
-nTestNumes <- 10
+nTestNumes <- 30
 # increasing will (randomly) cover more test cases, but quickly slow down the test suite.
 
 #' @title test coverage
@@ -84,16 +84,6 @@ lsf <- function(pkg) {
   funcs
 }
 
-#' @title shuffle
-#' @description shuffle the order of a vector or list. This is to improve
-#'   quality of bad data to throw at functions when testing.
-#' @param x list or vector
-#' @return list or vector of same length as input, (probably) in a different
-#'   order
-#' @export
-shuffle <- function(x)
-  sample(x, length(x), replace = FALSE, prob = NULL)
-
 #' @title convert numbers to long and float types
 #' @description intended for generating values for stress testing functions
 #' @param ... list of values to convert to long and double
@@ -102,12 +92,12 @@ shuffle <- function(x)
 #' @export
 numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   #browser()
-  x <- flatten_list(list(...))
+  x <- flattenList(list(...))
   # drop any NA values. Very big numbers not representable by 32 bit integers,
   # give NA with warning. For test case generation, usually we will want to
   # remove NAs.
   suppressWarnings(
-    x <- flatten_list(list(as.integer(x)), list(as.double(x)), na.rm = na.rm)
+    x <- flattenList(list(as.integer(x)), list(as.double(x)), na.rm = na.rm)
   )
   x
 }
@@ -156,8 +146,9 @@ random_test_numbers <- function(n = nTestNumes,
          sqrt(2),
          runif(n),
          runif(n, min = -1, max = 0),
-         runif(n, max = .Machine$double.xmax),
-         runif(n, min = -.Machine$double.xmax),
+         runif(n, min = 0, max = 1),
+         runif(n, max = ifelse(is.null(max), .Machine$double.xmax, max)),
+         runif(n, min = ifelse(is.null(max), -.Machine$double.xmax, min)),
          runif(n, min = -n * .Machine$double.xmin, max = n * .Machine$double.xmin)
   )
   #drop any generated numbers that didn't match the constraints
@@ -169,6 +160,18 @@ random_test_numbers <- function(n = nTestNumes,
     x <- x[!(x >= hole[1] & x <= hole[2])]
   }
   x
+}
+
+#' @rdname random_test_numbers
+#' @export
+random_test_integers <- function(n = nTestNumes,
+                                 min = -.Machine$integer.max,
+                                 max = .Machine$integer.max,
+                                 hole = NULL) {
+  suppressWarnings(
+    x <- unique(as.integer(random_test_numbers(n = n, min = min, max = max, hole = hole)))
+  )
+  x[!is.na(x)]
 }
 
 #' @rdname random_test_numbers
@@ -212,3 +215,4 @@ extreme_numbers <- c(
   .Machine$double.xmax,
   -.Machine$double.xmin,
   -.Machine$double.xmax)
+

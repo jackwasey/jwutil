@@ -48,7 +48,7 @@ test_that("Converting separate dates and times", {
 
   # overall stategy: anything invalid gives error. Consider giving warnings for syntactically correct but invalid inputs, e.g. time "2505" but error for "55555"
 
-  not_dates_or_times <- flatten_list(extreme_numbers, random_test_letters(), random_test_numbers(hole=c(0,2400))) # NA should just give an NA
+  not_dates_or_times <- flattenList(extreme_numbers, random_test_letters(), random_test_numbers(hole=c(0,2400))) # NA should just give an NA
 
   #baseposix <- as.POSIXlt("2010-06-30") # date without time
   #basedate <- as.Date("2010-06-30")
@@ -62,6 +62,7 @@ test_that("Converting separate dates and times", {
     "2015-10-10")
 
   invalid_short_dates <- list(
+    # can't allow 2 digit years, even if as.Date could convert them, because high chance of ambiguity, e.g. with birth dates at the begniing of either century.
     "14-12-31",
     "200-12-31",
     "20141231",
@@ -80,7 +81,7 @@ test_that("Converting separate dates and times", {
   #posixvaliddateonly <- as.POSIXlt(validdateonly, format="%Y-%m-%d")
 
   # unlist with recursive FALSE means a list of mixed type is returned, but flattened to depth of one.
-  invalid_dates <- flatten_list(invalid_short_dates, invalid_long_dates)
+  invalid_dates <- flattenList(invalid_short_dates, invalid_long_dates)
 
   #TODO: include nonsense numbers and strings in the bad dates and times, randomly generated
   #TODO: include empty strings and NULLs
@@ -88,14 +89,14 @@ test_that("Converting separate dates and times", {
   numbertimes <- numbers_to_long_and_float(2359, 959, 10, 1, 0, na.rm=TRUE)
   stringtimes <- list("2359","959","0","1") # no leading zeros
   paddedtimes <- list("0959","100","0000","0001")
-  numbertimesbad <- flatten_list(
+  numbertimesbad <- flattenList(
     -0.1, 0.7, 100.6,
     numbers_to_long_and_float(2400, 2401, 999, -1, 2500, -1.1, 12345, 100000000000000) # technically 2400 is ISO POSIX valid, but I want an error in this case
   )
   stringtimesbad <- c("2401", "999", "0999", "9999", "-1", "100.5", "2500", "-0.1", "1-1")
-  valid_times <- flatten_list(numbertimes, stringtimes, paddedtimes)
-  invalid_times <- flatten_list(numbertimesbad, stringtimesbad, not_dates_or_times, valid_dates, invalid_long_dates, invalid_short_dates)
-  #"invalid times: %s", paste(invalid_times, collapse=" "
+  valid_times <- flattenList(numbertimes, stringtimes, paddedtimes)
+  invalid_times <- flattenList(numbertimesbad, stringtimesbad, not_dates_or_times, valid_dates, invalid_long_dates, invalid_short_dates)
+  #"invalid times: %s", paste(invalid_times, collapse = " "
 
   # nested tests, now the harness has been set up...
   test_that("completely stupid inputs, e.g. giving (valid) dates as time field", {
@@ -103,9 +104,18 @@ test_that("Converting separate dates and times", {
     for (jd in valid_dates) { # use valid input, but in the wrong place
       for (jt in valid_times) {
         # if Date class is put in time field, then this is a programming error, not a data error, so stop.
-        expect_error(add_time_to_date(tms=as.Date(jd), dts=jd), label="incorrectly put date in time column", info=paste(jd, sep=" ", collapse=", "))
-        expect_error(add_time_to_date(dts=c(jd,jd), tms=c(jt,jt,jt)), info=paste(jd, jt, sep=" ", collapse=", ")) # vector lengths differ
-        expect_error(add_time_to_date(dts=c(jd,jd), tms=jt), info=paste(jd, jt, sep=" ", collapse=", ")) # vector lengths differ
+        expect_error(
+          add_time_to_date(tms=as.Date(jd), dts = jd),
+          label="incorrectly put date in time column",
+          info = paste(jd, sep = " ", collapse=", "))
+
+        expect_error(
+          add_time_to_date(dts=c(jd,jd), tms=c(jt,jt,jt)),
+          info = paste(jd, jt, sep = " ", collapse=", ")) # vector lengths differ
+
+        expect_error(
+          add_time_to_date(dts=c(jd,jd), tms=jt),
+          info = paste(jd, jt, sep = " ", collapse=", ")) # vector lengths differ
       }
     }
   })
@@ -116,20 +126,36 @@ test_that("Converting separate dates and times", {
   #expect_true(is.na(add_time_to_date(as.POSIXlt(NA),as.POSIXlt(NA))))
 
   expect_error(add_time_to_date(dts = 7.7, tms = "2020")) # numeric class should error for Date
+  expect_error(add_time_to_date(dts = 20141231, tms = "2020")) # numeric class should error for Date
 
-  test_that("bad dates, give warnings regardless of time input", {
+  test_that("bad dates, give errors, regardless of time input", {
     for (jd in invalid_dates) {
-      for (jt in flatten_list(valid_times, invalid_times)) {
-        #paste("classes: ", class(jd), class(jt), "values: ", jd, jt, collapse=" ", sep=" ")
-        expect_warning(add_time_to_date(dts=jd, tms=jt), info=paste("classes: ", class(jd), class(jt), "values: ", jd, jt, collapse=" ", sep=" "))
+      for (jt in flattenList(valid_times, invalid_times)) {
+        expect_that(
+          add_time_to_date(dts = jd, tms = jt),
+          throws_error(),
+          info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s", class(jd), class(jt), jd, jt)
+        )
       }
     }
   })
 
-  test_that("bad times give warnings, regardless of date input", {
-    for (jd in flatten_list(valid_dates, invalid_dates)) {
+  test_that("bad times give warnings, with good date input", {
+    for (jd in flattenList(valid_dates)) {
       for (jt in invalid_times) {
-        expect_warning(add_time_to_date(dts=jd, tms=jt), info=paste("classes: ", class(jd), class(jt),  "values: ", jd, jt, collapse=" ", sep=" "))
+
+        expect_that(
+          add_time_to_date(dts = jd, tms = jt),
+          testthat::not(testthat::throws_error()),
+          info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s", class(jd), class(jt), jd, jt)
+        )
+
+        expect_that(
+          add_time_to_date(dts = jd, tms = jt),
+          testthat::gives_warning(),
+          info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s", class(jd), class(jt), jd, jt)
+        )
+
       }
     }
   })
@@ -137,21 +163,28 @@ test_that("Converting separate dates and times", {
   #can't give datetime for as date: we're expecting just a date
   expect_error(add_time_to_date(fulldates, rep(x="1230", times=length(fulldates))))
 
-  test_that("good inputs don't give errors, including NA", {
+  test_that("good inputs don't give errors or warnings, including NA", {
     for (jd in c(valid_dates, NA)) {
       for (jt in c(valid_times, NA)) {
         add_time_to_date(
           dts = jd,
           tms = jt
         )
+
         expect_that(
-          add_time_to_date(
-            dts = jd,
-            tms = jt
-            ),
-          #not(throws_error()), # not(throws_error()) appears to be a bug in testthat right now.
+          add_time_to_date(dts = jd, tms = jt),
+          testthat::not(throws_error()),
+          info = paste("classes: ", class(jd), class(jt), " data: ", jd, jt, collapse = ", ", sep=", "))
+
+        expect_that(
+          add_time_to_date(dts = jd, tms = jt),
+          testthat::not(gives_warning()),
+          info = paste("classes: ", class(jd), class(jt), " data: ", jd, jt, collapse = ", ", sep=", "))
+
+        expect_that(
+          add_time_to_date(dts = jd, tms = jt),
           is_a("POSIXlt"),
-          info = paste("classes: ", class(jd), class(jt), jd, jt, collapse = ", ", sep=", "))
+          info = paste("classes: ", class(jd), class(jt), " data: ", jd, jt, collapse = ", ", sep=", "))
       }
     }
   })
@@ -159,3 +192,148 @@ test_that("Converting separate dates and times", {
 
 })
 #
+
+test_that("Count cumulative non-NA values in times", {
+
+  data.frame(fa = c(1,2,3),
+             fb = c(NA,NA,NA),
+             fc = c(99,99,NA))
+
+  expect_equivalent(
+    countNonNaCumulative( data.frame(fa = c(1,2,3),
+                                     fb = c(NA,NA,NA),
+                                     fc = c(99,99,NA))
+    ),
+    setNames(c(3,3,3), c("fa","fb","fc")))
+
+  expect_equivalent(
+    countNonNaCumulative( data.frame(fa = c(1,NA,3),
+                                     fb = c(NA,NA,NA),
+                                     fc = c(99,99,NA))
+    ),
+    setNames(c(2,2,3), c("fa","fb","fc")))
+
+  expect_equivalent(
+    countNonNaCumulative( data.frame(fa = c(NA,2,3),
+                                     fb = c(NA,NA,NA),
+                                     fc = c(99,99,NA))
+    ),
+    setNames(c(2,2,3), c("fa","fb","fc")))
+
+  expect_equivalent(
+    countNonNaCumulative( data.frame(fa = c(NA,NA,NA),
+                                     fb = c(NA,NA,NA),
+                                     fc = c(NA,NA,NA))
+    ),
+    setNames(c(0,0,0), c("fa","fb","fc")))
+
+  expect_equivalent(
+    countNonNaCumulative( data.frame(fa = c(1:3),
+                                     fb = c(5:7),
+                                     fc = c(9:11))
+    ),
+    setNames(c(3,3,3), c("fa","fb","fc")))
+
+})
+
+test_that("allIsNumeric", {
+  expect_true(allIsNumeric(1))
+  expect_true(allIsNumeric(c(1,2)))
+  expect_true(allIsNumeric(1.1))
+  expect_true(allIsNumeric(-1))
+  expect_true(allIsNumeric(pi))
+  expect_true(allIsNumeric(c(-1,0,0.1,pi)))
+  expect_true(allIsNumeric(zeroes))
+  expect_true(allIsNumeric(random_test_numbers()))
+  expect_true(allIsNumeric(extreme_numbers))
+  expect_true(allIsNumeric(NA_integer_))
+  expect_true(allIsNumeric(NA_real_))
+  #expect_false(allIsNumeric(NA_character_)) this is just an NA, so will be true.
+  expect_true(allIsNumeric(random_test_dates())) # dates are typeof 'double'
+
+  expect_false(allIsNumeric(random_test_letters()))
+
+  expect_error(allIsNumeric(bad_input))
+
+})
+
+test_that("allIsInteger", {
+  expect_true(allIsInteger(1))
+  expect_true(allIsInteger(integer(0)))
+  expect_true(allIsInteger(c())) # class = typeof = NULL
+  expect_true(allIsInteger(c(1, 2)))
+  expect_true(allIsInteger(-1))
+  expect_true(allIsInteger(zeroes))
+  expect_true(allIsInteger(random_test_integers()))
+  expect_true(allIsInteger(NA_integer_, na.rm = T))
+  expect_true(allIsInteger(NA_real_, na.rm = T))
+  expect_true(allIsInteger(NA_integer_))
+  expect_true(allIsInteger(NA_real_))
+  #expect_false(allIsInteger(NA_character_)) this is just an NA, so will be true.
+  expect_true(allIsInteger(1.00000000005))
+  expect_true(allIsInteger(1.005, tol = 0.01))
+  expect_true(allIsInteger(c(1.005, NA_integer_), tol = 0.01, na.rm = T))
+  expect_true(allIsInteger(c(1.005, NA_character_), tol = 0.01, na.rm = T)) # I don't care what sort of NA is given:
+
+  expect_false(allIsInteger(random_test_numbers()))
+  expect_false(allIsInteger(pi))
+  expect_false(allIsInteger(1.000000002, ))
+  expect_false(allIsInteger(-0.1))
+  expect_false(allIsInteger("jack"))
+  expect_false(allIsInteger(random_test_letters()))
+  expect_false(allIsInteger(c(-1, 0, 0.1, pi)))
+
+  expect_error(allIsInteger(bad_input))
+})
+
+test_that("areIntegers", {
+  expect_true(areIntegers(1))
+  expect_identical(areIntegers(integer(0)), logical(0))
+  expect_that(areIntegers(c()), testthat::is_identical_to(logical(0))) # class = typeof = NULL
+  expect_that(areIntegers(c(1, 2)), testthat::equals(c(TRUE, TRUE)))
+  expect_true(areIntegers(-1))
+  expect_true(all(areIntegers(zeroes)))
+  expect_that(all(areIntegers(random_test_integers())), is_true())
+  expect_true(areIntegers(1.00000000005)) # inside default tolerance
+  expect_that(areIntegers(NA_integer_, na.ignore = T), testthat::equals(NA_integer_))
+  expect_that(areIntegers(NA_real_, na.ignore = T), testthat::equals(NA_integer_))
+  expect_that(areIntegers(NA_character_, na.ignore = T), testthat::equals(NA_integer_))
+  expect_that(areIntegers(NA_integer_, na.ignore = F), testthat::is_false())
+  expect_that(areIntegers(NA_real_, na.ignore = F), testthat::is_false())
+  expect_that(areIntegers(NA_character_, na.ignore = F), testthat::is_false())
+  expect_true(areIntegers(1.005, tol = 0.01))
+
+  # multi value:
+  expect_that(areIntegers(c(1, 0, -1)), testthat::equals(c(T, T, T)))
+  expect_that(areIntegers(zeroes), testthat::equals(rep(TRUE, times = length(zeroes))))
+  expect_that(areIntegers(random_test_integers()), testthat::equals(rep(TRUE, times = length(random_test_integers()))))
+  expect_that(
+    areIntegers(c(1 + 1e-10, 1.1, 1 - 1e-10)),
+    testthat::equals(c(TRUE, FALSE, TRUE))) # both inside default tolerance
+  expect_that(
+    areIntegers(c(NA_integer_, NA_real_, NA_character_), na.ignore = T),
+    testthat::equals(c(NA_integer_, NA_integer_, NA_integer_)))
+  expect_that(
+    areIntegers(c(NA_integer_, 1.1, 2.0), na.ignore = F),
+    testthat::equals(c(FALSE, FALSE, TRUE)))
+  expect_that(
+    areIntegers(c(NA_integer_, 1.1, 2.0), na.ignore = T),
+    testthat::equals(c(NA_integer_, FALSE, TRUE)))
+  expect_that(
+    areIntegers(c(NA_integer_, NA_real_, NA_character_), na.ignore = F),
+    testthat::equals(c(FALSE, FALSE, FALSE)))
+  expect_that(areIntegers(c(0.995, 1.005), tol = 0.01), testthat::equals(c(T, T)))
+  expect_that(areIntegers(c(pi, sqrt(2))), testthat::equals(c(FALSE, FALSE)))
+
+  expect_false(areIntegers("jack"))
+  expect_false(areIntegers(random_test_letters()))
+
+  expect_error(areIntegers(c(1,2), tol = "cabbages"))
+  expect_error(areIntegers(c(1,2), tol = c(0.01, 0.005)))
+  expect_error(areIntegers(c(1,2), na.ignore = c(T, T)))
+  expect_error(areIntegers(c(1,2), na.ignore = "marfanoid"))
+  expect_error(areIntegers(c(1,2), na.ignore = TRUE, tol = "cabbages"))
+  expect_error(areIntegers(c(1,2), na.ignore = "marfanoid", tol = 0.01))
+  expect_error(areIntegers(c(1,2), na.ignore = FALSE, tol = "0.01"))
+
+})

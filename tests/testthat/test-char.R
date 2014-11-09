@@ -11,6 +11,9 @@ test_that("trim with empty inputs" , {
 })
 
 test_that("trim with acceptable inputs" , {
+  expect_equal(trim(NA_character_), NA_character_)
+  # not necesarily desirable, but this states the expectation.
+  expect_equal(trim(NA_integer_), NA_character_)
   expect_equal(trim("jack"), "jack")
   expect_equal(trim("jack "), "jack")
   expect_equal(trim(" jack "), "jack")
@@ -22,4 +25,7 @@ test_that("trim with acceptable inputs" , {
   expect_equal(trim("ja ck "), "ja ck")
   expect_equal(trim(" ja ck "), "ja ck")
   expect_equal(trim(" ja ck"), "ja ck")
-})
+
+  expect_equal(trim(c(" jack", "hayley ")), c("jack", "hayley"))
+
+  })

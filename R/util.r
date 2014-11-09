@@ -3,14 +3,28 @@
 #'   throwing warning derived from Hmsic package
 #' @param x is a character vector to be tested
 #' @param extras is a vector of character strings which are counted as NA
-#'   values, defaults to '.' and 'NA'
+#'   values, defaults to '.' and 'NA'. Also allow \code{NA}.
 #' @return logical
 #' @export
-allIsNumeric <- function(x, extras=c('.','NA')) {
-  old <- options(warn=-1)
+allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
+  old <- options(warn = -1)
   on.exit(options(old))
   xs <- x[x %nin% c('',extras)]
   !any(is.na(as.numeric(xs)))
+}
+
+#' @title check whether vector represents all integer values, not that the same
+#'   as \code{is.integer}
+#' @description check whether all the items of input vector are integer
+#'   as.integer
+#' @param x is a vector to be tested
+#' @return logical
+#' @export
+allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE) {
+  all(
+    areIntegers(x, tol = tol, na.ignore = TRUE), # don't count NA as false automatically
+    na.rm = na.rm
+  )
 }
 
 #' @title convert factor or vector to character without warnings
@@ -33,6 +47,9 @@ asCharacterNoWarn <- function(x) {
 #'   errors can be a problem going from numeric to integer, so consider adding
 #'   tolerance to this conversion. \code{asIntegerNoWarn} silently
 #'   \code{\link{floor}}s.
+#'
+#'   "are" functions return a value for each input, where is "allIs" functions
+#'   return a single logical.
 #' @param x is a vector, probably of numbers of characters
 #' @return numeric vector, may have NA values
 #' @export
@@ -50,11 +67,20 @@ asIntegerNoWarn <- function(x) {
 }
 
 #' @rdname asNumericNoWarn
+#' @param na.ignore logical, if TRUE will pass through NA values, otherwise,
+#'   they are marked FALSE.
 #' @export
-areIntegers <- function(x) {
+areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
+  stopifnot(is.numeric(tol), is.logical(na.ignore))
+  stopifnot(length(tol) <= 1, length(na.ignore) <= 1)
+  nas <- is.na(x)
   n <- asNumericNoWarn(x)
-  i <- abs(n - floor(n)) < 1e-9
+  i <- abs(n - round(n)) < tol
   i[is.na(i)] <- FALSE
+  if (!na.ignore)
+    i[nas] <- FALSE
+  else
+    i[nas] <- NA_integer_
   i
 }
 
@@ -209,9 +235,8 @@ lsp <- function(package, all.names = TRUE, pattern) {
 }
 
 #' @title convert separate lists of dates and times to POSIXlt objects
-#' @description PeriopAIM data comes conveniently with a single date and a load
-#'   of integers representing times. This function restores the full date-time.
-#'   It does not know if midnight happened before the time was recorded...
+#' @description Some datetime data is presented as a separate dates and times.
+#'   This function restores the full date-time.
 #' @param dts vector of dates, in string format \%Y-\%m-\%d or simple R Date
 #'   objects
 #' @param tms vector of times, i.e. number in range 0 to 2400, as string or
@@ -228,32 +253,32 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
     stop(paste("date must be of class Date, character, but received: %s",
                class(dts)))
 
+  # if a time part is given in the date field, this is an error
   if (class(dts) == "character" && any(grepl(pattern="\\S\\s\\S", dts)))
-    warning("suspect time is given with date, which invalidates this entire function. e.g. %s",
-            dts[grepl(pattern="\\S\\s\\S", dts)][1])
+    stop("suspect time is already given with date argument, which invalidates this entire function. e.g. %s",
+         dts[grepl(pattern="\\S\\s\\S", dts)][1])
 
-  # convert an error to a warning if cannot cast to Date
-  dts <- tryCatch( {
-    as.Date(dts) },
-    error = function(cond) {
-      warning("Date '%s' is ambiguous. (%s). Returning NA...", dts, cond)
-      NA
-    }
-  )
+  # convert to Date (may already be Date, but that's fine) any conversion error
+  # in any item will result in an error. an alternative strategy would be to
+  # individually tryCatch converting each Date, returning warnings, NA, or
+  # detailed error message. TODO
+  dts <- as.Date(dts)
 
   # a single NA value could appear as type logical
   if (class(tms) %nin% c("numeric","integer","character") && !is.na(tms))
     stop("time must be numeric or character, but got class for times of '%s'.",
          class(tms))
 
-  # this is a data error, not a programming error, so just warn and set NA
+  # this is a data error, not a programming error, stop
   if (any(dts < as.Date("1850-01-01"), na.rm = TRUE)) {
-    warning("some dates are before 1850: ", dts[dts<as.Date("1850-01-01")])
-    dts[dts < as.Date("1850-01-01")] <- NA
+    stop("some dates are before 1850: ", dts[dts<as.Date("1850-01-01")])
+    # could alternatively set NA, warn and continue:
+    # dts[dts < as.Date("1850-01-01")] <- NA
   }
 
-  if (!all(isValidTime(tms))) {
-    warning("invalid times received, replacing with NA")
+  # let NA be valid:
+  if (!all(isValidTime(tms, na.rm = TRUE))) {
+    warning(sprintf("%d invalid time(s) received, replacing with NA", sum(isValidTime(tms, na.rm = TRUE))))
     tms[!isValidTime(tms)] <- NA
   }
 
@@ -277,10 +302,12 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 #' @title check if a time is valid in 24h clock
 #' @description allow leading and trailing space, optional colon in middle, 2400 is not allowed.
 #' @param tms is a vector of characters which may represent times
+#' @param na.rm logical if true, will ignore NA values, otherwise these will test as invalid.
 #' @return logical vector, with NA out if NA given
 #' @export
-isValidTime <- function(tms) {
-  grepl(pattern="^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
+isValidTime <- function(tms, na.rm = FALSE) {
+  if (na.rm) tms <- tms[!is.na(tms)]
+  grepl(pattern = "^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
   # Don't do this, or we can't use logical test in case all vals are NA. validTimes[is.na(tms)] <- NA # grepl only gives T or F output
   #TODO: write tests...
 }
@@ -300,11 +327,58 @@ listTrim  <-  function(x){   # delele null/empty entries in a list
 #' @return list without nested lists, objects with preserved data types
 #' @source https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
 #' @export
-flatten_list <- function(..., na.rm = FALSE) {
+flattenList <- function(..., na.rm = FALSE) {
   x <- list(...)
   y <- list()
   rapply(x, function(x) y <<- c(y,x))
   if (na.rm)
     return(y[!is.na(y)])
   y
+}
+
+#' @title determine whether a list is nested
+#' @param x list
+#' @return single logical
+#' @export
+isFlat <- function(x)
+  unlist(x, recursive = TRUE) == unlist(x, recursive = FALSE)
+
+#' @title shuffle
+#' @description randomly shuffle the order of a vector or list. This is to improve
+#'   quality of bad data to throw at functions when testing.
+#' @param x list or vector
+#' @return list or vector of same length as input, (probably) in a different
+#'   order
+#' @export
+shuffle <- function(x)
+  sample(x = x, size = length(x), replace = FALSE, prob = NULL)
+
+#' @title generate all permutations of input, reusing values in each result row
+#' @description systematically permute the input vector or list
+#' @param x list or vector
+#' @return data frame, each row being one permutation
+#' @export
+permuteWithRepeats <- function(x)
+  expand.grid(rep(list(unlist(x)), times = length(unlist(x))))
+
+#' @title generate all permutations of input
+#' @description systematically permute the input vector or list, which is very
+#'   slow for long x. Am amazed something this simple isn't either in base R, or
+#'   in a straightforward form in a package.
+#' @param x list or vector
+#' @return data frame, each row being one permutation
+#' @export
+permute <- function(x) {
+  # break out of recursion:
+  if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
+
+  res <- c()
+
+  #take each one and place it first, then recurse the rest:
+  for (element in 1:length(x)) {
+    sub_combs <- Recall(x[-element]) # recurse
+    new_combs <- cbind(x[element], sub_combs)
+    res <- rbind(res, new_combs)
+  }
+  unname(res)
 }
