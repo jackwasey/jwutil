@@ -8,9 +8,17 @@ optName = "cachedir"
 #' @description There are various memoise and cache functions in R but none did
 #'   what I wanted. These functions allow a package to cache data in a standard
 #'   place, or specified directory.
+#'
+#'   Global environment is used by default to save
 #' @param varName char
 #' @param cacheDir char
 #' @param force logical - reload data even if already available
+#' @param envir environment to start searching for the cached data (it may
+#'   already be in memory). Starts off with \code{parent.frame()} by default, and
+#'   /code{inherits}, so should find already loaded cache files in .GlobalEnv
+#'   eventually.
+#' @param load_envir target environment in which to load given cached data.
+#'   Default is \code{envir}
 #' @export
 saveToCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
   save(list = varName,
@@ -27,26 +35,25 @@ lsCache <- function(cacheDir = NULL) {
 
 #' @rdname cache
 #' @export
-loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = parent.frame()) {
-  if (!force && exists(varName)) return(invisible(get(varName, envir = envir)))
+loadFromCache <- function(varName, cacheDir = NULL, force = FALSE,
+                          envir = .GlobalEnv, load_envir = envir) {
+  if (!force && exists(varName))
+    return(invisible(get(varName, envir = envir, inherits = TRUE)))
+
 
   fp <- findCacheFilePath(varName, cacheDir)
-  if (file.exists(fp)) {
-    load(file =  fp, envir = parent.frame())
-    return(invisible(get(varName, envir = parent.frame())))
-  }
-  stop("couldn't find '", varName, "' in path ", fp)
+  if (!file.exists(fp)) stop(sprintf("%s doesn't exist when trying to access cache", fp))
+  load(file =  fp, envir = load_envir)
+  invisible(get(varName, envir = load_envir))
 }
 
 #' @rdname cache
 #' @export
-getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
-  if (!force && exists(varName)) return(get(varName))
-
-  # load into parent frame with its own varName, then return the data. This way
-  # it is memory-cached also for future gets. Alternative is to memoise.
-  load(file =  findCacheFilePath(varName, cacheDir), envir = .GlobalEnv) # or parent.frame() ???
-  get(varName)
+getFromCache <- function(varName, cacheDir = NULL, force = FALSE,
+                         load_envir = .GlobalEnv) {
+  loadFromCache(varName = varName, cacheDir = cacheDir, force = force,
+                envir = load_envir, load_envir = load_envir)
+  get(varName, envir = load_envir)
 }
 
 #' @title find path to the cache directory
@@ -71,15 +78,24 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE) {
 #' @param cacheDirName single character string, defaults to 'jwcache'. 'cache'
 #'   alone is not distinctive, and conflicts with other things, such as the
 #'   cache directory in the vignettes directory.
+#' @import magrittr
 #' @export
 findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
   td <- file.path(getwd(), cacheDirName)
   if (file.exists(td)) return(td)
-  td <- file.path(dirname(getwd()), cacheDirName) # this is good when stuck in vignette sub-directory of a project
+
+  # parents: this is good when stuck e.g. in vignette sub-directory of a project
+  td <- getwd() %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
-  td <- file.path(dirname(dirname(getwd())), cacheDirName) # parent of parent
+  td <- getwd() %>% dirname %>% dirname %>% file.path(cacheDirName) #parent of parent
+  if (file.exists(td)) return(td)
+  td <- getwd() %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName) # parent of parent of parent
+  if (file.exists(td)) return(td)
+  td <- getwd() %>%
+    dirname %>% dirname %>% dirname %>% dirname %>%
+    file.path(cacheDirName) # parent of parent of parent of parent (believe it or not, this has use cases)
   if (file.exists(td)) return(td)
 
   # now we've looked where it should be, and still not found it, let's keep
@@ -103,7 +119,9 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   #     if (pwd == lastwd) break
   #   }
   message("Could not find cache directory starting from working directory: ", getwd())
-  message(paste(system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE), sep=", ", collapse=", "))
+  if (platformIsLinux())
+    system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%
+    paste(sep=", ", collapse=", ") %>% message
   message("You can use the cacheDir= argument to specify it directly,
           or check the cache was created in the correct place")
   fb <- options("jwutil.fallbackCacheDir")

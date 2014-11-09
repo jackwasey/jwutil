@@ -382,3 +382,17 @@ permute <- function(x) {
   }
   unname(res)
 }
+
+#' Are we running on Linux or Windows?
+#'
+#' @return logical
+#' @export
+platformIsLinux <- function() {
+  Sys.info()[["sysname"]] == "Linux"
+}
+
+#' @rdname platformIsLinux
+#' @export
+platformIsWindows <- function() {
+  Sys.info()[["sysname"]] == "Windows"
+}
