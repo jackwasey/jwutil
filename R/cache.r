@@ -133,7 +133,7 @@ assignCache <- function(varName, value,
 #'   cache directory in the vignettes directory.
 #' @import magrittr
 #' @export
-findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
+findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FALSE) {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
   if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
   td <- file.path(getwd(), cacheDirName)
@@ -171,14 +171,14 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache") {
   #     # to root...
   #     if (pwd == lastwd) break
   #   }
-  message("Could not find cache directory starting from working directory: ", getwd())
-  if (platformIsLinux())
+  if (verbose) message("Could not find cache directory starting from working directory: ", getwd())
+  if (verbose && platformIsLinux())
     system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%
     paste(sep=", ", collapse=", ") %>% message
-  message("You can use the cacheDir= argument to specify it directly,
+  if (verbose) message("You can use the cacheDir= argument to specify it directly,
           or check the cache was created in the correct place")
   fb <- options("jwutil.fallbackCacheDir")
-  message("using fallback cache directory: ")
+  if (verbose) message("using fallback cache directory: ")
   td <- getOption("jwutil.fallbackCacheDir")
   if (!file.exists(td)) dir.create(td)
   td
@@ -210,4 +210,14 @@ saveInDataDir <- function(varName, suffix) {
        file = file.path('data', strip(paste0(varName, suffix, '.RData'))),
        compress = ifelse(platformIsWindows(), "bzip2", "xz")
   )
+}
+
+#' @rdname cache
+#' @title remove from cache and environment
+#' @export
+rmCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
+  if (isCached(varName = varName, cacheDir = cacheDir, force = TRUE, envir = envir)) {
+    file.remove(findCacheFilePath(varName, cacheDir))
+    suppressWarnings(rm(list = varName, envir = envir, inherits = FALSE))
+  }
 }

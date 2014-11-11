@@ -169,9 +169,9 @@ propNaPerField <- function(dframe) {
 #' @param ... names of fields which must have no NA values
 #' @return data frame without rows containing NA in the specified data fields.
 #' @export
-dropRowsWithNAField <- function(dat, ...) {
-  fld <- c(..., recursive=TRUE)
-  message(fld)
+dropRowsWithNAField <- function(dat, ..., verbose = FALSE) {
+  fld <- c(..., recursive = TRUE)
+  if (verbose) message(fld)
 
   c(is.na(dat))
   for (f in fld) {

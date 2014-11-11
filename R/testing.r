@@ -20,10 +20,10 @@ testCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) 
   if (verbose) message("pkg = ", pkg)
   pkgenvir = as.environment(paste0("package:", pkg))
   funs <- lsf(pkg) # see function in util which lists contents of a package
-  if (verbose)
-    message(sprintf("functions found in %s are: %s", pkg, paste(funs, collapse=", ")))
+  if (verbose) message(sprintf("functions found in %s are:
+                               %s", pkg, paste(funs, collapse=", ")))
 
-  tfcon <-file(tempfile(), open='w+')
+  tfcon <- file(tempfile(), open = 'w+')
   sink(file = tfcon, type = "message")
   for (f in funs) {
     trace(f, where = pkgenvir, print = TRUE)
@@ -222,7 +222,7 @@ extreme_numbers <- c(
 #'   handle mixed error/no error outcomes after permutation, which is an
 #'   important feature to consider. The command following this function attaches this function to the testthat namespace. This means that it can call internal testthat functions, but does not mean it appears as testthat::expect_that_combine
 #'   @examples
-#'   expect_that_combine(sum(1,2,3), testthat::equals(6))
+#'   expect_that_combine_all_args(sum(1,2,3), testthat::equals(6))
 #'
 #' @return testthat result
 #' @export
