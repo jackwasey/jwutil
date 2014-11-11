@@ -3,6 +3,36 @@
 #' @keywords character internal
 optName = "cachedir"
 
+#' @title check whether an object is in the cache
+#' @rdname cache
+#' @description use the same search algorithm as loading from the cache, but
+#'   only report whether the file was there.
+#' @param varName character string containing the name of the cache object to
+#'   load. This would be the variable name were it to be loaded. cacheDir = NULL
+#' @param cacheDir specify cached dir. If NULL or not specified, then we search
+#'   up through parents looking for the cache.
+#' @param force single logical. If TRUE, then actually look in the cache
+#'   directory, otherwise we are satisfied if the variable already exists in the
+#'   given environment. This exactly parallels \code{loadFromCache}
+#' @param envir environment in which to check whether the data is already loaded
+#'   (force = TRUE will skip this test). Default is \code{.GlobalEnv}
+#' @return logical, single logical value.
+#' @export
+isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
+  stopifnot(length(varName) == 1,
+            length(cacheDir) == 1,
+            length(force) == 1,
+            length(envir) == 1)
+  stopifnot(is.character(varName),
+            is.logical(force),
+            is.environment(envir))
+  stopifnot(is.null(cacheDir) || is.character(cacheDir))
+
+  if (!force && exists(varName, envir = envir)) return(TRUE)
+  if (findCacheFilePath(varName, cacheDir) %>% file.exists) return(TRUE)
+  FALSE
+}
+
 #' @title Cache an R object
 #' @rdname cache
 #' @description There are various memoise and cache functions in R but none did
@@ -17,8 +47,6 @@ optName = "cachedir"
 #'   already be in memory). Starts off with \code{parent.frame()} by default, and
 #'   /code{inherits}, so should find already loaded cache files in .GlobalEnv
 #'   eventually.
-#' @param load_envir target environment in which to load given cached data.
-#'   Default is \code{envir}
 #' @export
 saveToCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
   save(list = varName,
@@ -35,25 +63,24 @@ lsCache <- function(cacheDir = NULL) {
 
 #' @rdname cache
 #' @export
-loadFromCache <- function(varName, cacheDir = NULL, force = FALSE,
-                          envir = .GlobalEnv, load_envir = envir) {
-  if (!force && exists(varName))
-    return(invisible(get(varName, envir = envir, inherits = TRUE)))
-
-
-  fp <- findCacheFilePath(varName, cacheDir)
-  if (!file.exists(fp)) stop(sprintf("%s doesn't exist when trying to access cache", fp))
-  load(file =  fp, envir = load_envir)
-  invisible(get(varName, envir = load_envir))
+loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
+  # getFromCache loads into the given environment and returns the data:
+  # loadFromCache just does this silently.
+  invisible(getFromCache(varName, cacheDir, force, envir)
 }
 
 #' @rdname cache
 #' @export
-getFromCache <- function(varName, cacheDir = NULL, force = FALSE,
-                         load_envir = .GlobalEnv) {
-  loadFromCache(varName = varName, cacheDir = cacheDir, force = force,
-                envir = load_envir, load_envir = load_envir)
-  get(varName, envir = load_envir)
+getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
+  if (!force && exists(varName, envir = envir))
+    return(get(varName, envir = envir, inherits = TRUE))
+
+  fp <- findCacheFilePath(varName, cacheDir)
+  if (!file.exists(fp)) stop(sprintf("Path '%s' doesn't exist when trying to access cache", fp))
+  load(file =  fp, envir = envir)
+  # we are assuming that the .RData file contains a variable with the same name
+  # as the file name (minus the file extension)
+  get(varName, envir = envir)
 }
 
 #' @title find path to the cache directory
@@ -155,6 +182,6 @@ saveInDataDir <- function(varName, suffix) {
   save(list = varName,
        envir = parent.frame(),
        file = file.path('data', strip(paste0(varName, suffix, '.RData'))),
-       compress = "bzip2"
+       compress = ifelse(platformIsWindows(), "bzip2", "xz")
   )
 }
