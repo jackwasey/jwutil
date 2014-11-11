@@ -20,9 +20,8 @@ optName = "cachedir"
 #' @export
 isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
   stopifnot(length(varName) == 1,
-            length(cacheDir) == 1,
-            length(force) == 1,
-            length(envir) == 1)
+            length(cacheDir) == 1 || is.null(cacheDir),
+            length(force) == 1)
   stopifnot(is.character(varName),
             is.logical(force),
             is.environment(envir))
@@ -81,6 +80,33 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Globa
   # we are assuming that the .RData file contains a variable with the same name
   # as the file name (minus the file extension)
   get(varName, envir = envir)
+}
+
+#' @title assign a value to an environment, but only evaluate the assignment if
+#'   it doesn't already exist on the cache. In this case, it is also saved in
+#'   the cache.
+#' @rdname cache
+#' @description Same as assign, but will only touch cache if the variable isn't
+#'   already loaded.
+#' @param envir environment to assign to
+#' @param searchEnv environment (and parents) to search to see if we really need
+#'   to load from cache
+#' @param unlike assign, returns invisibly TRUE for 'did assign from cache', or
+#'   FALSE when the cache had to be touched.
+#' @export
+assignCache <- function(varName, value,
+                            cacheDir = NULL,
+                            envir = parent.frame(),
+                            searchEnv = envir) {
+  # value should not be evaluated until used, so a database query in 'value'
+  # should be ignored until needed.
+  if (!isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
+    assign(varName, value, envir = envir) # this evaluates 'value' and should run the db query at this point
+    saveToCache(varName, cacheDir = cacheDir, envir = envir)
+    return(invisible(TRUE))
+  }
+  loadFromCache(varName, cacheDir, force = FALSE, envir = searchEnv)
+  invisible(FALSE)
 }
 
 #' @title find path to the cache directory
