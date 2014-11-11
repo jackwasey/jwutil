@@ -365,10 +365,13 @@ permuteWithRepeats <- function(x)
 #' @description systematically permute the input vector or list, which is very
 #'   slow for long x. Am amazed something this simple isn't either in base R, or
 #'   in a straightforward form in a package.
+#'
+#'   TODO: limit to a certain cut-off, after which we randomly sample
 #' @param x list or vector
 #' @return data frame, each row being one permutation
 #' @export
 permute <- function(x) {
+  stopifnot(length(x) < 8) # this is already 5,040 permutations
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
 

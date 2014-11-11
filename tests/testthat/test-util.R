@@ -311,6 +311,9 @@ test_that("areIntegers", {
     areIntegers(c(1 + 1e-10, 1.1, 1 - 1e-10)),
     testthat::equals(c(TRUE, FALSE, TRUE))) # both inside default tolerance
   expect_that(
+    areIntegers(c(-0.1, 0.02, 0.3, 4.4, 55.6789, pi, sqrt(2))),
+    testthat::equals(c(F, F, F, F, F, F, F))) # both inside default tolerance
+  expect_that_combine_first_arg(
     areIntegers(c(NA_integer_, NA_real_, NA_character_), na.ignore = T),
     testthat::equals(c(NA_integer_, NA_integer_, NA_integer_)))
   expect_that(

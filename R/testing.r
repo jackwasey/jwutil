@@ -226,17 +226,18 @@ extreme_numbers <- c(
 #'
 #' @return testthat result
 #' @export
-expect_that_combine <- function(object, condition, info = NULL, label = NULL) {
+expect_that_combine_all_args <- function(object, condition, info = NULL, label = NULL) {
 
   library(testthat)
 
   cl <- substitute(object)
-  stopifnot(sum(sapply(cl, is.symbol)) == 1)
+  #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
+  #want to know whether there are multiple top-level symbols
 
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
   # can only handle flat lists of arguments when permuting
-  stopifnot(unlist(args, recursive = TRUE) == unlist(args, recursive = FALSE))
+  stopifnot(identical(unlist(args, recursive = TRUE), unlist(args, recursive = FALSE)))
   stopifnot(length(args) >= 2)
 
   # get the combinations of arguments
@@ -260,5 +261,45 @@ expect_that_combine <- function(object, condition, info = NULL, label = NULL) {
   invisible(e)
 }
 
+#' @rdname expect_that_combine_all_args
+#' @export
+expect_that_combine_first_arg <- function(object, condition, info = NULL, label = NULL) {
+
+  library(testthat)
+
+  cl <- substitute(object)
+  #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
+  #want to know whether there are multiple top-level symbols
+
+  func_name <- cl[[1]]
+  args <- as.list(cl[-1])
+  arg_one <- eval(args[[1]]) # e.g. c(1,2,3) would have length FOUR, because not evaluated yet.
+  # can only handle flat lists of arguments when permuting? Does this apply when
+  # working on first argument only?
+  stopifnot(identical(unlist(args, recursive = TRUE), unlist(args, recursive = FALSE)))
+  stopifnot(length(arg_one) >= 2) # alternatively, just pass it through to a normal expect_that? TODO
+
+  # get the combinations of arguments
+  arg_one_combs <- permute(arg_one)
+
+  # now loop through all permutations
+  for (comb in 1:dim(arg_one_combs)[1]) {
+    # create a promise in effort to mimic expect_that behaviour
+    #objective = delayedAssign("objective", do.call(as.character(func_name), as.list(arg_combs[comb,])))
+    e <- expect_that(
+      object    = do.call(as.character(func_name), c(list(arg_one_combs[comb,]), args[-1])),
+      condition = condition,
+      info      = paste0(
+        info, "arg_one = ",
+        paste(arg_one_combs[comb, ], collapse = " ", sep = ","),
+        sprintf(" (test iteration %d)", comb)
+      ),
+      label     = label
+    )
+  }
+  invisible(e)
+}
+
 # put my function into the testthat namespace
-environment(expect_that_combine) <- asNamespace('testthat')
+environment(expect_that_combine_all_args) <- asNamespace('testthat')
+environment(expect_that_combine_first_arg) <- asNamespace('testthat')
