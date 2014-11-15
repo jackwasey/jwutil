@@ -229,7 +229,8 @@ mergeBetter <- function(x, y,
   leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
   if (leftMergeDrops > 0 | rightMergeDrops > 0) {
     if (verbose) message(
-      sprintf("mergeBetter: would drop %d out of %d from the new table, and %d out of %d from the existing data",
+      sprintf("mergeBetter: would drop %d out of %d from the new table,
+              and %d out of %d from the existing data",
               leftMergeDrops, nrow(y), rightMergeDrops, nrow(x)
               )
     )
@@ -243,12 +244,14 @@ mergeBetter <- function(x, y,
 
   if (length(duplicateFieldNames) > 0 && doRename == "no") {
     if (verbose) message("there are conflicting field names in the merge but
-            no prefix or suffix was requested: ", duplicateFieldNames)
+            no prefix or suffix was requested: ", paste(duplicateFieldNames, collapse = ", "))
     for (n in duplicateFieldNames) {
+      if (verbose) message("checking whether '", n, "'' has duplicated data.")
       if (identical(x[n], y[n])) {
         y[n] <- NULL # drop the field if it is identical to another one with the same name
-        if (verbose) message("dropping identical field: ", n) # and warn?
-      } else { # rename individual conflicting fields
+        if (verbose) message("dropping identical field: ", n)
+      } else {
+        # rename individual conflicting fields
         if (ifConflict == "suffix") {
           newName <- paste(n, affix, sep=".")
         } else if (ifConflict == "prefix") {
@@ -303,7 +306,7 @@ affixFields <- function(fieldNames, skipFields, affix,
     if (verbose) message("renaming first table field names with prefix")
     fieldNames[fieldNames %nin% skipFields] <- paste(affix, fieldNames[fieldNames %nin% skipFields], sep = sep)
   } else {
-    if (verbose) message(name="not adding prefix or suffix to first table because doRename = ", doRename)
+    if (verbose) message(name="doRename = ", doRename, " so not adding prefix or suffix, but final merge might do so.")
   }
   fieldNames
 }

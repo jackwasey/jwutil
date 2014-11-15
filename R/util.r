@@ -399,3 +399,39 @@ platformIsLinux <- function() {
 platformIsWindows <- function() {
   Sys.info()[["sysname"]] == "Windows"
 }
+
+
+#' @title read .xlsx file, interpret as CSV, and return data frame
+#' @description currently relies on Linux xlsx2csv command, but could
+#'   potentially be done with VB script in Windows
+#' @details shell command is
+#' xlsx2csv --delimiter=tab --dateformat=%m-%d-%y MVJan2010-Jan2014.xlsx > MVJan2010-Jan2014.csv
+#' VB script to accomplish the same on windows, could be considered
+#'   Set objArgs = WScript.Arguments
+#'   InputName = objArgs(0)
+#'   OutputName = objArgs(1)
+#'   Set objExcel = CreateObject("Excel.application")
+#'   objExcel.application.visible=false
+#'   objExcel.application.displayalerts=false
+#'   set objExcelBook = objExcel.Workbooks.Open(InputName)
+#'   objExcelBook.SaveAs OutputName, 23
+#'   objExcel.Application.Quit
+#'   objExcel.Quit
+#'
+#'   Invoke this as:
+#'
+#'   wscript script.vbs file.xlsx file.csv
+#' @param file is the path to the .xlsx file
+#' @return data frame
+#' @export
+readXlsxLinux <- function(file) {
+  if (jwutil::platformIsWindows())
+    stop("can only convert XLSX on linux using xlsx2csv command")
+
+  csvfile <- tempfile()
+  system(
+    paste0('xlsx2csv --delimiter=tab --dateformat=%m-%d-%y "', file, '" > ', csvfile)
+  )
+  read.delim(csvfile)
+}
+
