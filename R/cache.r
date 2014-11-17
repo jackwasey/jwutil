@@ -93,14 +93,17 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Globa
 #'   to load from cache
 #' @param unlike assign, returns invisibly TRUE for 'did assign from cache', or
 #'   FALSE when the cache had to be touched.
+#' @param force logical value, if TRUE will force the assignment to overwrite
+#'   whatever was in the cache, if anything.
+#' @return TRUE for cache was written, FALSE for read-only.
 #' @export
 assignCache <- function(varName, value,
-                            cacheDir = NULL,
-                            envir = parent.frame(),
-                            searchEnv = envir) {
+                        cacheDir = NULL,
+                        envir = parent.frame(),
+                        searchEnv = envir, force = FALSE) {
   # value should not be evaluated until used, so a database query in 'value'
   # should be ignored until needed.
-  if (!isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
+  if (force || !isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
     assign(varName, value, envir = envir) # this evaluates 'value' and should run the db query at this point
     saveToCache(varName, cacheDir = cacheDir, envir = envir)
     return(invisible(TRUE))

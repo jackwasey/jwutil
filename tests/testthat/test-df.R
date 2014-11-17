@@ -110,16 +110,35 @@ test_that("factorToCols", {
 })
 
 
-  dfa <- data.frame(a = c(1,2,3,4), b = c(11,12,13,14), c = c(101,102,103,104))
-  dfb <- dfa
-  dfb[1, "b"] <- 999
-  dfc <- dfb
-  dfc[2, "c"] <- 888
+dfa <- dfb <- dfc <- data.frame(a = c(1,2,3,4), b = c(11,12,13,14), c = c(101,102,103,104))
+dfb[1, "b"] <- 999
+dfc[1, "b"] <- 999
+dfc[2, "c"] <- 888
 
 
 test_that("merge identical frames should give identical result" , {
   r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a")
   expect_equal(dfa, r)
+})
+
+test_that("merge identical frames with reordered should give identical result" , {
+  expect_equal(mergeBetter(x = dfa, y = dfa[c("a", "c", "b")], by.x = "a", by.y = "a"), dfa)
+  expect_equal(mergeBetter(x = dfa, y = dfa[c("c", "b", "a")], by.x = "a", by.y = "a"), dfa)
+})
+
+test_that("can't handle double duplicate fields, esp not keys", {
+  dfA <- dfa[c("a", "b", "c", "c")]
+  names(dfA) <- c("a", "b", "C", "c")
+  expect_error(mergeBetter(x = dfa, y =  dfA, by.x = "a", by.y = "a"))
+  dfA <- dfa[c("a", "b", "b", "c")]
+  names(dfA) <- c("a", "b", "B", "c")
+  expect_error(mergeBetter(x = dfa, y =  dfA, by.x = "a", by.y = "a"))
+  dfA <- dfa[c("a", "a", "b", "c")]
+  names(dfA) <- c("a", "A", "b", "c")
+  expect_error(mergeBetter(x = dfa, y =  dfA, by.x = "a", by.y = "a"))
+  dfA <- dfa[c("a", "a", "b", "b")]
+  names(dfA) <- c("a", "A", "B", "b")
+  expect_error(mergeBetter(x = dfa, y =  dfA, by.x = "a", by.y = "a"))
 })
 
 test_that("merge non-identical frames should suffix field name by default" , {
@@ -132,9 +151,18 @@ test_that("merge non-identical frames should suffix field name by default" , {
 test_that("merge identical frames should give identical result" , {
   r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a")
   e <- dfa
-  e[["b.dfc"]] <- c(999,12,13,14)
-  e[["c.dfc"]] <- c(101,888,103,104)
-  expect_equal(r, e)
+  e[["b.dfc"]] <- c(999, 12, 13, 14)
+  e[["c.dfc"]] <- c(101, 888, 103, 104)
+  expect_identical(r, e)
 
 })
 
+test_that("drop duplicate fields in a data frame", {
+  expect_error(dropDuplicateFields(bad_input))
+  expect_error(dropDuplicateFields(dfa, dfa))
+  expect_error(dropDuplicateFields(extreme_numbers))
+  expect_equal(dropDuplicateFields(dfa), dfa)
+  expect_equal(dropDuplicateFields(dfa[c("a","b","c","c")]), dfa)
+  expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c")]), dfa)
+  expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c", "c")]), dfa)
+})
