@@ -97,7 +97,7 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Globa
 #'   whatever was in the cache, if anything.
 #' @return TRUE for cache was written, FALSE for read-only.
 #' @export
-assignCache <- function(varName, value,
+assignCache <- function(value, varName,
                         cacheDir = NULL,
                         envir = parent.frame(),
                         searchEnv = envir, force = FALSE) {
