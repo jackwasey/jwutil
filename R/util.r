@@ -4,7 +4,7 @@
 #' @param x is a character vector to be tested
 #' @param extras is a vector of character strings which are counted as NA
 #'   values, defaults to '.' and 'NA'. Also allow \code{NA}.
-#' @return logical
+#' @return logical scalar
 #' @export
 allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
   old <- options(warn = -1)
@@ -18,7 +18,7 @@ allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
 #' @description check whether all the items of input vector are integer
 #'   as.integer
 #' @param x is a vector to be tested
-#' @return logical
+#' @return logical scalar
 #' @export
 allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE) {
   all(
@@ -69,6 +69,7 @@ asIntegerNoWarn <- function(x) {
 #' @rdname asNumericNoWarn
 #' @param na.ignore logical, if TRUE will pass through NA values, otherwise,
 #'   they are marked FALSE.
+#' @return logical vector
 #' @export
 areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
   stopifnot(is.numeric(tol), is.logical(na.ignore))
@@ -300,9 +301,11 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 }
 
 #' @title check if a time is valid in 24h clock
-#' @description allow leading and trailing space, optional colon in middle, 2400 is not allowed.
+#' @description allow leading and trailing space, optional colon in middle, 2400
+#'   is not allowed. TODO: can lubridate do this better?
 #' @param tms is a vector of characters which may represent times
-#' @param na.rm logical if true, will ignore NA values, otherwise these will test as invalid.
+#' @param na.rm logical if true, will ignore NA values, otherwise these will
+#'   test as invalid.
 #' @return logical vector, with NA out if NA given
 #' @export
 isValidTime <- function(tms, na.rm = FALSE) {
@@ -321,11 +324,15 @@ listTrim  <-  function(x){   # delele null/empty entries in a list
 }
 
 #' @title flatten a list
-#' @description unlike unlist, this function returns a list of objects of different data types, but removes any depth
-#' @param ... list or any set of objects which will be made into a list, may include lists and nested lists
+#' @description unlike unlist, this function returns a list of objects of
+#'   different data types, but removes any depth
+#' @param ... list or any set of objects which will be made into a list, may
+#'   include lists and nested lists
 #' @param na.rm will drop NA values if TRUE
 #' @return list without nested lists, objects with preserved data types
-#' @source https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
+#' @source
+#'   https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
+#'
 #' @export
 flattenList <- function(..., na.rm = FALSE) {
   x <- list(...)

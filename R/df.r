@@ -29,14 +29,17 @@ logicalToBinary <- function(dframe) {
 }
 
 #' @title convert factor into a data.frame of logicals
-#' @description converts a factor into a data.frame with multiple T/F fields,
+#' @description converts a single factor into a data.frame with multiple T/F fields,
 #'   one for each factor
 #' @param fctr factor
 #' @param prefix defaults to "f" to pre-pend the factor level when constructing
 #'   the data frame columns names
 #' @return data.frame with columns of logicals
 #' @export
-factorToCols <- function(fctr, prefix = "f", verbose = FALSE) {
+factorToCols <- function(fctr,
+                         prefix = "f",
+                         sep = "",
+                         verbose = FALSE) {
 
   if (is.null(fctr)) { stop("factorToCols: NULL passed instead of factor") }
   if (class(fctr) != "factor") { stop(paste("input data is class ", class(fctr))) }
@@ -54,7 +57,7 @@ factorToCols <- function(fctr, prefix = "f", verbose = FALSE) {
 
   if (verbose) message("looping to extract logical vectors from the provided factor")
   for (i in 1:length(levels(fctr))) {
-    newColName = paste(prefix, levels(fctr)[i], sep=".")
+    newColName = paste(prefix, levels(fctr)[i], sep=sep)
     #message("factorToCols: creating new columns name: %s", newColName)
     newdframe[,newColName] <- (fctr == levels(fctr)[i])
   }
@@ -62,13 +65,22 @@ factorToCols <- function(fctr, prefix = "f", verbose = FALSE) {
   newdframe
 }
 
-#' @title convert multi level factor to multiple true/false fields
+#' @title Takes factors from a data frame and converts them to true/false fields
+#'   with appropriately named fields.
+#' @description For a two level factor, this is relatively easy, since we just
+#'   replace the field with \code{x==levels(x)[1]} or something like that, and
+#'   rename the field to indicate that TRUE is level 1 of the factor. This works
+#'   well for gender. For multi-level factors there is redundancy with multiple
+#'   new fields now containing FALSE, with only one TRUE for the matching level.
 #' @param dframe data.frame to search for factors to convert
 #' @param considerFactors character vector of field names in the data frame to
 #'   consider. Defaults to all fields
-#' @return data.frame with factors converted to multiple binary fields
+#' @return data.frame with no factors
 #' @export
-expandFactors <- function (dframe, considerFactors = names(dframe), verbose = FALSE) {
+expandFactors <- function (dframe,
+                           considerFactors = names(dframe),
+                           sep = "",
+                           verbose = FALSE) {
   if (verbose) message("exFactor: converting factors in a data frame into logical vectors")
 
   #message("considerFactors: %s", paste(considerFactors, collapse=', '))
@@ -91,7 +103,7 @@ expandFactors <- function (dframe, considerFactors = names(dframe), verbose = FA
       if (length(levelNames)>0) {
         for (i in 1:length(levelNames)) {
           # create new field in the data frame call "factorname.levelname"
-          newColName = paste(mfName, ".", levelNames[i], sep="")
+          newColName = paste(mfName, sep, levelNames[i], sep = "") %>% stripForFormula
           # and populate it with the boolean whether the data points match the
           # currently considered 'levelname' within the factor
           dframe[,newColName] <- dframe[,mfName] == levels(dframe[,mfName])[i]
@@ -109,7 +121,7 @@ expandFactors <- function (dframe, considerFactors = names(dframe), verbose = FA
 
   if (verbose) message("newFields: %s", paste(newCols, collapse=", "))
 
-  list(dat = dframe, newFields = newCols)
+  dframe
 }
 
 # getFactorStatus <- function(dframe, considerFactors=names(dframe)) {
@@ -142,16 +154,21 @@ getNonFactorNames <- function(dframe, considerFactors = names(dframe)) {
   considerFactors[considerFactors %nin% getFactorNames(dframe, considerFactors)]
 }
 
-
 #' @title get NA field names from data frame
 #' @param dframe data.frame
-#' @return vector of names of fields which contain any NA values, or NULL if none
+#' @return vector of names of fields which contain any NA values, length zero if no matches
 #' @export
 getNAFields <- function(dframe) {
   if (class(dframe) != "data.frame") stop(paste("getNAfields: passed an object of class: ", class(dframe), collapse=" "))
-  naFields <- names(dframe)[sapply(dframe, countIsNa)>0]
-  if (length(naFields)>0) return(naFields)
+  naFields <- names(dframe)[sapply(dframe, countIsNa) > 0]
+  if (length(naFields) == 0) return(character())
+  naFields
 }
+
+#' @rdname getNAFields
+#' @export
+getNonNAFields <- function(dframe)
+  names(dframe)[names(dframe) %nin% getNAFields(dframe)]
 
 #' @title return proportion of NA values per field
 #' @param dframe is a data frame

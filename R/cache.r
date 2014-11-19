@@ -63,7 +63,7 @@ lsCache <- function(cacheDir = NULL) {
 #' @rdname cache
 #' @export
 loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
-  # getFromCache loads into the given environment and returns the data:
+  # getFromCache already (cheekily) loads into the given environment and returns the data:
   # loadFromCache just does this silently.
   invisible(getFromCache(varName, cacheDir, force, envir))
 }
@@ -100,7 +100,8 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Globa
 assignCache <- function(value, varName,
                         cacheDir = NULL,
                         envir = parent.frame(),
-                        searchEnv = envir, force = FALSE) {
+                        searchEnv = envir,
+                        force = FALSE) {
   # value should not be evaluated until used, so a database query in 'value'
   # should be ignored until needed.
   if (force || !isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {

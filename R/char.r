@@ -2,15 +2,24 @@
 #' @title strip all whitespace
 #' @description could do this with regular expression, but slow, and this
 #'   function is called frequently. My only use case works with removal of all
-#'   space character whitespace, and I don't expect <TAB>.
+#'   space character whitespace, and I don't expect <TAB>. This uses non-unicode
+#'   aware matching for speed. This can be changed by setting useBytes to FALSE.
 #' @param x is a character vector to strip
 #' @param pattern is the non-regex of the character to strip, default " "
 #' @return character vector
 #' @export
-strip <- function (x, pattern = " ") {
-  # beware unicode
-  gsub(pattern = pattern, replacement = "", x, fixed = TRUE, useBytes = TRUE)
-}
+strip <- function (x, pattern = " ", useBytes = TRUE)
+  gsub(pattern = pattern, replacement = "", x, fixed = TRUE, useBytes = useBytes)
+
+#' @title strip a string so that it can be used as a variable name in a formula.
+#' @description This excludes many symbols, so just strip all symbols leaving
+#'   alphanumeric, and no whitespace.
+#' @param x character vector of potential formula variables
+#' @return character vector of length x
+#' @export
+stripForFormula <- function(x)
+  gsub(pattern = "[^[:alnum:]]", replacement = "", x)
+
 
 #' @title strip whitespace from ends of each string in given character vector
 #' @description slower than \code{strip}.
@@ -18,8 +27,9 @@ strip <- function (x, pattern = " ") {
 #' @return character vector
 #' @export
 trim <- function(x) {
-  if (class(x) == "data.frame") { stop("trimming data.frame gives unpredictable results.
-                                       Try trimming a column at a time using [s]apply.")}
+  if (class(x) == "data.frame")
+    stop("trimming data.frame gives unpredictable results.
+         Try trimming a column at a time using [s]apply.")
   gsub("^\\s+|\\s+$", "", x)
 }
 
