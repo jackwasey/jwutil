@@ -1,10 +1,10 @@
 #' @title option name for cache
 #' @description allow use of \code{options} to search for the cache directory.
+#' @family cache
 #' @keywords character internal
 optName = "cachedir"
 
 #' @title check whether an object is in the cache
-#' @rdname cache
 #' @description use the same search algorithm as loading from the cache, but
 #'   only report whether the file was there.
 #' @param varName character string containing the name of the cache object to
@@ -17,6 +17,7 @@ optName = "cachedir"
 #' @param envir environment in which to check whether the data is already loaded
 #'   (force = TRUE will skip this test). Default is \code{.GlobalEnv}
 #' @return logical, single logical value.
+#' @family cache
 #' @export
 isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
   stopifnot(length(varName) == 1,
@@ -33,7 +34,7 @@ isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv
 }
 
 #' @title Cache an R object
-#' @rdname cache
+#' @family cache
 #' @description There are various memoise and cache functions in R but none did
 #'   what I wanted. These functions allow a package to cache data in a standard
 #'   place, or specified directory.
@@ -54,13 +55,13 @@ saveToCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
        compress = "xz")
 }
 
-#' @rdname cache
+#' @title lsCache
 #' @export
 lsCache <- function(cacheDir = NULL) {
   list.files(path = findCacheDir(cacheDir))
 }
 
-#' @rdname cache
+#' @title loadFromCache
 #' @export
 loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
   # getFromCache already (cheekily) loads into the given environment and returns the data:
@@ -68,7 +69,20 @@ loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Glob
   invisible(getFromCache(varName, cacheDir, force, envir))
 }
 
-#' @rdname cache
+#' @title load or get a dated variable from cache
+#' @description This is a bit tricky with environments. The basic
+#'   jwutil::getFromCache etc functions put the loaded data in the global
+#'   environment by default. Here we are just going to load the (unddated name)
+#'   data to the parent environment, leaving the dated data in the global
+#'   environment.
+#' @param startDate YYYY-MM-DD
+#' @param endDate YYYY-MM-DD
+#' @family cache
+#' @export
+loadDatedFromCache <- function(varName, startDate, endDate, ...)
+  assign(varName, getDatedFromCache(varName, startDate, endDate, ...), envir = parent.frame())
+
+#' @title getFromCache
 #' @export
 getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
   if (!force && exists(varName, envir = envir))
@@ -82,35 +96,71 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Globa
   get(varName, envir = envir)
 }
 
+#' @title get a variable for a given date range
+#' @description we want to be transparent about the date range in the processing
+#'   code, so we can easily change the input data without changing everything.
+#'   We also want to cache data for some fixed date ranges, but these cached
+#'   data files will have specific names. The solution is to use this function
+#'   instead of \code{get} to bring the data into the working environment with a
+#'   standardized name. TODO: should this go in jwutil?
+#' @param varName base variable name on which to construct dated variable name.
+#' @family cache
+#' @export
+getDated <- function(varName, startDate, endDate, ...)
+  get(getCacheFileName(varName, startDate, endDate), ...)
+
+#' @title getDatedFromCache
+#' @export
+getDatedFromCache <- function(varName, startDate, endDate, ...)
+  getFromCache(varName = getCacheFileName(varName, startDate, endDate, ...),
+               envir = parent.frame())
+
 #' @title assign a value to an environment, but only evaluate the assignment if
 #'   it doesn't already exist on the cache. In this case, it is also saved in
 #'   the cache.
-#' @rdname cache
 #' @description Same as assign, but will only touch cache if the variable isn't
 #'   already loaded.
+#' @param value val
+#' @param varName var
 #' @param envir environment to assign to
 #' @param searchEnv environment (and parents) to search to see if we really need
 #'   to load from cache
-#' @param unlike assign, returns invisibly TRUE for 'did assign from cache', or
-#'   FALSE when the cache had to be touched.
 #' @param force logical value, if TRUE will force the assignment to overwrite
 #'   whatever was in the cache, if anything.
-#' @return TRUE for cache was written, FALSE for read-only.
+#' @return unlike assign, returns invisibly TRUE for 'did assign from cache', or
+#'   FALSE when the cache had to be touched.
+#' @family cache
 #' @export
 assignCache <- function(value, varName,
                         cacheDir = NULL,
                         envir = parent.frame(),
                         searchEnv = envir,
                         force = FALSE) {
-  # value should not be evaluated until used, so a database query in 'value'
-  # should be ignored until needed.
+
+  if (is.null(force)) force <- FALSE
+
+  # "value" should not be evaluated until used, so a database query in 'value'
+  # should be ignored if not needed, and not throw an error if database not available.
   if (force || !isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
-    assign(varName, value, envir = envir) # this evaluates 'value' and should run the db query at this point
+    assign(x = varName, value = value, envir = envir) # this evaluates 'value' and should run the db query at this point
     saveToCache(varName, cacheDir = cacheDir, envir = envir)
     return(invisible(TRUE))
   }
   loadFromCache(varName, cacheDir, force = FALSE, envir = searchEnv)
   invisible(FALSE)
+}
+
+#' @title  assign dated to cache
+#' @param startDate YYYY-MM-DD
+#' @param endDate YYYY-MM-DD
+#' @export
+assignDatedCache <- function(value, varName,
+                             startDate, endDate,
+                             cacheDir = NULL, envir = parent.frame(), searchEnv = envir, force = FALSE) {
+  assignCache(value = value,
+              varName = getCacheFileName(varName, startDate, endDate),
+              cacheDir, envir, searchEnv, force)
+
 }
 
 #' @title find path to the cache directory
@@ -136,6 +186,7 @@ assignCache <- function(value, varName,
 #'   alone is not distinctive, and conflicts with other things, such as the
 #'   cache directory in the vignettes directory.
 #' @import magrittr
+#' @family cache
 #' @export
 findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FALSE) {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
@@ -192,6 +243,7 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FA
 #' @param varName char
 #' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist,
 #'   stop with error.
+#' @family cache
 #' @export
 findCacheFilePath <- function(varName, cacheDir = NULL) {
   cacheDir <- findCacheDir(cacheDir)
@@ -207,6 +259,7 @@ findCacheFilePath <- function(varName, cacheDir = NULL) {
 #'   compress = "xz")
 #' @param varName char name of the variable in the calling frame to save
 #' @param suffix char additional characters before ".RData"
+#' @family cache
 #' @export
 saveInDataDir <- function(varName, suffix) {
   save(list = varName,
@@ -216,12 +269,27 @@ saveInDataDir <- function(varName, suffix) {
   )
 }
 
-#' @rdname cache
 #' @title remove from cache and environment
+#' @family cache
 #' @export
 rmCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
   if (isCached(varName = varName, cacheDir = cacheDir, force = TRUE, envir = envir)) {
     file.remove(findCacheFilePath(varName, cacheDir))
     suppressWarnings(rm(list = varName, envir = envir, inherits = FALSE))
   }
+}
+
+#' @title make cache file name from dates and unadorned variable name
+#' @param varName string
+#' @param startDate YYYY-MM-DD
+#' @param endDate YYYY-MM-DD
+#' @family cache
+#' @export
+getCacheFileName <- function(varName, startDate, endDate) {
+  stopifnot(length(varName) == length(startDate))
+  stopifnot(length(endDate) == length(startDate))
+  paste(varName,
+        paste(startDate,
+              endDate, sep = "to"),
+        sep = "")
 }

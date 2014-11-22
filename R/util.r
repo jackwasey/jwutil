@@ -442,3 +442,28 @@ readXlsxLinux <- function(file) {
   read.delim(csvfile)
 }
 
+#' @title build simple linear formula from variable names
+#' @param left character vector
+#' @param right character vector
+#' @return formula
+#' @export
+buildLinearFormula <- function (left, right) {
+  as.formula(
+    paste(
+      paste(left, collapse = "+"),
+      paste(right, collapse = "+"),
+      sep="~")
+  )
+}
+
+#' @title inverse which
+#' @description for a given vector of ordinals which would reference items in a
+#'   vector, list etc, \code{invwhich} returns a logical vector with TRUE for
+#'   the cited positions. If length is not provided, the maximum index is used.
+#' @param which integer vector of indices, as would be produced by \code{which}
+#' @param length integer scalar: length of return vector, defaults to
+#'   \code{max(which)}
+#' @return logical vector of length \code{length}
+#' @export
+invwhich <- function(which, length = max(which))
+  is.element(seq_len(length), which)
