@@ -328,8 +328,9 @@ test_that("areIntegers", {
   expect_that(areIntegers(c(0.995, 1.005), tol = 0.01), testthat::equals(c(T, T)))
   expect_that(areIntegers(c(pi, sqrt(2))), testthat::equals(c(FALSE, FALSE)))
 
-  expect_false(areIntegers("jack"))
-  expect_false(areIntegers(random_test_letters()))
+  expect_equal(areIntegers("jack"), FALSE)
+  expect_equal(areIntegers(c("jack","alf")), c(FALSE, FALSE))
+  expect_equal(areIntegers(c("jack","10")), c(FALSE, TRUE))
 
   expect_error(areIntegers(c(1,2), tol = "cabbages"))
   expect_error(areIntegers(c(1,2), tol = c(0.01, 0.005)))

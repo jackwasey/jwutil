@@ -7,10 +7,8 @@ optName = "cachedir"
 #' @title check whether an object is in the cache
 #' @description use the same search algorithm as loading from the cache, but
 #'   only report whether the file was there.
-#' @param varName character string containing the name of the cache object to
-#'   load. This would be the variable name were it to be loaded. cacheDir = NULL
-#' @param cacheDir specify cached dir. If NULL or not specified, then we search
-#'   up through parents looking for the cache.
+#' @template varName
+#' @template cacheDir
 #' @param force single logical. If TRUE, then actually look in the cache
 #'   directory, otherwise we are satisfied if the variable already exists in the
 #'   given environment. This exactly parallels \code{loadFromCache}
@@ -40,9 +38,8 @@ isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv
 #'   place, or specified directory.
 #'
 #'   Global environment is used by default to save
-#' @param varName char
-#' @param cacheDir char
-#' @param force logical - reload data even if already available
+#' @template varName
+#' @template cacheDir
 #' @param envir environment to start searching for the cached data (it may
 #'   already be in memory). Starts off with \code{parent.frame()} by default, and
 #'   /code{inherits}, so should find already loaded cache files in .GlobalEnv
@@ -56,12 +53,17 @@ saveToCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
 }
 
 #' @title lsCache
+#' @template cacheDir
 #' @export
 lsCache <- function(cacheDir = NULL) {
   list.files(path = findCacheDir(cacheDir))
 }
 
 #' @title loadFromCache
+#' @template varName
+#' @template cacheDir
+#' @param force logical, whether to reload from source even if found in cache
+#' @param envir environment in which to load, deafults to \code{.GlobalEnv}
 #' @export
 loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
   # getFromCache already (cheekily) loads into the given environment and returns the data:
@@ -73,18 +75,27 @@ loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Glob
 #' @description This is a bit tricky with environments. The basic
 #'   jwutil::getFromCache etc functions put the loaded data in the global
 #'   environment by default. Here we are just going to load the (unddated name)
-#'   data to the parent environment, leaving the dated data in the global
+#'   data to the parent environment (by default), leaving the dated data in the global
 #'   environment.
-#' @param startDate YYYY-MM-DD
-#' @param endDate YYYY-MM-DD
+#' @template varName
+#' @template startEndDate
+#' @param envir, where to load the data, defaults to \code{.GlobalEnv}
+#' @param ... additional arguments to pass to \code{getDatedFromCache}
 #' @family cache
 #' @export
-loadDatedFromCache <- function(varName, startDate, endDate, ...)
-  assign(varName, getDatedFromCache(varName, startDate, endDate, ...), envir = parent.frame())
+loadDatedFromCache <- function(varName, startDate, endDate, envir = parent.env(), ...)
+  assign(varName, getDatedFromCache(varName, startDate, endDate, envir = envir, ...), envir = envir)
 
 #' @title getFromCache
+#' @template varName
+#' @template cacheDir
+#' @param envir environment in which to save the retrieved cache data. This is
+#'   done even though the data is being return, being a simple in-memory level
+#'   of the cache. Default is \code{.GlobalEnv}.
+#' @param force logical whether to get the data from cache even if it is already
+#'   in an accessible environment
 #' @export
-getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
+getFromCache <- function(varName, cacheDir = NULL, envir = .GlobalEnv, force = FALSE) {
   if (!force && exists(varName, envir = envir))
     return(get(varName, envir = envir, inherits = TRUE))
 
@@ -103,17 +114,21 @@ getFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Globa
 #'   data files will have specific names. The solution is to use this function
 #'   instead of \code{get} to bring the data into the working environment with a
 #'   standardized name. TODO: should this go in jwutil?
-#' @param varName base variable name on which to construct dated variable name.
+#' @template varName
+#' @template startEndDate
+#' @param ... additional arguments pased to \code{get}
 #' @family cache
 #' @export
 getDated <- function(varName, startDate, endDate, ...)
   get(getCacheFileName(varName, startDate, endDate), ...)
 
 #' @title getDatedFromCache
+#' @template varName
+#' @template startEndDate
+#' @param ... additional arguments pased to \code{getFromCache}
 #' @export
 getDatedFromCache <- function(varName, startDate, endDate, ...)
-  getFromCache(varName = getCacheFileName(varName, startDate, endDate, ...),
-               envir = parent.frame())
+  getFromCache(varName = getCacheFileName(varName, startDate, endDate), ...)
 
 #' @title assign a value to an environment, but only evaluate the assignment if
 #'   it doesn't already exist on the cache. In this case, it is also saved in
@@ -121,7 +136,8 @@ getDatedFromCache <- function(varName, startDate, endDate, ...)
 #' @description Same as assign, but will only touch cache if the variable isn't
 #'   already loaded.
 #' @param value val
-#' @param varName var
+#' @template varName
+#' @template cacheDir
 #' @param envir environment to assign to
 #' @param searchEnv environment (and parents) to search to see if we really need
 #'   to load from cache
@@ -151,8 +167,15 @@ assignCache <- function(value, varName,
 }
 
 #' @title  assign dated to cache
-#' @param startDate YYYY-MM-DD
-#' @param endDate YYYY-MM-DD
+#' @param value value to assign to the given variable called \code{varName}
+#' @template varName
+#' @template startEndDate
+#' @template cacheDir
+#' @param envir environment to assign to, defaults to \code{parent.frame()}
+#' @param searchEnv environment in which to look to see if cache needs to be
+#'   hit, defaults to \code{envir}
+#' @param force logical, whether to re-evaluate and assign to cache even if data
+#'   already exists
 #' @export
 assignDatedCache <- function(value, varName,
                              startDate, endDate,
@@ -179,12 +202,11 @@ assignDatedCache <- function(value, varName,
 #'   tree with all the testing files, and may not include the \code{cache}
 #'   directory from the working tree, e.g. if the cache directory is in
 #'   \code{.Rbuildignore}.
-#' @param varName char
-#' @param cacheDir char, defaults to NULL. If \code{cacheDir} is not \code{NULL}
-#'   and doesn't exist, stop with error.
+#' @template cacheDir
 #' @param cacheDirName single character string, defaults to 'jwcache'. 'cache'
 #'   alone is not distinctive, and conflicts with other things, such as the
 #'   cache directory in the vignettes directory.
+#' @template verbose
 #' @import magrittr
 #' @family cache
 #' @export
@@ -240,9 +262,8 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FA
 }
 
 #' @title find path to a file in cache directory
-#' @param varName char
-#' @param cacheDir char, defaults to NULL. If \code{cacheDir} doesn't exist,
-#'   stop with error.
+#' @template varName
+#' @template cacheDir
 #' @family cache
 #' @export
 findCacheFilePath <- function(varName, cacheDir = NULL) {
@@ -257,7 +278,7 @@ findCacheFilePath <- function(varName, cacheDir = NULL) {
 #'   tools::checkRdaFiles(file.path("data", list.files(path = "data")))
 #'   tools::resaveRdaFiles(file.path("data", list.files(path = "data")),
 #'   compress = "xz")
-#' @param varName char name of the variable in the calling frame to save
+#' @template varName
 #' @param suffix char additional characters before ".RData"
 #' @family cache
 #' @export
@@ -270,6 +291,10 @@ saveInDataDir <- function(varName, suffix) {
 }
 
 #' @title remove from cache and environment
+#' @template varName
+#' @template cacheDir
+#' @param envir environment in which to remove the variable from, defaults to
+#'   the calling frame.
 #' @family cache
 #' @export
 rmCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
@@ -280,9 +305,8 @@ rmCache <- function(varName, cacheDir = NULL, envir = parent.frame()) {
 }
 
 #' @title make cache file name from dates and unadorned variable name
-#' @param varName string
-#' @param startDate YYYY-MM-DD
-#' @param endDate YYYY-MM-DD
+#' @template varName
+#' @template startEndDate
 #' @family cache
 #' @export
 getCacheFileName <- function(varName, startDate, endDate) {

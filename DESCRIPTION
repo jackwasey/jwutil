@@ -9,11 +9,11 @@ Description: small set of simple utilities for common data manipulation tasks,
 Depends:
     R (>= 3.1.1)
 Imports:
+    magrittr
+Suggests:
+    testthat,
     devtools,
     roxygen2,
-    testthat,
-    magrittr,
-    Rcpp,
     icd9
 License: GPL-3
 LazyData: true

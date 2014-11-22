@@ -247,7 +247,7 @@ lsp <- function(package, all.names = TRUE, pattern) {
 #'   objects
 #' @param tms vector of times, i.e. number in range 0 to 2400, as string or
 #'   integer, with or without trailing zeros
-#' @param verbose logical
+#' @template verbose
 #' @return vector of POSIXlt date-times
 #' @export
 add_time_to_date <- function(tms, dts, verbose = FALSE) {

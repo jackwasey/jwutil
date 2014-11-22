@@ -36,7 +36,7 @@ testCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) 
   sink()
   #close(tfcon)
 
-  trace_output <- capture.output(test_dir("tests/testthat/", reporter = SilentReporter()))
+  trace_output <- capture.output(testthat::test_dir("tests/testthat/", reporter = testthat::SilentReporter()))
   #trace_output <- capture.output(test_file("tests/test-all.R", reporter=SilentReporter()))
 
   tfcon <- file(tempfile(), open = 'w+')
@@ -211,8 +211,8 @@ random_test_letters <- function(n = nTestNumes, maxStringLength = 257) {
   for (i in 1:n) {
     x[length(x) + 1] <- paste(
       sample(
-        c(LETTERS,letters, 0:9),
-        runif(n=1, min = 1, max = maxStringLength),
+        c(LETTERS,letters),
+        runif(n = 1, min = 1, max = maxStringLength),
         replace = TRUE),
       collapse = "")
   }
@@ -233,18 +233,23 @@ extreme_numbers <- c(
   -.Machine$double.xmax)
 
 #' @title alternative \code{expect_that} from \code{testthat} which permutes all
-#'   the inputs to a function which should give the same result where n args >=2 and the function is commutative.
+#'   the inputs to a function which should give the same result where n args >=2
+#'   and the function is commutative.
 #' @description This makes a lot of assumptions, needs more testing. It can't
 #'   handle mixed error/no error outcomes after permutation, which is an
-#'   important feature to consider. The command following this function attaches this function to the testthat namespace. This means that it can call internal testthat functions, but does not mean it appears as testthat::expect_that_combine
-#'   @examples
-#'   expect_that_combine_all_args(sum(1,2,3), testthat::equals(6))
-#'
+#'   important feature to consider. The command following this function attaches
+#'   this function to the testthat namespace. This means that it can call
+#'   internal testthat functions, but does not mean it appears as
+#'   testthat::expect_that_combine
+#' @inheritParams testthat::expect_that
+#' @examples
+#'  \dontrun{ expect_that_combine_all_args(sum(1,2,3),
+#'   testthat::equals(6)) }
 #' @return testthat result
 #' @export
 expect_that_combine_all_args <- function(object, condition, info = NULL, label = NULL) {
 
-  library(testthat)
+#   suppressPackageStartupMessages(library(testthat))
 
   cl <- substitute(object)
   #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
@@ -257,7 +262,7 @@ expect_that_combine_all_args <- function(object, condition, info = NULL, label =
   stopifnot(length(args) >= 2)
 
   # get the combinations of arguments
-  arg_combs <- permute(unlist(args))
+  arg_combs <- jwutil::permute(unlist(args))
 
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
@@ -281,7 +286,7 @@ expect_that_combine_all_args <- function(object, condition, info = NULL, label =
 #' @export
 expect_that_combine_first_arg <- function(object, condition, info = NULL, label = NULL) {
 
-  library(testthat)
+  suppressPackageStartupMessages(library(testthat))
 
   cl <- substitute(object)
   #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
@@ -296,7 +301,7 @@ expect_that_combine_first_arg <- function(object, condition, info = NULL, label 
   stopifnot(length(arg_one) >= 2) # alternatively, just pass it through to a normal expect_that? TODO
 
   # get the combinations of arguments
-  arg_one_combs <- permute(arg_one)
+  arg_one_combs <- jwutil::permute(arg_one)
 
   # now loop through all permutations
   for (comb in 1:dim(arg_one_combs)[1]) {

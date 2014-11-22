@@ -38,7 +38,7 @@ logicalToBinary <- function(dframe) {
 #'   forming new data frame column names
 #' @param na.rm logical scalar: if NA data and/or NA levels, then covert to NA
 #'   strings and expand these as for any other factor
-#' @param verbose logical scalar
+#' @template verbose
 #' @return data.frame with columns of logicals
 #' @export
 factorToDataframeLogical <- function(fctr,
@@ -107,6 +107,7 @@ factorToDataframeLogical <- function(fctr,
 #'   values in new column names
 #' @param na.rm logical scalar: if NA data and/or NA levels, then covert to NA
 #'   strings and expand these as for any other factor
+#' @template verbose
 #' @return data.frame with no factors
 #' @export
 expandFactors <- function (dframe,
@@ -199,6 +200,7 @@ propNaPerField <- function(dframe) {
 #' @description unlike na.omit, the list of fields determines exactly which fields must have no NA values
 #' @param dat is a data frame
 #' @param ... names of fields which must have no NA values
+#' @template verbose
 #' @return data frame without rows containing NA in the specified data fields.
 #' @export
 dropRowsWithNAField <- function(dat, ..., verbose = FALSE) {
@@ -355,9 +357,11 @@ affixFields <- function(fieldNames, skipFields, affix,
 }
 
 #' @title get numbers that would be dropped in a merge
-#' @description converts both vectors to numeric
-#' @param one vector or factor
-#' @param two vector or factor
+#' @description converts both vectors to numeric. This simulates merging when
+#'   one key is character (but contains integer numbers), and another key is
+#'   stored as integer.
+#' @param x vector or factor
+#' @param y vector or factor
 #' @return list of two vectors
 #' @export
 getDroppedNumeric <- function(x, y) {
@@ -372,6 +376,9 @@ getDroppedNumeric <- function(x, y) {
 #' @description compares all data in each field to every other field, and drops
 #'   the latter match. Will find multiple matches. Doesn't do any type
 #'   conversions yet. This is purely by content, not by field name.
+#' @param df data.frame
+#' @template verbose
+#' @return data frame without duplicate fields
 #' @export
 dropDuplicateFields <- function(df, verbose = FALSE) {
   stopifnot(class(verbose) == "logical" && length(verbose) ==1)
