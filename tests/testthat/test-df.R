@@ -2,9 +2,13 @@
 context("data frame manipulation")
 
 
-f1 = factor(x=c(1,2,3,1,2,3,3,2,1))
-f2 = factor(x=c(10,20,30,10,20,30,30,20,10))
-f3 = factor(x=c("a","b","c","d","c","b","a"))
+f1 <-  factor(x=c(1,2,3,1,2,3,3,2,1))
+f2 <- factor(x=c(10,20,30,10,20,30,30,20,10))
+f3 <- factor(x=c("a","b","c","d","c","b","a"))
+fOneLevel <- factor(x = c("jack", "jack"))
+fTwoLevels <- factor(x = c("jack", "alfie", "jack", "alfie"))
+fOneExtraLevel <- factor(x = c("jack", "jack"), levels = c("jack", "alfie", "liv"))
+fTwoExtraLevel <- factor(x = c("jack", "alfie", "jack", "alfie"), levels = c("jack", "alfie", "liv"))
 f.short = factor(x=c(1))
 f.empty = factor()
 dframe <- data.frame(f1, f2)
@@ -16,7 +20,11 @@ vdf <- data.frame(v1, v2)
 fdv1 <- data.frame(v2, v1)
 fdv2 <- data.frame(v2=v1, v1=v2)
 
-# CaseControlFunctions:
+dfa <- dfb <- dfc <- data.frame(a = c(1,2,3,4), b = c(11,12,13,14), c = c(101,102,103,104))
+dfb[1, "b"] <- 999
+dfc[1, "b"] <- 999
+dfc[2, "c"] <- 888
+
 test_that("getNonFactorNames", {
 
   expect_identical(
@@ -77,39 +85,75 @@ test_that("expandFactors", {
   expect_warning(out <- expandFactors(dframe, considerFactors = NULL))
   expect_identical(dframe, out)
 
-  out <- expandFactors(dframe, considerFactors=c("f1","f2"))
+  out <- expandFactors(dframe, considerFactors=c("f1","f2"), sep = ".")
   expect_equal(dim(out), c(9,6))
   expect_equal(class(out[[1]]), "logical")
   expect_equal(names(out), c("f1.1","f1.2","f1.3","f2.10","f2.20","f2.30"))
 
-  out <- expandFactors(dframe, considerFactors=c("f1"))
+  out <- expandFactors(dframe, considerFactors=c("f1"), sep = ".")
   expect_equal(dim(out), c(9,4))
   expect_equal(class(out[["f1.1"]]), "logical")
   expect_equal(names(out), c("f2","f1.1","f1.2","f1.3"))
 
-  out <- expandFactors(mixed.df, considerFactors=c("v1","f1"))
+  out <- expandFactors(mixed.df, considerFactors = c("v1","f1"), sep = ".")
   expect_equal(dim(out), c(9,5))
   expect_equal(class(out[["f1.1"]]), "logical")
   expect_equal(names(out), c("f2","v1","f1.1","f1.2","f1.3"))
 })
 
-test_that("factorToCols", {
+test_that("factorToDataframeLogical bad input fails", {
 
-  expect_error(factorToCols())
-  expect_error(factorToCols(dframe))
-  expect_error(factorToCols("some string of characters"))
-  expect_equal(dim(factorToCols(f1)), c(9,3))
-  expect_equal(class(factorToCols(f1)), "data.frame")
-  expect_equal(as.vector(sapply(factorToCols(f1), class)), c("logical", "logical", "logical"))
+  expect_error(factorToDataframeLogical())
+  expect_error(factorToDataframeLogical(dframe))
+  expect_error(factorToDataframeLogical(bad_input))
+  expect_error(factorToDataframeLogical(c("some","string of characters")))
+
+  expect_error(factorToDataframeLogical(f1, prefix = c("1", "2")))
+  expect_error(factorToDataframeLogical(f1, prefix = 1))
+
+})
+
+test_that("factorToDataframeLogical works", {
+  expect_equal(dim(factorToDataframeLogical(f1, prefix = "f1")), c(9, 3))
+  expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
+  expect_true(all(sapply(factorToDataframeLogical(f1, prefix = "f1"), is.logical)))
+
+})
+
+test_that("factorToDataframeLogical works for extra factor levels, one and two level factors", {
+  expect_that(dim(factorToDataframeLogical(fTwoExtraLevel)), testthat::equals(c(4, 1)))
+  expect_that(dim(factorToDataframeLogical(fOneExtraLevel)), testthat::equals(c(2, 1)))
+  expect_that(dim(factorToDataframeLogical(fTwoLevels)), testthat::equals(c(4, 1)))
+  expect_that(dim(factorToDataframeLogical(fOneLevel)), testthat::equals(c(2, 1)))
+
+  # for two-level factors, we keep the first level, drop the second.
+
+})
+
+test_that("factorToDataframeLogical works for NA factor levels", {
+
+  f <- factor(c("jack", "alfie", NA), exclude = NULL) # make NA a level
+  df <- data.frame(fjack = c(T, F, F), falfie = c(F,T,F), fNA = c(F,F,T))
+  expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
+
+  f <- factor(c("jack", "alfie", NA), exclude = NA) # make NA not a level
+  df <- data.frame(fjack = c(T, F, F), falfie = c(F,T,F), fNA = c(F,F,T))
+  expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
+
+  f <- factor(c("jack", NA))
+  df <- data.frame(fjack =c(T,F))
+  expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
+
+  f <- factor(c("jack", "alfie"), levels = c("jack", "alfie", NA))
+  df <- data.frame(fjack = c(T,F))
+  expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
 })
 
 
-dfa <- dfb <- dfc <- data.frame(a = c(1,2,3,4), b = c(11,12,13,14), c = c(101,102,103,104))
-dfb[1, "b"] <- 999
-dfc[1, "b"] <- 999
-dfc[2, "c"] <- 888
 
+
+context("test merging")
 
 test_that("merge identical frames should give identical result" , {
   r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a")

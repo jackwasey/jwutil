@@ -29,40 +29,68 @@ logicalToBinary <- function(dframe) {
 }
 
 #' @title convert factor into a data.frame of logicals
-#' @description converts a single factor into a data.frame with multiple T/F fields,
-#'   one for each factor
+#' @description converts a single factor into a data.frame with multiple T/F
+#'   fields, one for each factor
 #' @param fctr factor
 #' @param prefix defaults to "f" to pre-pend the factor level when constructing
 #'   the data frame columns names
+#' @param sep scalar character, introduced between factor names and levels when
+#'   forming new data frame column names
+#' @param na.rm logical scalar: if NA data and/or NA levels, then covert to NA
+#'   strings and expand these as for any other factor
+#' @param verbose logical scalar
 #' @return data.frame with columns of logicals
 #' @export
-factorToCols <- function(fctr,
-                         prefix = "f",
-                         sep = "",
-                         verbose = FALSE) {
-
-  if (is.null(fctr)) { stop("factorToCols: NULL passed instead of factor") }
-  if (class(fctr) != "factor") { stop(paste("input data is class ", class(fctr))) }
-  if (sum(is.na(fctr))>0) { warning("factorToCols: factor passed to factorCols contains NA") }
-
-  #remove unused factor levels (because we have already taken a limited number
-  #of rows of whole data set) message('remove unused factor levels')
+factorToDataframeLogical <- function(fctr,
+                                     prefix = deparse(substitute(fctr)),
+                                     sep = "",
+                                     na.rm = TRUE,
+                                     verbose = FALSE) {
+  stopifnot(is.factor(fctr))
+  stopifnot(is.character(prefix))
+  stopifnot(length(prefix) == 1)
+  stopifnot(length(sep) == 1)
+  stopifnot(is.logical(na.rm))
+  stopifnot(length(na.rm) == 1)
+  stopifnot(is.logical(verbose))
+  stopifnot(length(verbose) == 1)
+  if (verbose && sum(is.na(fctr)) > 0) warning("factorToCols: factor passed to factorCols contains NA")
+  #remove unused factor levels
   fctr <- factor(fctr)
+  stopifnot(length(levels(fctr)) > 0)
+  stopifnot(length(fctr) > 0)
 
-  if (length(levels(fctr))<=0) { stop(paste("factor has no levels after reducing: ", length(levels(fctr)))) }
-  if (length(fctr)<=0) { stop(paste("factor length is: ", length(fctr))) }
-
-  newdframe <- data.frame(fctr)
-  names(newdframe) <- c('tempdeleteme')
-
-  if (verbose) message("looping to extract logical vectors from the provided factor")
-  for (i in 1:length(levels(fctr))) {
-    newColName = paste(prefix, levels(fctr)[i], sep=sep)
-    #message("factorToCols: creating new columns name: %s", newColName)
-    newdframe[,newColName] <- (fctr == levels(fctr)[i])
+  if (na.rm) {
+    # don't ignore NA values or levels
+    fctr <- factor(fctr, unique(fctr), exclude = NULL)
+    levels(fctr)[is.na(levels(fctr))] <- "NA"
   }
-  newdframe['tempdeleteme'] <- NULL
-  newdframe
+
+  if (length(levels(fctr)) == 1) {
+    if (verbose) message("only one factor level, returning all TRUE")
+    df <- data.frame(fctr)
+    names(df) <- prefix
+    return(df)
+  }
+
+  if (length(levels(fctr)) == 2) {
+    if (verbose) message("two factor levels: returning TRUE/FALSE for first level")
+    df <- data.frame(fctr == levels(fctr)[1])
+    names(df) <- paste(prefix, levels(fctr)[1], sep = sep)
+    return(df)
+  }
+
+  # set-up data frame with empty logical
+  df <- data.frame(tmp = logical(length = length(fctr)))
+
+  if (verbose) message("more than two factor levels")
+  for (lev in levels(fctr)) {
+    newColName = paste(prefix, lev, sep = sep)
+    if (verbose) message(sprintf("creating new column name: %s", newColName))
+    df[newColName] <- fctr == lev
+  }
+  df["tmp"] <- NULL
+  df
 }
 
 #' @title Takes factors from a data frame and converts them to true/false fields
@@ -75,11 +103,16 @@ factorToCols <- function(fctr,
 #' @param dframe data.frame to search for factors to convert
 #' @param considerFactors character vector of field names in the data frame to
 #'   consider. Defaults to all fields
+#' @param sep character scalar used to separate field prefixes from factor
+#'   values in new column names
+#' @param na.rm logical scalar: if NA data and/or NA levels, then covert to NA
+#'   strings and expand these as for any other factor
 #' @return data.frame with no factors
 #' @export
 expandFactors <- function (dframe,
                            considerFactors = names(dframe),
                            sep = "",
+                           na.rm = TRUE,
                            verbose = FALSE) {
   if (verbose) message("exFactor: converting factors in a data frame into logical vectors")
 
@@ -90,37 +123,19 @@ expandFactors <- function (dframe,
 
   #message("got factorNames: %s", paste(factorNames, collapse=", "))
 
-  newCols <- vector()
-  if (length(factorNames)>0) {
-    if (verbose) message("there are factors to be converted into values", paste(factorNames, collapse=", "))
-    for (mf in 1:length(factorNames)) {
-      mfName = factorNames[mf]
-      # simplify problem by removing unused factor levels (because we have
-      # already taken a limited number of rows of whole data set) remove unused
-      # factor levels
-      dframe[,mfName] <- factor(dframe[,mfName])
-      levelNames = levels(dframe[,mfName]) # now get the reduced list of factor levels
-      if (length(levelNames)>0) {
-        for (i in 1:length(levelNames)) {
-          # create new field in the data frame call "factorname.levelname"
-          newColName = paste(mfName, sep, levelNames[i], sep = "") %>% stripForFormula
-          # and populate it with the boolean whether the data points match the
-          # currently considered 'levelname' within the factor
-          dframe[,newColName] <- dframe[,mfName] == levels(dframe[,mfName])[i]
-          # do i care about keeping list of new columns?
-          newCols[length(newCols)+1] <- newColName
-        }
-      }
-      # delete the original factor from the data frame
-      dframe[,mfName]<-NULL
+  if (length(factorNames) > 0) {
+    if (verbose) message("there are factors to be converted into values: ",
+                         paste(factorNames, collapse = ", "))
+    for (fn in factorNames) {
+      if (verbose) message(sprintf("working on factor: %s", fn))
+      dfpart <- factorToDataframeLogical(fctr = dframe[[fn]],
+                                         prefix = fn, sep = sep, na.rm = na.rm, verbose = verbose)
+      dframe[fn] <- NULL
+      dframe <- cbind(dframe, dfpart)
     }
   } else {
     if (verbose) message("no factors found to convert in exFactor")
   }
-  if (length(newCols) == 0) newCols <- NULL
-
-  if (verbose) message("newFields: %s", paste(newCols, collapse=", "))
-
   dframe
 }
 
@@ -243,8 +258,8 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   if (class(x) != class(y)) warning(
     sprintf("x & y are different classes.
-              They will be cast implicitly by the merge.
-              Classes are: %s and %s", class(x), class(y)))
+            They will be cast implicitly by the merge.
+            Classes are: %s and %s", class(x), class(y)))
 
   # convert factors of keys only # TODO: as.integer may be appropriate sometimes/often.
   #TODO: tests for this

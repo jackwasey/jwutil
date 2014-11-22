@@ -12,11 +12,16 @@ nTestNumes <- 30
 #'   The testing relies on the tests/testthat directory to exist. It doesn't call
 #'   test() directly, because this results in tracing the wrong functions. Maybe
 #'   Hadley Wickham could incorporate this into testthat.
-#' @inheritParams lsf
+#'
+#'   This is submitted to testthat as a github pull request.
+#' @param pkg character single package name
+#' @param verbose logical
 #' @export
 testCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) {
-  require(testthat)
-  require(devtools)
+  suppressPackageStartupMessages({
+    library(testthat)
+    library(devtools)
+  })
   if (verbose) message("pkg = ", pkg)
   pkgenvir = as.environment(paste0("package:", pkg))
   funs <- lsf(pkg) # see function in util which lists contents of a package
@@ -31,10 +36,10 @@ testCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) 
   sink()
   #close(tfcon)
 
-  trace_output <- capture.output(test_dir("tests/testthat/", reporter=SilentReporter()))
+  trace_output <- capture.output(test_dir("tests/testthat/", reporter = SilentReporter()))
   #trace_output <- capture.output(test_file("tests/test-all.R", reporter=SilentReporter()))
 
-  tfcon <-file(tempfile(), open='w+')
+  tfcon <- file(tempfile(), open = 'w+')
   sink(file = tfcon, type = "message")
   for (f in funs) {
     capture.output(untrace(f, where = pkgenvir))
@@ -174,33 +179,44 @@ random_test_integers <- function(n = nTestNumes,
   x[!is.na(x)]
 }
 
-#' @rdname random_test_numbers
+#' @title generate random Dates or POSIXlt test datetimes
+#' @param n integer number to generate
 #' @param origin Date defaults to Jan 1, 2000.
-#' @param dayspread integer number of days either side of origin to pick random dates from
-#' @return vector of Dates
+#' @param dayspread integer number of days either side of origin to pick random
+#'   dates from, defaults to 150 years.
+#' @return vector of POSIXlt datetimes or Dates
 #' @export
 random_test_dates <- function(n = nTestNumes,
-                              origin=as.Date("2000-01-01"),
+                              origin = as.Date("2000-01-01"),
                               dayspread = 365*150) {
   as.Date(runif(n, min = -dayspread, max = dayspread), origin)
 }
 
-#' @rdname random_test_numbers
-#' @param origin Date defaults to Jan 1, 2000.
-#' @param dayspread integer number of days either side of origin to pick random
-#'   dates from
-#' @return vector of Dates
+#' @rdname random_test_dates
 #' @export
 random_test_posixlt_datetimes <- function(n = nTestNumes,
                                           origin = as.Date("2000-01-01"),
                                           dayspread = 365*150) {
-  as.POSIXlt(as.POSIXlt(random_test_dates(n, origin, dayspread)) + runif(1, min = 0, max=24*60*60))
+  as.POSIXlt(
+    as.POSIXlt(random_test_dates(n, origin, dayspread)) +
+      runif(1, min = 0, max = 24 * 60 * 60)
+  )
 }
 
 #' @rdname random_test_numbers
+#' @param maxStringLength integer scalar, maximum length of possible strings created, as distinct from number of strings given by \code{n}
 #' @export
-random_test_letters <- function(n = nTestNumes, maxlen = 257) {
-  paste(sample(c(LETTERS,letters, 0:9), runif(n, min = 0, max = maxlen), replace = TRUE), collapse = "")
+random_test_letters <- function(n = nTestNumes, maxStringLength = 257) {
+  x <- c()
+  for (i in 1:n) {
+    x[length(x) + 1] <- paste(
+      sample(
+        c(LETTERS,letters, 0:9),
+        runif(n=1, min = 1, max = maxStringLength),
+        replace = TRUE),
+      collapse = "")
+  }
+  x
 }
 
 #' @title extreme numbers

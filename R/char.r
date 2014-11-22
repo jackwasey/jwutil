@@ -6,6 +6,7 @@
 #'   aware matching for speed. This can be changed by setting useBytes to FALSE.
 #' @param x is a character vector to strip
 #' @param pattern is the non-regex of the character to strip, default " "
+#' @param useBytes logical scalar. Unlike gsub, this will default to TRUE here, therefore breaking unicode.
 #' @return character vector
 #' @export
 strip <- function (x, pattern = " ", useBytes = TRUE)

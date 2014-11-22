@@ -18,6 +18,9 @@ allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
 #' @description check whether all the items of input vector are integer
 #'   as.integer
 #' @param x is a vector to be tested
+#' @param tol single numeric, default if less than 1e-9 from an integer then
+#'   considered an integer.
+#' @param na.rm single logical, passed on to \code{all}
 #' @return logical scalar
 #' @export
 allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE) {
@@ -56,7 +59,7 @@ asCharacterNoWarn <- function(x) {
 asNumericNoWarn <- function(x) {
   old <- options(warn = -1)
   on.exit(options(old))
-  if (class(x)=='factor') x <- levels(x)[x]
+  if (class(x) == 'factor') x <- levels(x)[x]
   as.numeric(x)
 }
 
@@ -67,6 +70,8 @@ asIntegerNoWarn <- function(x) {
 }
 
 #' @rdname asNumericNoWarn
+#' @param tol tolerance when considering if two numbers are integers, default
+#'   1e-9
 #' @param na.ignore logical, if TRUE will pass through NA values, otherwise,
 #'   they are marked FALSE.
 #' @return logical vector
@@ -242,6 +247,7 @@ lsp <- function(package, all.names = TRUE, pattern) {
 #'   objects
 #' @param tms vector of times, i.e. number in range 0 to 2400, as string or
 #'   integer, with or without trailing zeros
+#' @param verbose logical
 #' @return vector of POSIXlt date-times
 #' @export
 add_time_to_date <- function(tms, dts, verbose = FALSE) {
