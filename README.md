@@ -6,6 +6,6 @@ without bringing in huge dependencies.
 
 ## install
 ```
-library(devools)
+library(devtools)
 install_github("jackwasey/jwutil")
 ```
