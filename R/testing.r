@@ -17,7 +17,7 @@ nTestNumes <- 30
 #' @param pkg character single package name
 #' @param verbose logical
 #' @export
-testCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) {
+testFunctionCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) {
   suppressPackageStartupMessages({
     library(testthat)
     library(devtools)
