@@ -68,7 +68,7 @@ lsCache <- function(cacheDir = NULL) {
 loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
   # getFromCache already (cheekily) loads into the given environment and returns the data:
   # loadFromCache just does this silently.
-  invisible(getFromCache(varName = varName, cacheDir = cacheDir, force = force, envir = envir))
+  invisible(getFromCache(varName = varName, cacheDir = cacheDir, envir = envir, force = force))
 }
 
 #' @title load or get a dated variable from cache
