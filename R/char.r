@@ -9,8 +9,13 @@
 #' @param useBytes logical scalar. Unlike gsub, this will default to TRUE here, therefore breaking unicode.
 #' @return character vector
 #' @export
-strip <- function (x, pattern = " ", useBytes = TRUE)
+strip <- function (x, pattern = " ", useBytes = TRUE) {
+  stopifnot(length(pattern) == 1)
+  stopifnot(length(useBytes) == 1)
+  stopifnot(class(pattern) == "character")
+  stopifnot(class(useBytes) == "logical")
   gsub(pattern = pattern, replacement = "", x, fixed = TRUE, useBytes = useBytes)
+}
 
 #' @title strip a string so that it can be used as a variable name in a formula.
 #' @description This excludes many symbols, so just strip all symbols leaving
@@ -18,8 +23,11 @@ strip <- function (x, pattern = " ", useBytes = TRUE)
 #' @param x character vector of potential formula variables
 #' @return character vector of length x
 #' @export
-stripForFormula <- function(x)
-  gsub(pattern = "[^[:alnum:]]", replacement = "", x)
+stripForFormula <- function(x) {
+  res <- gsub(pattern = "[^[:alnum:]]", replacement = "", x)
+  stopifnot(anyDuplicated(res) == 0)
+  res
+}
 
 
 #' @title strip whitespace from ends of each string in given character vector
@@ -73,9 +81,24 @@ strMultiMatch <- function(pattern, text, dropEmpty = FALSE, ...) {
 #'   not to swap, so the first match becomes the name.
 #' @export
 strPairMatch <- function(pattern, text, swap = FALSE, dropEmpty = FALSE, ...) {
-  res <- strMultiMatch(pattern = pattern, text = text, dropEmpty = TRUE, ...)
+  stopifnot(length(pattern) == 1)
+  stopifnot(length(text) > 0)
+  stopifnot(length(swap) == 1)
+  stopifnot(length(dropEmpty) == 1)
+  stopifnot(class(pattern) == "character")
+  stopifnot(class(text) == "character")
+  stopifnot(class(swap) == "logical")
+  stopifnot(class(dropEmpty) == "logical")
+
+  res <- strMultiMatch(pattern = pattern, text = text, dropEmpty = dropEmpty, ...)
+  stopifnot(all(sapply(res, function(x) length(x) == 2)))
+
   outNames <- vapply(X = res, FUN = '[', FUN.VALUE = character(1), ifelse(swap, 2, 1))
+  stopifnot(all(!is.na(outNames)))
+
   out <- vapply(X = res, FUN = '[', FUN.VALUE = character(1), ifelse(swap, 1, 2))
+  stopifnot(all(!is.na(out)))
+
   names(out) <- outNames
   out
 }
