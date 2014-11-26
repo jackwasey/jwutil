@@ -81,14 +81,15 @@ loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .Glob
 #' @template varName
 #' @template startEndDate
 #' @param envir, where to load the data, defaults to \code{.GlobalEnv}
-#' @param ... additional arguments to pass to \code{getDatedFromCache}
+#' @param ... additional arguments to pass to \code{getFromCache}
 #' @family cache
 #' @export
 loadDatedFromCache <- function(varName, startDate, endDate, envir = parent.env(), ...)
-  assign(varName, getDatedFromCache(varName, startDate, endDate, envir = envir, ...), envir = envir)
+  assign(varName, getFromCache(varName, startDate, endDate, envir = envir, ...), envir = envir)
 
 #' @title getFromCache
 #' @template varName
+#' @template startEndDate
 #' @template cacheDir
 #' @param envir environment in which to save the retrieved cache data. This is
 #'   done even though the data is being return, being a simple in-memory level
@@ -96,11 +97,19 @@ loadDatedFromCache <- function(varName, startDate, endDate, envir = parent.env()
 #' @param force logical whether to get the data from cache even if it is already
 #'   in an accessible environment
 #' @export
-getFromCache <- function(varName, cacheDir = NULL, envir = .GlobalEnv, force = FALSE) {
+getFromCache <- function(varName, startDate = NULL, endDate = NULL,
+                         cacheDir = NULL, envir = .GlobalEnv, force = FALSE) {
+
+  stopifnot(!xor(is.null(startDate), is.null(endDate)))
+  if (!is.null(startDate))
+    vn <- getCacheVarDated(varName, startDate = startDate, endDate = endDate)
+  else
+    vn <- varName
+
   if (!force && exists(varName, envir = envir))
     return(get(varName, envir = envir, inherits = TRUE))
 
-  fp <- findCacheFilePath(varName, cacheDir)
+  fp <- findCacheFilePath(vn, cacheDir)
   if (!file.exists(fp)) stop(sprintf("Path '%s' doesn't exist when trying to access cache", fp))
   load(file =  fp, envir = envir)
   # we are assuming that the .RData file contains a variable with the same name
@@ -122,14 +131,6 @@ getFromCache <- function(varName, cacheDir = NULL, envir = .GlobalEnv, force = F
 #' @export
 getDated <- function(varName, startDate, endDate, ...)
   get(getCacheVarDated(varName, startDate, endDate), ...)
-
-#' @title getDatedFromCache
-#' @template varName
-#' @template startEndDate
-#' @param ... additional arguments pased to \code{getFromCache}
-#' @export
-getDatedFromCache <- function(varName, startDate, endDate, ...)
-  getFromCache(varName = getCacheVarDated(varName, startDate, endDate), ...)
 
 #' @title assign a value to an environment, but only evaluate the assignment if
 #'   it doesn't already exist on the cache. In this case, it is also saved in

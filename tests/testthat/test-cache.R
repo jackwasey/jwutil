@@ -105,6 +105,34 @@ test_that("cache with date limited files", {
   expect_true(any(grepl(pattern = "oliver", x = lsCache(cacheDir = cd))))
   expect_false(any(grepl(pattern = "not in the cache", x = lsCache(cacheDir = cd))))
 
+  # we actually don't store the dated variable name in the working environment:
+  expect_error(getDated("oliver", startDate = startDate, endDate = endDate, envir = mytestenv))
+
+  expect_equal(getFromCache("oliver", startDate = startDate, endDate = endDate,
+                                 cacheDir = cd, envir = mytestenv),
+               get("oliver", envir = mytestenv))
+  # repeat, without force should just get from memory (and be the same!)
+  expect_equal(getFromCache("oliver", startDate = startDate, endDate = endDate,
+                                 cacheDir = cd, envir = mytestenv),
+               get("oliver", envir = mytestenv))
+
+  suppressWarnings(rm(list = "oliver", envir = mytestenv))
+  loadDatedFromCache("oliver", startDate = startDate, endDate = endDate,
+                     cacheDir = cd, envir = mytestenv)
+  expect_true(exists("oliver", envir = mytestenv))
+  # and bypass cache if already in memory
+  loadFromCache("oliver", cacheDir = cd, envir = mytestenv)
+  expect_true(exists("oliver", envir = mytestenv))
+
+  suppressWarnings(rm(list = c("oliver", "oliver2010-02-01to2011-03-15"), envir = mytestenv))
+  loadDatedFromCache("oliver", startDate = startDate, endDate = endDate, cacheDir = cd, envir = mytestenv)
+  expect_true(exists("oliver", envir = mytestenv))
+  expect_false(exists("oliver2010-02-01to2011-03-15", envir = mytestenv))
+  # and bypass cache if already in memory
+  loadDatedFromCache("oliver", startDate = startDate, endDate = endDate, cacheDir = cd, envir = mytestenv)
+  expect_true(exists("oliver", envir = mytestenv))
+  expect_false(exists("oliver2010-02-01to2011-03-15", envir = mytestenv))
+
   #   print(pryr::where('jack'))
   #   print(environment())
   #   print(find("jack", ))
