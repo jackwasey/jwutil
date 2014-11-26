@@ -231,6 +231,11 @@ test_that("drop rows with NA values in given fields good data", {
   expect_identical(dropRowsWithNAField(carsna1), cars[2:50, ])
   expect_identical(dropRowsWithNAField(carsna2), cars[2:50, ])
   expect_identical(dropRowsWithNAField(carsna3), cars[2:50, ])
+  # without specifying particular fields, this should be equivalent to
+  # \code{na.omit} (but not an 'omit' object)
+  expect_equivalent(dropRowsWithNAField(carsna1), na.omit(carsna1))
+  expect_equivalent(dropRowsWithNAField(carsna2), na.omit(carsna2))
+  expect_equivalent(dropRowsWithNAField(carsna3), na.omit(carsna3))
 
   expect_identical(dropRowsWithNAField(cars, "speed"), cars)
   expect_identical(dropRowsWithNAField(carsna1, "speed"), cars[2:50, ])

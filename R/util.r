@@ -211,19 +211,6 @@ countNonNaCumulative <- function(d) {
   )
 }
 
-#' @title merge lists by names
-#' @description merge lists by combining all the elements of the list items with the matching names
-#' @param x list with named elements
-#' @param y list with named elements
-#' @return list
-#' @export
-mergeLists <- function(x, y) {
-  both <- list(x, y)
-  n <- unique(unlist(lapply(both, names)))
-  names(n) <- n
-  lapply(n, function(ni) unlist(lapply(both, `[[`, ni)))
-}
-
 #' @title list all items in a package
 #' @description default to including (?private) functions beginning with '.'
 #' @param package is the (unquoted) name of the package
@@ -320,41 +307,6 @@ isValidTime <- function(tms, na.rm = FALSE) {
   # Don't do this, or we can't use logical test in case all vals are NA. validTimes[is.na(tms)] <- NA # grepl only gives T or F output
   #TODO: write tests...
 }
-
-#' @title trim null or empty values from a list
-#' @param x list
-#' @return trimmed list
-#' @export
-listTrim  <-  function(x){   # delele null/empty entries in a list
-  x[unlist(lapply(x, length) != 0)]
-}
-
-#' @title flatten a list
-#' @description unlike unlist, this function returns a list of objects of
-#'   different data types, but removes any depth
-#' @param ... list or any set of objects which will be made into a list, may
-#'   include lists and nested lists
-#' @param na.rm will drop NA values if TRUE
-#' @return list without nested lists, objects with preserved data types
-#' @source
-#'   https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
-#'
-#' @export
-flattenList <- function(..., na.rm = FALSE) {
-  x <- list(...)
-  y <- list()
-  rapply(x, function(x) y <<- c(y,x))
-  if (na.rm)
-    return(y[!is.na(y)])
-  y
-}
-
-#' @title determine whether a list is nested
-#' @param x list
-#' @return single logical
-#' @export
-isFlat <- function(x)
-  unlist(x, recursive = TRUE) == unlist(x, recursive = FALSE)
 
 #' @title shuffle
 #' @description randomly shuffle the order of a vector or list. This is to improve
@@ -467,9 +419,14 @@ buildLinearFormula <- function (left, right) {
 #'   vector, list etc, \code{invwhich} returns a logical vector with TRUE for
 #'   the cited positions. If length is not provided, the maximum index is used.
 #' @param which integer vector of indices, as would be produced by \code{which}
-#' @param length integer scalar: length of return vector, defaults to
+#' @param len integer scalar: length of return vector, defaults to
 #'   \code{max(which)}
 #' @return logical vector of length \code{length}
 #' @export
-invwhich <- function(which, length = max(which))
-  is.element(seq_len(length), which)
+invwhich <- function(which, len = max(which)) {
+  stopifnot(all(which > 0) )
+  stopifnot(allIsInteger(which))
+  stopifnot(length(len) > 0)
+  stopifnot(identical(areIntegers(len), TRUE))
+  is.element(seq_len(len), which)
+}

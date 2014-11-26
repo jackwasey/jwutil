@@ -341,3 +341,26 @@ test_that("areIntegers", {
   expect_error(areIntegers(c(1,2), na.ignore = FALSE, tol = "0.01"))
 
 })
+
+test_that("inverse of base 'which' function", {
+  expect_error(invwhich(bad_input))
+  expect_error(invwhich(random_test_letters))
+  expect_error(invwhich())
+  expect_error(invwhich(0))
+  expect_error(invwhich(-1))
+  expect_error(invwhich(1.5))
+  expect_error(invwhich(1, len ="carrots"))
+  expect_error(invwhich(1, len =-1))
+  expect_error(invwhich(1, len =0.5))
+  expect_error(invwhich(1, len =c(1,2)))
+
+  expect_equal(invwhich(1), TRUE)
+  expect_equal(invwhich(2), c(FALSE,TRUE))
+  expect_equal(invwhich(c(1,2)), c(TRUE,TRUE))
+  expect_equal(invwhich(c(1,2), len =3), c(TRUE, TRUE, FALSE))
+})
+
+test_that("platform", {
+  expect_that(platformIsLinux() & platformIsWindows(), testthat::not(is_true()))
+})
+
