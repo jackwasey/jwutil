@@ -12,7 +12,7 @@ test_that("merge lists of vectors", {
   expect_equal(mergeLists(x, x), list(a = c(1,1), b = c(10,10)))
   expect_equal(mergeLists(x, y), list(a = 1, b = c(10,20), c = 100))
 
-  expect_equal(mergeLists(x, c(x, 1)), list(a = c(1,1), b = c(10,10)))
+  expect_equal(mergeLists(x, c(x, 1)), list(a = c(1, 1), b = c(10, 10)))
   expect_equal(mergeLists(c(x, 5), y), list(a = 1, b = c(10,20), c = 100))
 })
 

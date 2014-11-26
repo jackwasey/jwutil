@@ -8,12 +8,13 @@
 #' @export
 mergeLists <- function(x, y) {
   stopifnot(isFlat(x), isFlat(y))
-  stopifnot(all(lapply(x, is.vector)))
-  stopifnot(all(lapply(y, is.vector)))
+  stopifnot(all(vapply(x, is.vector, vector(length = 1))))
+  stopifnot(all(vapply(y, is.vector, vector(length = 1))))
   both <- list(x, y)
   n <- unique(unlist(lapply(both, names)))
   names(n) <- n
-  lapply(n, function(ni) unlist(lapply(both, `[[`, ni)))
+  res <- lapply(n, function(ni) unlist(lapply(both, `[[`, ni)))
+  res[!vapply(res, is.null, logical(1))]
 }
 
 #' @title trim null or empty values from a list
