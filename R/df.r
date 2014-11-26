@@ -356,7 +356,7 @@ affixFields <- function(fieldNames, skipFields, affix,
   fieldNames
 }
 
-#' @title get numbers that would be dropped in a merge
+#' @title get items or numerics that would be dropped in a merge
 #' @description converts both vectors to numeric. This simulates merging when
 #'   one key is character (but contains integer numbers), and another key is
 #'   stored as integer.
@@ -364,13 +364,22 @@ affixFields <- function(fieldNames, skipFields, affix,
 #' @param y vector or factor
 #' @return list of two vectors
 #' @export
-getDroppedNumeric <- function(x, y) {
-  x <- asNumericNoWarn(x)
-  x <- asNumericNoWarn(y)
+getDropped <- function(x,y) {
   list(
     missing_from_x = y[y %nin% x],
     missing_from_y = x[x %nin% y])
 }
+
+#' @rdname getDropped
+#' @export
+getDroppedNumeric <- function(x, y)
+  getDropped(asNumericNoWarn(x), asNumericNoWarn(y))
+
+#' @rdname getDropped
+#' @export
+getDroppedInteger <- function(x, y)
+  getDropped(asIntegerNoWarn(x), asIntegerNoWarn(y))
+
 
 #' @title drop duplicate fields
 #' @description compares all data in each field to every other field, and drops
