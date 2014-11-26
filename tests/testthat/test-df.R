@@ -205,3 +205,41 @@ test_that("drop duplicate fields in a data frame", {
   expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c")]), dfa)
   expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c", "c")]), dfa)
 })
+
+
+test_that("drop rows with NA values in given fields bad data", {
+  # don't test \code{complete.cases}, just my function
+  expect_error(dropRowsWithNAField(c(4,5)))
+  expect_error(dropRowsWithNAField(bad_input))
+  expect_error(dropRowsWithNAField(random_test_dates()))
+  expect_error(dropRowsWithNAField())
+  expect_error(dropRowsWithNAField(cars, "speed", "dist"))
+  expect_error(dropRowsWithNAField(cars, "doesnotexist"))
+  expect_error(dropRowsWithNAField(cars, c("speed", "doesnotexist")))
+})
+
+test_that("drop rows with NA values in given fields good data", {
+  expect_identical(dropRowsWithNAField(cars, "speed"), cars)
+  expect_identical(dropRowsWithNAField(cars, c("speed", "dist")), cars)
+
+  carsna1 <- carsna2 <- carsna3 <- cars
+  carsna1[1,1] = NA_integer_
+  carsna2[1,2] = NA_integer_
+  carsna3[1,1:2] = NA_integer_
+
+  expect_identical(dropRowsWithNAField(cars), cars)
+  expect_identical(dropRowsWithNAField(carsna1), cars[2:50, ])
+  expect_identical(dropRowsWithNAField(carsna2), cars[2:50, ])
+  expect_identical(dropRowsWithNAField(carsna3), cars[2:50, ])
+
+  expect_identical(dropRowsWithNAField(cars, "speed"), cars)
+  expect_identical(dropRowsWithNAField(carsna1, "speed"), cars[2:50, ])
+  expect_identical(dropRowsWithNAField(carsna2, "speed"), carsna2)
+  expect_identical(dropRowsWithNAField(carsna3, "speed"), cars[2:50, ])
+
+  expect_identical(dropRowsWithNAField(cars, "dist"), cars)
+  expect_identical(dropRowsWithNAField(carsna1, "dist"), carsna1)
+  expect_identical(dropRowsWithNAField(carsna2, "dist"), cars[2:50, ])
+  expect_identical(dropRowsWithNAField(carsna3, "dist"), cars[2:50, ])
+
+})

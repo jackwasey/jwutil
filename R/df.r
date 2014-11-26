@@ -197,17 +197,27 @@ propNaPerField <- function(dframe) {
 }
 
 #' @title drops rows with NA values in specified fields
-#' @description unlike na.omit, the list of fields determines exactly which fields must have no NA values
-#' @param dat is a data frame
-#' @param ... names of fields which must have no NA values
+#' @description employs complete.cases which is fast internal C code. Returns a
+#'   data frame with unused factor levels dropped (these may have been
+#'   introduced by dropping rows with some NA values)
+#' @param x data frame
+#' @param fld vector with names of fields which must have no NA values
 #' @template verbose
 #' @return data frame without rows containing NA in the specified data fields.
-#' @export
-dropRowsWithNAField <- function(dat, ..., verbose = FALSE) {
+#'   There may be NA values in the resulting data frame in fields which are not
+#'   listed in fld.
+dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
+  if (verbose) message(sprintf("checking fields: %s for NA values", fld))
+  stopifnot(class(fld) == "character")
+  stopifnot(class(x) == "data.frame")
+  cc <- complete.cases(x[fld])
+  droplevels(x[cc,])
+}
+
+dropRowsWithNAFieldOld <- function(x, ..., verbose = FALSE) {
   fld <- c(..., recursive = TRUE)
   if (verbose) message(fld)
 
-  c(is.na(dat))
   for (f in fld) {
     dat <- dat[as.vector(!is.na(dat[f])),]
   }
