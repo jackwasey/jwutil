@@ -1,10 +1,15 @@
 #' @title merge lists by names
-#' @description merge lists by combining all the elements of the list items with the matching names
-#' @param x list with named elements
-#' @param y list with named elements
-#' @return list
+#' @description merge lists by vector combining all the vector elements of the
+#'   list items with the matching names. Unnamed vectors in the list will be
+#'   dropped silently.
+#' @param x unnested list with named elements, each of which is a vector
+#' @param y unnested list with named elements, each of which is a vector
+#' @return list of vectors
 #' @export
 mergeLists <- function(x, y) {
+  stopifnot(isFlat(x), isFlat(y))
+  stopifnot(all(lapply(x, is.vector)))
+  stopifnot(all(lapply(y, is.vector)))
   both <- list(x, y)
   n <- unique(unlist(lapply(both, names)))
   names(n) <- n
@@ -12,7 +17,8 @@ mergeLists <- function(x, y) {
 }
 
 #' @title trim null or empty values from a list
-#' @description delele null/empty entries in a list. Recursively looks through list if nested.
+#' @description delele null/empty entries in a list. Recursively looks through
+#'   list if nested.
 #' @param x list
 #' @return trimmed list
 #' @export
@@ -26,7 +32,8 @@ listTrim  <-  function(x){
 #' @return trimmed list
 #' @export
 listTrimFlat  <-  function(x) {   # delele null/empty entries in a list
-  stopifnot(isFlat(x)) # inefficient to do this twice if called from listTrim, but hey ho.
+  # inefficient to do this twice if called from listTrim, but hey ho.
+  stopifnot(isFlat(x))
   suppressWarnings(
     x[sapply(x, length) != 0 &
         !sapply(x, function(y) all(is.null(y))) &
@@ -44,7 +51,6 @@ listTrimFlat  <-  function(x) {   # delele null/empty entries in a list
 #' @return list without nested lists, objects with preserved data types
 #' @source
 #'   https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
-#'
 #' @export
 flattenList <- function(..., na.rm = FALSE) {
   x <- list(...)
