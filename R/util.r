@@ -23,12 +23,11 @@ allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
 #' @param na.rm single logical, passed on to \code{all}
 #' @return logical scalar
 #' @export
-allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE) {
-  all(
-    areIntegers(x, tol = tol, na.ignore = TRUE), # don't count NA as false automatically
+allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
+  all( # don't count NA as false automatically
+    areIntegers(x, tol = tol, na.ignore = TRUE),
     na.rm = na.rm
   )
-}
 
 #' @title convert factor or vector to character without warnings
 #' @description correctly converts factors to vectors, and then converts to
@@ -65,9 +64,9 @@ asNumericNoWarn <- function(x) {
 
 #' @rdname asNumericNoWarn
 #' @export
-asIntegerNoWarn <- function(x) {
+asIntegerNoWarn <- function(x)
   as.integer(asNumericNoWarn(x))
-}
+
 
 #' @rdname asNumericNoWarn
 #' @param tol tolerance when considering if two numbers are integers, default
@@ -91,13 +90,14 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
 }
 
 #' @title inverse of \%in\%
-#' @description borrowed from Hmisc. See %in%
+#' @description borrowed from Hmisc. See %in%. Original %in% is: match(x, table,
+#'   nomatch = 0L) > 0L
 #' @param x is the vector of values to be matched
 #' @param table is actually a vector, to be matched against
 #' @return logical vector of length of x
 #' @export
-"%nin%" <- function(x, table) match(x, table, nomatch = 0) == 0
-# original %in% is: match(x, table, nomatch = 0L) > 0L
+"%nin%" <- function(x, table)
+  match(x, table, nomatch = 0) == 0
 
 #' @title read file from zip at URL
 #' @description downloads zip file, and opens named file \code{filename}, or the
@@ -134,50 +134,45 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
 }
 
 #' @title count non-numeric elements
-#' @description counts the number of non-numeric elements in a vector, without throwing warnings
+#' @description counts the number of non-numeric elements in a vector, without
+#'   throwing warnings
 #' @details did have \code{extras = c(".", "NA"))}
 #' @param x is usually a charcter vector
 #' @return integer
 #' @export
-countNotNumeric <- function (x) {
-  old <- options(warn = -1)
-  on.exit(options(old))
-  #xs <- x[x %nin% c("", extras)] #%nin% is in Hmisc, and = !%iin%
+countNotNumeric <- function (x)
   countIsNa(asNumericNoWarn(x))
-}
 
 #' @title count numeric elements
-#' @description counts the number of numeric elements in a vector, without throwing warnings
+#' @description counts the number of numeric elements in a vector, without
+#'   throwing warnings
 #' @param x is usually a character vector
 #' @return integer
 #' @export
-countNumeric <- function(x) {
+countNumeric <- function(x)
   length(x) - countNotNumeric(x)
-}
 
 #' @title count NA in vector
 #' @param x vector
 #' @return integer
 #' @export
-countIsNa <- function(x) {
+countIsNa <- function(x)
   sum(is.na(x))
-}
 
 #' @title Proportion of NA values in a vector
 #' @param x is a vector which may have NA values
 #' @return numeric proportion of NAs in the supplied vector
 #' @export
-propIsNa <- function(x) {
-  if (length(x) == 0) return(0)
-  countIsNa(x) / length(x)
-}
+propIsNa <- function(x)
+  ifelse(length(x) == 0, 0, countIsNa(x) / length(x))
 
 #' @title count which combinations of fields have at least one non-NA
-#' @description cycles through the given data frame twice, and applies logical OR to all elements of each column
-#' it then counts how many of these pairs are not-na, i.e. have at least one non-NA value
-#' TODO: tests
+#' @description cycles through the given data frame twice, and applies logical
+#'   OR to all elements of each column it then counts how many of these pairs
+#'   are not-na, i.e. have at least one non-NA value TODO: tests
 #' @param d data.frame
-#' @return matrix with nrow and ncol being the number of fields in the given dataframe
+#' @return matrix with nrow and ncol being the number of fields in the given
+#'   dataframe
 #' @export
 countNonNaPairs <- function(d) {
   apply(!is.na(d),
@@ -192,10 +187,11 @@ countNonNaPairs <- function(d) {
 }
 
 #' @title running totals of number of non-NA values in consecutive fields
-#' @description counts non-NA fields in first field, then progreses through fields, OR new field and saves running total for each field
-#' TODO: tests
+#' @description counts non-NA fields in first field, then progreses through
+#'   fields, OR new field and saves running total for each field TODO: tests
 #' @param d data.frame
-#' @return vector of cumulative non-NA counts with names corresponding to the given data frame
+#' @return vector of cumulative non-NA counts with names corresponding to the
+#'   given data frame
 #' @export
 countNonNaCumulative <- function(d) {
   running <- rep(FALSE, dim(d)[1])
@@ -304,8 +300,9 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 isValidTime <- function(tms, na.rm = FALSE) {
   if (na.rm) tms <- tms[!is.na(tms)]
   grepl(pattern = "^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
-  # Don't do this, or we can't use logical test in case all vals are NA. validTimes[is.na(tms)] <- NA # grepl only gives T or F output
-  #TODO: write tests...
+  #Don't do this, or we can't use logical test in case all vals are NA.
+  #validTimes[is.na(tms)] <- NA # grepl only gives T or F output TODO: write
+  #tests...
 }
 
 #' @title shuffle
@@ -355,16 +352,13 @@ permute <- function(x) {
 #'
 #' @return logical
 #' @export
-platformIsLinux <- function() {
+platformIsLinux <- function()
   Sys.info()[["sysname"]] == "Linux"
-}
 
 #' @rdname platformIsLinux
 #' @export
-platformIsWindows <- function() {
+platformIsWindows <- function()
   Sys.info()[["sysname"]] == "Windows"
-}
-
 
 #' @title read .xlsx file, interpret as CSV, and return data frame
 #' @description currently relies on Linux xlsx2csv command, but could

@@ -3,7 +3,40 @@
 
 context("Utility Functions")
 
+test_that("asCharacterNoWarn", {
+  expect_error(asCharacterNoWarn())
+  expect_equal(asCharacterNoWarn(1), "1")
+  expect_equal(asCharacterNoWarn(1L), "1")
+  expect_equal(asCharacterNoWarn(1.1), "1.1")
+  expect_equal(asCharacterNoWarn(c(1.2, 34.555)), c("1.2", "34.555"))
+
+  expect_equal(asCharacterNoWarn(NA), NA_character_)
+  expect_equal(asCharacterNoWarn(c(1.2, NA)), c("1.2", NA_character_))
+  expect_equal(asCharacterNoWarn(c(NA, 1.2)), c(NA_character_, "1.2"))
+})
+
+test_that("asNumericNoWarn", {
+  expect_error(asNumericNoWarn())
+
+  expect_true(is.na(asNumericNoWarn(NA)))
+  expect_equal(asNumericNoWarn("1"), 1.0)
+  expect_equal(asNumericNoWarn("1.1"), 1.1)
+  expect_equal(asNumericNoWarn("-1"), -1.0)
+  expect_equal(asNumericNoWarn(c("-1 "," not a number", "100")), c(-1.0, NA_real_, 100.0))
+})
+
+test_that("asIntegerNoWarn", {
+  expect_error(asIntegerNoWarn())
+
+  expect_equal(asIntegerNoWarn(NA), NA_integer_)
+  expect_equal(asIntegerNoWarn("1"), 1L)
+  expect_equal(asIntegerNoWarn("1.1"), 1L)
+  expect_equal(asIntegerNoWarn("-1"), -1L)
+  expect_equal(asIntegerNoWarn(c("-1.1 "," not a number", "100")), c(-1L, NA_integer_, 100L))
+})
+
 test_that("countNotNumeric", {
+  expect_error(countNotNumeric())
   expect_equal(countNotNumeric(c(NA)), 1)
   expect_equal(countNotNumeric(c("badger's mount")), 1)
   expect_equal(countNotNumeric(c("1 ", NA)), 1)
@@ -13,6 +46,23 @@ test_that("countNotNumeric", {
   expect_equal(countNotNumeric(c("1","two", c(NA,1))), 2)
   expect_equal(countNotNumeric(c("1","two", c("2",NA,1))), 2)
   expect_equal(countNotNumeric(c()),0) # no non-numeric values in an empty vector
+})
+
+test_that("countNumeric", {
+  expect_error(countNumeric())
+  expect_equal(countNumeric(c(NA)), 0)
+  expect_equal(countNumeric(c("badger's mount")), 0)
+  expect_equal(countNumeric(c("1 ", NA)), 1)
+  expect_equal(countNumeric(c(" 1", NA)), 1)
+  expect_equal(countNumeric(c(" 1 ", NA)), 1)
+  expect_equal(countNumeric(c("1","two", NA)), 1)
+  expect_equal(countNumeric(c("1","two", "2")), 2)
+  expect_equal(countNumeric(c("9.9 ", NA)), 1)
+  expect_equal(countNumeric(c(" 9.9", NA)), 1)
+  expect_equal(countNumeric(c(" 9.9 ", NA)), 1)
+  expect_equal(countNumeric(c("9.9","two", NA)), 1)
+  expect_equal(countNumeric(c("9.9","two", NA, 1)), 2)
+  expect_equal(countNumeric(c()), 0) # no non-numeric values in an empty vector
 })
 
 test_that("propIsNa", {
@@ -364,3 +414,10 @@ test_that("platform", {
   expect_that(platformIsLinux() & platformIsWindows(), testthat::not(is_true()))
 })
 
+
+test_that("download zip", {
+  expect_that(
+    read.zip.url("http://phs.googlecode.com/files/Download%20File%20Test.zip"),
+    testthat::not(throws_error())
+  )
+})
