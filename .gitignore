@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 man
+traceOutput.txt
+coverage_report.html
