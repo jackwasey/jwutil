@@ -224,10 +224,10 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 #' @param affix either prefix or suffix to disambiguate files. By default, this
 #'   is the name of the table specified in \code{y}. In all other respects in
 #'   this function, \code{x} and \code{y} are symmetric.
-#' @param ifConflict - determines whether prefix or suffix is added to
+#' @param renameConflict - determines whether prefix or suffix is added to
 #'   disambiguate conflicting column names. Value can be "suffix", "prefix".
 #'   Suffix is the default.
-#' @param doRename - regardless of column name clashes, "prefix" or "suffix"
+#' @param renameAll - regardless of column name clashes, "prefix" or "suffix"
 #'   with every field with original table name, or "no" for neither
 #' @param convertFactors Default is TRUE which causes factors to be converted to
 #'   character before merge. This is almost certainly safer.
@@ -237,13 +237,20 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 mergeBetter <- function(x, y, by.x, by.y,
                         all.x = FALSE, all.y = FALSE,
                         affix = NULL,
-                        ifConflict = c("suffix", "prefix"),
-                        doRename = c("no", "suffix", "prefix"),
+                        renameConflict = c("suffix", "prefix"),
+                        renameAll = c("no", "suffix", "prefix"),
                         convertFactors = TRUE,
                         verbose = FALSE) {
 
-  ifConflict <- match.arg(ifConflict)
-  doRename <- match.arg(doRename)
+  renameConflict <- match.arg(renameConflict)
+  renameAll <- match.arg(renameAll)
+
+  stopifnot(class(x) == "data.frame")
+  stopifnot(class(y) == "data.frame")
+  stopifnot(length(by.x) == 1, length(by.y) == 1)
+  stopifnot(length(all.x) == 1, length(all.y) == 1)
+  stopifnot(length(verbose) == 1, length(convertFactors) == 1)
+
 
   # we don't want case sensitive names: we rely on case insensitivity, and it is
   # very common for the same data to have case-changes in the field name.
@@ -251,14 +258,10 @@ mergeBetter <- function(x, y, by.x, by.y,
   stopifnot(all(!duplicated(tolower(names(y)))))
 
   # guess a good affix. If y is not just a variable name, use 'y'
-  affix <- deparse(substitute(y))
-  #if (any(grepl(pattern = "\\(|\\[", affix))) affix = "y"
-  if (length(substitute(y)) > 1) affix = "y"
-
-  if (class(x) != class(y)) warning(
-    sprintf("x & y are different classes.
-            They will be cast implicitly by the merge.
-            Classes are: %s and %s", class(x), class(y)))
+  if (is.null(affix)) {
+    affix <- deparse(substitute(y))
+    if (length(substitute(y)) > 1) affix = "y"
+  }
 
   # convert factors of keys only # TODO: as.integer may be appropriate sometimes/often.
   #TODO: tests for this
@@ -287,10 +290,10 @@ mergeBetter <- function(x, y, by.x, by.y,
   if (verbose) message("got duplicate x field names: ", paste(dupeNames_x, collapse=", "))
 
   if (length(dupeNames_x) > 0) {
-    if (doRename == "no") {
-      if (verbose) message("there are conflicting field names in the merge but no renaming was specifically requested so using ifCOnflict to guide the renaming of clashing fields in x:",
+    if (renameAll == "no") {
+      if (verbose) message("there are conflicting field names in the merge but no renaming was specifically requested so using renameConflict to guide the renaming of clashing fields in x:",
                            paste(dupeNames_x, collapse = ", "))
-      dropFields=c()
+      dropFields = c()
       for (xdup in dupeNames_x) {
         #rematch y - this is unsatisfying but simplifies the logic.
         match_x_in_y <- match(xdup, names(y))
@@ -299,23 +302,19 @@ mergeBetter <- function(x, y, by.x, by.y,
         if (verbose) message("checking whether '", xdup, "' (matching '", ydup, "') has duplicated data.")
         isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
         if (identical(isAllEqual, TRUE)) { # all.equal returns true or a char vector
-          dropFields <- c(dropFields, ydup)
           if (verbose) message("will drop  identical field: ", ydup)
+          dropFields <- c(dropFields, ydup)
         } else {
-          if (verbose) { message(isAllEqual); message("renaming conflicting field") }
-          if (ifConflict == "suffix") {
-            newName <- paste(ydup, affix, sep=".")
-          } else if (ifConflict == "prefix") {
-            newName <- paste(affix, ydup, sep=".")
-          }
-          names(y)[which(names(y) == ydup)] <- newName
+          if (verbose) message("renaming conflicting field")
+          names(y)[which(names(y) == ydup)] <- affixFields(fieldNames = ydup, affix = affix,
+                                                           renameHow = renameConflict)
         }
       }
       # actually drop the fields: best not to do while looping through the data frames.
       for (dropField in dropFields) y[dropField] <- NULL
-    } else { # doRename = yes
+    } else { # renameAll != "no"
       names(y) <- affixFields(fieldNames = names(y), skipFields = by.y,
-                              affix = affix, doRename = doRename, verbose = verbose)
+                              affix = affix, renameHow = renameAll)
     }
   } # end if there are duplicates (no else - we can proceed)
 
@@ -328,27 +327,27 @@ mergeBetter <- function(x, y, by.x, by.y,
 #' @title update a set of data frame field names
 #' @description prefix or suffix
 #' @param fieldNames char vector
-#' @param skipFields char vector
 #' @param affix character
-#' @param doRename should be "suffix" or "prefix"
+#' @param skipFields char vector, defaults to include all fields
+#' @param renameAll should be "suffix" or "prefix"
 #' @param sep default '.'
-#' @param verbose whether to display any informative messages
 #' @return character vector, same length as fieldNames
 #' @export
-affixFields <- function(fieldNames, skipFields, affix,
-                        doRename = c("no", "suffix", "prefix"),
-                        sep = ".", verbose = FALSE) {
+affixFields <- function(fieldNames, affix, skipFields = NULL,
+                        renameHow = c("suffix", "prefix"),
+                        sep = ".") {
 
-  doRename <- match.arg(doRename)
+  stopifnot(length(affix) == 1)
+  stopifnot(nchar(affix) >0)
+  stopifnot(is.null(skipFields) || is.character(skipFields))
 
-  if (doRename == "suffix") {
-    if (verbose) message("renaming first table field names with suffix")
-    fieldNames[fieldNames %nin% skipFields] <- paste(fieldNames[fieldNames %nin% skipFields], affix, sep = sep)
-  } else if (doRename == "prefix") {
-    if (verbose) message("renaming first table field names with prefix")
-    fieldNames[fieldNames %nin% skipFields] <- paste(affix, fieldNames[fieldNames %nin% skipFields], sep = sep)
+  renameHow <- match.arg(renameHow)
+  if (renameHow == "suffix") {
+    fieldNames[fieldNames %nin% skipFields] <-
+      paste(fieldNames[fieldNames %nin% skipFields], affix, sep = sep)
   } else {
-    if (verbose) message(name="doRename = ", doRename, " so not adding prefix or suffix, but final merge might do so.")
+    fieldNames[fieldNames %nin% skipFields] <-
+      paste(affix, fieldNames[fieldNames %nin% skipFields], sep = sep)
   }
   fieldNames
 }

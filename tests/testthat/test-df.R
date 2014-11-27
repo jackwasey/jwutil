@@ -196,6 +196,40 @@ test_that("merge identical frames should give identical result" , {
 
 })
 
+test_that("merge identical frames forcing prefix" , {
+  r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a", renameAll = "prefix")
+  e <- structure(list(a = c(1, 2, 3, 4),
+                      b = c(11, 12, 13, 14),
+                      c = c(101, 102, 103, 104),
+                      dfc.b = c(999, 12, 13, 14),
+                      dfc.c = c(101, 888, 103, 104)),
+                 .Names = c("a", "b", "c", "dfc.b", "dfc.c"),
+                 class = "data.frame")
+  expect_equivalent(r, e)
+
+  r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a", renameAll = "suffix", verbose = TRUE)
+  e <- structure(list(a = c(1, 2, 3, 4),
+                      b = c(11, 12, 13, 14),
+                      c = c(101, 102, 103, 104),
+                      dfc.b = c(999, 12, 13, 14),
+                      dfc.c = c(101, 888, 103, 104)),
+                 .Names = c("a", "b", "c", "b.dfc", "c.dfc"),
+                 class = "data.frame")
+  expect_equivalent(r, e)
+
+  r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a", renameAll = "suffix", affix = "jack")
+  e <- structure(list(a = c(1, 2, 3, 4),
+                      b = c(11, 12, 13, 14),
+                      c = c(101, 102, 103, 104),
+                      dfc.b = c(999, 12, 13, 14),
+                      dfc.c = c(101, 888, 103, 104)),
+                 .Names = c("a", "b", "c", "b.jack", "c.jack"),
+                 class = "data.frame")
+  expect_equivalent(r, e)
+
+  skip("to do tests covering case where there are duplicate frames but rename is explicitly requested")
+})
+
 test_that("drop duplicate fields in a data frame", {
   expect_error(dropDuplicateFields(bad_input))
   expect_error(dropDuplicateFields(dfa, dfa))
@@ -303,4 +337,38 @@ test_that("set diff on data frame indices before merging", {
                list(missing_from_x = integer(0),
                     missing_from_y = integer(0)))
 
+})
+
+test_that("affix fields bad inputs", {
+  expect_error(affixFields(c("a", "b")))
+  expect_error(affixFields(c("a", "b"), affix = ""))
+  expect_error(affixFields(c("a", "b"), affix = "x", skipFields = bad_input))
+  expect_error(affixFields(c("a", "b"), affix = "x", renameHow = "no"))
+})
+
+test_that("affix good inputs", {
+  expect_equal(
+    affixFields("a", affix = "x", renameHow = "prefix"),
+    "x.a"
+  )
+  expect_equal(
+    affixFields(c("a", "b"), affix = "x", renameHow = "prefix"),
+    c("x.a", "x.b")
+  )
+  expect_equal(
+    affixFields(c("a", "b"), affix = "x", renameHow = "suffix"),
+    c("a.x", "b.x")
+  )
+  expect_equal(
+    affixFields(c("a", "b"), affix = "x", renameHow = "prefix", skipFields = "a"),
+    c("a", "x.b")
+  )
+  expect_equal(
+    affixFields(c("a", "b"), affix = "x", renameHow = "prefix", skipFields = "b"),
+    c("x.a", "b")
+  )
+  expect_equal(
+    affixFields(c("a", "b"), affix = "x", renameHow = "prefix", sep = "op"),
+    c("xopa", "xopb")
+  )
 })
