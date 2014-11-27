@@ -155,7 +155,7 @@ test_that("factorToDataframeLogical works for NA factor levels", {
 
 context("test merging")
 
-test_that("merge identical frames should give identical result" , {
+test_that("merge identical frames should give identical result unless prefix or suffix requested" , {
   r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a", verbose = TRUE)
   expect_equal(dfa, r)
 })
@@ -196,7 +196,10 @@ test_that("merge identical frames should give identical result" , {
 
 })
 
-test_that("merge identical frames forcing prefix" , {
+test_that("merge frames forcing prefix" , {
+
+  r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a", renameAll = "prefix")
+
   r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a", renameAll = "prefix")
   e <- structure(list(a = c(1, 2, 3, 4),
                       b = c(11, 12, 13, 14),
