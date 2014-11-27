@@ -3,6 +3,24 @@
 
 context("Utility Functions")
 
+test_that("inverse of base 'which' function", {
+  expect_error(invwhich(bad_input))
+  expect_error(invwhich(random_test_letters))
+  expect_error(invwhich())
+  expect_error(invwhich(0))
+  expect_error(invwhich(-1))
+  expect_error(invwhich(1.5))
+  expect_error(invwhich(1, len ="carrots"))
+  expect_error(invwhich(1, len =-1))
+  expect_error(invwhich(1, len =0.5))
+  expect_error(invwhich(1, len =c(1,2)))
+
+  expect_equal(invwhich(1), TRUE)
+  expect_equal(invwhich(2), c(FALSE,TRUE))
+  expect_equal(invwhich(c(1,2)), c(TRUE,TRUE))
+  expect_equal(invwhich(c(1,2), len =3), c(TRUE, TRUE, FALSE))
+})
+
 test_that("asCharacterNoWarn", {
   expect_error(asCharacterNoWarn())
   expect_equal(asCharacterNoWarn(1), "1")
@@ -15,6 +33,21 @@ test_that("asCharacterNoWarn", {
   expect_equal(asCharacterNoWarn(c(NA, 1.2)), c(NA_character_, "1.2"))
 })
 
+test_that("asCharacterNoWarn factor", {
+  expect_equal(asCharacterNoWarn(factor(1)), "1")
+  expect_equal(asCharacterNoWarn(factor(1L)), "1")
+  expect_equal(asCharacterNoWarn(factor(1.1)), "1.1")
+  expect_equal(asCharacterNoWarn(factor(c(1.2, 34.555))), c("1.2", "34.555"))
+
+  expect_equal(asCharacterNoWarn(factor(NA)), NA_character_)
+  expect_equal(asCharacterNoWarn(factor(c(1.2, NA))), c("1.2", NA_character_))
+  expect_equal(asCharacterNoWarn(factor(c(NA, 1.2))), c(NA_character_, "1.2"))
+  expect_equal(asCharacterNoWarn(factor(NA, exclude = FALSE)), NA_character_)
+  expect_equal(asCharacterNoWarn(factor(c(1.2, NA), exclude = FALSE)), c("1.2", NA_character_))
+  expect_equal(asCharacterNoWarn(factor(c(NA, 1.2), exclude = FALSE)), c(NA_character_, "1.2"))
+})
+
+
 test_that("asNumericNoWarn", {
   expect_error(asNumericNoWarn())
 
@@ -23,6 +56,17 @@ test_that("asNumericNoWarn", {
   expect_equal(asNumericNoWarn("1.1"), 1.1)
   expect_equal(asNumericNoWarn("-1"), -1.0)
   expect_equal(asNumericNoWarn(c("-1 "," not a number", "100")), c(-1.0, NA_real_, 100.0))
+
+})
+
+test_that("asNumericNoWarn factor", {
+  expect_true(is.na(asNumericNoWarn(factor(NA))))
+  expect_true(is.na(asNumericNoWarn(factor(NA, exclude = NULL))))
+  expect_equal(asNumericNoWarn(factor("1")), 1.0)
+  expect_equal(asNumericNoWarn(factor("1.1")), 1.1)
+  expect_equal(asNumericNoWarn(factor("-1")), -1.0)
+  expect_equal(asNumericNoWarn(factor(c("-1 "," not a number", "100"))), c(-1.0, NA_real_, 100.0))
+
 })
 
 test_that("asIntegerNoWarn", {
@@ -33,6 +77,15 @@ test_that("asIntegerNoWarn", {
   expect_equal(asIntegerNoWarn("1.1"), 1L)
   expect_equal(asIntegerNoWarn("-1"), -1L)
   expect_equal(asIntegerNoWarn(c("-1.1 "," not a number", "100")), c(-1L, NA_integer_, 100L))
+})
+
+test_that("asIntegerNoWarn factor", {
+  expect_equal(asIntegerNoWarn(factor(NA, exclude = TRUE)), NA_integer_)
+  expect_equal(asIntegerNoWarn(factor(NA, exclude = FALSE)), NA_integer_)
+  expect_equal(asIntegerNoWarn(factor("1")), 1L)
+  expect_equal(asIntegerNoWarn(factor("1.1")), 1L)
+  expect_equal(asIntegerNoWarn(factor("-1")), -1L)
+  expect_equal(asIntegerNoWarn(factor(c("-1.1 "," not a number", "100"))), c(-1L, NA_integer_, 100L))
 })
 
 test_that("countNotNumeric", {
@@ -392,32 +445,106 @@ test_that("areIntegers", {
 
 })
 
-test_that("inverse of base 'which' function", {
-  expect_error(invwhich(bad_input))
-  expect_error(invwhich(random_test_letters))
-  expect_error(invwhich())
-  expect_error(invwhich(0))
-  expect_error(invwhich(-1))
-  expect_error(invwhich(1.5))
-  expect_error(invwhich(1, len ="carrots"))
-  expect_error(invwhich(1, len =-1))
-  expect_error(invwhich(1, len =0.5))
-  expect_error(invwhich(1, len =c(1,2)))
-
-  expect_equal(invwhich(1), TRUE)
-  expect_equal(invwhich(2), c(FALSE,TRUE))
-  expect_equal(invwhich(c(1,2)), c(TRUE,TRUE))
-  expect_equal(invwhich(c(1,2), len =3), c(TRUE, TRUE, FALSE))
-})
-
 test_that("platform", {
   expect_that(platformIsLinux() & platformIsWindows(), testthat::not(is_true()))
 })
-
 
 test_that("download zip", {
   expect_that(
     read.zip.url("http://phs.googlecode.com/files/Download%20File%20Test.zip"),
     testthat::not(throws_error())
   )
+})
+
+test_that("permute a vector", {
+  v <- 1:4
+  expect_that(dim(permute(v)), testthat::equals(c(24,4)))
+  expect_identical(v, unique(v))
+
+  # we can allow up to about 12, which is 500 million rows. If each vector item
+  # is a character string, it would still use way too much RAM.
+  expect_error(permute(1:20))
+})
+
+test_that("recombine a vector", {
+  v <- 1:4
+  expect_that(dim(permuteWithRepeats(v)), testthat::equals(c(256,4)))
+  expect_identical(v, unique(v))
+
+  # we can allow up to about 12, which is 500 million rows. If each vector item
+  # is a character string, it would still use way too much RAM.
+  expect_error(permuteWithRepeats(1:8)) # even 8^8 is quite slow and memory hungry, esp for character vectors
+})
+
+test_that("count non na pairs", {
+  skip("this is out of control")
+  expect_that(countNonNaPairs(cars), is_a("matrix"))
+  expect_that(row.names(countNonNaPairs(cars)), equals(c("speed", "dist")))
+  expect_that(colnames(countNonNaPairs(cars)), equals(c("speed", "dist")))
+  expect_true(all(countNonNaPairs(cars) == 50))
+  expect_identical(countNonNaPairs(cars),
+                   structure(c(50L, 50L, 50L, 50L), .Dim = c(2L, 2L),
+                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+
+  c2 <- cars
+  c2[1, 1] <- NA
+  expect_identical(countNonNaPairs(c2),
+                   structure(c(50L, 49L, 49L, 50L), .Dim = c(2L, 2L),
+                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+
+  c3 <- cars
+  c3[1:2, 1] <- NA
+  expect_identical(countNonNaPairs(c3),
+                   structure(c(50L, 48L, 48L, 50L), .Dim = c(2L, 2L),
+                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+  c4 <- cars
+  c4[1, 1:2] <- NA
+  expect_identical(countNonNaPairs(c4),
+                   structure(c(49L, 49L, 49L, 49L), .Dim = c(2L, 2L),
+                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+
+  c5 <- cars
+  c5[1:2, 1:2] <- NA
+  expect_identical(countNonNaPairs(c5),
+                   structure(c(48L, 48L, 48L, 48L), .Dim = c(2L, 2L),
+                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+
+  v <- VADeaths
+  expect_identical(countNonNaPairs(v),
+                   structure(c(5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L), .Dim = c(4L, 4L),
+                             .Dimnames = list(c("Rural Male", "Rural Female", "Urban Male", "Urban Female"),
+                                              c("Rural Male", "Rural Female", "Urban Male", "Urban Female"))))
+
+  v2 <- v
+  v2[1,1] <- NA
+  expect_identical(countNonNaPairs(v2),
+                   structure(c(5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L), .Dim = c(4L, 4L),
+                             .Dimnames = list(c("Rural Male", "Rural Female", "Urban Male", "Urban Female"),
+                                              c("Rural Male", "Rural Female", "Urban Male", "Urban Female"))))
+
+})
+
+test_that("list functions in a package", {
+  expect_true("runif" %in% lsp(stats))
+  expect_true(".checkMFClasses" %in% lsp(stats, all.names = TRUE))
+  expect_true("runif" %in% lsp(stats, pattern = "run"))
+})
+
+test_that("shuffle reorders a vector", {
+  v <- names(longley)
+  expect_true(all(v %in% shuffle(v)))
+  expect_true(all(shuffle(v) %in% v))
+  expect_equal(length(v), length(shuffle(v)))
+  v[2] <- NA
+  v <- names(longley)
+  expect_true(all(v %in% shuffle(v)))
+  expect_true(all(shuffle(v) %in% v))
+  expect_equal(length(v), length(shuffle(v)))
+
+  v[3] <- NA
+  v <- names(longley)
+  expect_true(all(v %in% shuffle(v)))
+  expect_true(all(shuffle(v) %in% v))
+  expect_equal(length(v), length(shuffle(v)))
+
 })

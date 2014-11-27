@@ -175,12 +175,13 @@ propIsNa <- function(x)
 #'   dataframe
 #' @export
 countNonNaPairs <- function(d) {
+  stop("needs thinking through")
   apply(!is.na(d),
         MARGIN = 2,
         FUN = function(y) {
           apply(is.na(d),
                 MARGIN = 2,
-                FUN = function(x, y) sum(x|y),
+                FUN = function(x, y) sum(x | y),
                 y)
         }
   )
@@ -320,8 +321,10 @@ shuffle <- function(x)
 #' @param x list or vector
 #' @return data frame, each row being one permutation
 #' @export
-permuteWithRepeats <- function(x)
+permuteWithRepeats <- function(x) {
+  stopifnot(length(x) < 8)
   expand.grid(rep(list(unlist(x)), times = length(unlist(x))))
+}
 
 #' @title generate all permutations of input
 #' @description systematically permute the input vector or list, which is very
@@ -333,7 +336,7 @@ permuteWithRepeats <- function(x)
 #' @return data frame, each row being one permutation
 #' @export
 permute <- function(x) {
-  stopifnot(length(x) < 8) # this is already 5,040 permutations
+  stopifnot(length(x) < 13) # this is already 5,040 permutations
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
 
