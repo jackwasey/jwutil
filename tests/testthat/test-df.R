@@ -85,7 +85,7 @@ test_that("expandFactors", {
   expect_warning(out <- expandFactors(dframe, considerFactors = NULL))
   expect_identical(dframe, out)
 
-  out <- expandFactors(dframe, considerFactors=c("f1","f2"), sep = ".")
+  out <- expandFactors(dframe, considerFactors=c("f1","f2"), sep = ".", verbose = TRUE)
   expect_equal(dim(out), c(9,6))
   expect_equal(class(out[[1]]), "logical")
   expect_equal(names(out), c("f1.1","f1.2","f1.3","f2.10","f2.20","f2.30"))
@@ -114,7 +114,7 @@ test_that("factorToDataframeLogical bad input fails", {
 })
 
 test_that("factorToDataframeLogical works", {
-  expect_equal(dim(factorToDataframeLogical(f1, prefix = "f1")), c(9, 3))
+  expect_equal(dim(factorToDataframeLogical(f1, prefix = "f1", verbose = TRUE)), c(9, 3))
   expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
   expect_true(all(sapply(factorToDataframeLogical(f1, prefix = "f1"), is.logical)))
 
@@ -156,7 +156,7 @@ test_that("factorToDataframeLogical works for NA factor levels", {
 context("test merging")
 
 test_that("merge identical frames should give identical result" , {
-  r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a")
+  r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a", verbose = TRUE)
   expect_equal(dfa, r)
 })
 
@@ -181,7 +181,7 @@ test_that("can't handle double duplicate fields, esp not keys", {
 })
 
 test_that("merge non-identical frames should suffix field name by default" , {
-  r <- mergeBetter(x = dfa, y = dfb, by.x = "a", by.y = "a")
+  r <- mergeBetter(x = dfa, y = dfb, by.x = "a", by.y = "a", verbose = TRUE)
   e <- dfa
   e[["b.dfb"]] <- c(999,12,13,14)
   expect_equal(r, e)
@@ -219,7 +219,7 @@ test_that("drop rows with NA values in given fields bad data", {
 })
 
 test_that("drop rows with NA values in given fields good data", {
-  expect_identical(dropRowsWithNAField(cars, "speed"), cars)
+  expect_identical(dropRowsWithNAField(cars, "speed", verbose = TRUE), cars)
   expect_identical(dropRowsWithNAField(cars, c("speed", "dist")), cars)
 
   carsna1 <- carsna2 <- carsna3 <- cars
@@ -246,5 +246,61 @@ test_that("drop rows with NA values in given fields good data", {
   expect_identical(dropRowsWithNAField(carsna1, "dist"), carsna1)
   expect_identical(dropRowsWithNAField(carsna2, "dist"), cars[2:50, ])
   expect_identical(dropRowsWithNAField(carsna3, "dist"), cars[2:50, ])
+
+})
+
+test_that("get NA and non-NA  fields", {
+
+  carsna1 <- carsna2 <- carsna3 <- cars
+  carsna1[1,1] = NA_integer_
+  carsna2[1,2] = NA_integer_
+  carsna3[1,1:2] = NA_integer_
+
+  expect_error(getNAFields())
+  expect_error(getNAFields(NA))
+  expect_error(getNAFields(bad_input))
+
+  expect_equal(getNAFields(cars), character(0))
+  expect_equal(getNAFields(carsna1), "speed")
+  expect_equal(getNAFields(carsna2), "dist")
+  expect_equal(getNAFields(carsna3), c("speed", "dist"))
+
+  expect_equal(getNonNAFields(cars), c("speed", "dist"))
+  expect_equal(getNonNAFields(carsna1), "dist")
+  expect_equal(getNonNAFields(carsna2), "speed")
+  expect_equal(getNonNAFields(carsna3), character(0))
+
+  expect_equal(propNaPerField(cars), c(speed = 0, dist = 0))
+  expect_equal(propNaPerField(carsna1), c(speed = 0.02, dist = 0))
+  expect_equal(propNaPerField(carsna2), c(speed = 0, dist = 0.02))
+  expect_equal(propNaPerField(carsna3), c(speed = 0.02, dist = 0.02))
+
+})
+
+test_that("set diff on data frame indices before merging", {
+  expect_error(getDropped())
+  expect_error(getDropped(1))
+  expect_error(getDropped("two"))
+
+  expect_equal(getDropped(c("1","2"), c("2","3")),
+               list(missing_from_x = "3",
+                    missing_from_y = "1"))
+  expect_equal(getDropped(c(1L, 2L), c(2L, 3L)),
+               list(missing_from_x = 3L,
+                    missing_from_y = 1L))
+  expect_equal(getDropped(c(1.1,2.2), c(2.2,3.3)),
+               list(missing_from_x = 3.3,
+                    missing_from_y = 1.1))
+
+  # both sides the same
+  expect_equal(getDropped(c("1","2","3"), c("1","2","3")),
+               list(missing_from_x = character(0),
+                    missing_from_y = character(0)))
+  expect_equal(getDropped(c(1,2,3), c(1,2,3)),
+               list(missing_from_x = numeric(0),
+                    missing_from_y = numeric(0)))
+  expect_equal(getDropped(c(1L, 2L, 3L), c(1L, 2L, 3L)),
+               list(missing_from_x = integer(0),
+                    missing_from_y = integer(0)))
 
 })

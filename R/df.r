@@ -190,11 +190,10 @@ getNonNAFields <- function(dframe)
 #' @param dframe is a data frame
 #' @return numeric vector
 #' @export
-propNaPerField <- function(dframe) {
+propNaPerField <- function(dframe)
   sapply(dframe, function(v) {
     countIsNa(v) / length(v)
   })
-}
 
 #' @title drops rows with NA values in specified fields
 #' @description employs complete.cases which is fast internal C code. Returns a
@@ -212,18 +211,6 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
   stopifnot(class(x) == "data.frame")
   cc <- complete.cases(x[fld])
   droplevels(x[cc,])
-}
-
-dropRowsWithNAFieldOld <- function(x, ..., verbose = FALSE) {
-  fld <- c(..., recursive = TRUE)
-  if (verbose) message(fld)
-
-  for (f in fld) {
-    dat <- dat[as.vector(!is.na(dat[f])),]
-  }
-  # automatically renumber the rows - we don't care about the internal R numbering as we have other unique identifiers per rwo
-  row.names(dat) <- NULL
-  droplevels(dat)
 }
 
 #' @title merge better
@@ -374,22 +361,11 @@ affixFields <- function(fieldNames, skipFields, affix,
 #' @param y vector or factor
 #' @return list of two vectors
 #' @export
-getDropped <- function(x,y) {
+getDropped <- function(x, y)
   list(
     missing_from_x = y[y %nin% x],
-    missing_from_y = x[x %nin% y])
-}
-
-#' @rdname getDropped
-#' @export
-getDroppedNumeric <- function(x, y)
-  getDropped(asNumericNoWarn(x), asNumericNoWarn(y))
-
-#' @rdname getDropped
-#' @export
-getDroppedInteger <- function(x, y)
-  getDropped(asIntegerNoWarn(x), asIntegerNoWarn(y))
-
+    missing_from_y = x[x %nin% y]
+  )
 
 #' @title drop duplicate fields
 #' @description compares all data in each field to every other field, and drops
