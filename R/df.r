@@ -322,8 +322,10 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   if (verbose) message(sprintf("merging using id field: %s, and new id field: %s", by.x, by.y))
 
-  merge(x = x, by.x = by.x, all.x = all.x,
+  m <- merge(x = x, by.x = by.x, all.x = all.x,
         y = y, by.y = by.y, all.y = all.y)
+  stopifnot(anyDuplicated(names(m) > 0))
+  m
 }
 
 #' @title update a set of data frame field names
