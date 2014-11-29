@@ -294,13 +294,13 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   if (length(dupeNames_x) > 0 && renameAll == "no") {
     if (verbose) message("there are conflicting field names in the merge but no renaming was
-                         specifically requested so using renameConflict to guide the renaming of clashing fields in x:",
+                         specifically requested so using renameConflict to guide the renaming of clashing fields in x: ",
                          paste(dupeNames_x, collapse = ", "))
     dropFields = c()
     for (xdup in dupeNames_x) {
       #rematch y - this is unsatisfying but simplifies the logic.
       match_x_in_y <- match(xdup, names(y))
-      stopifnot(length(match_x_in_y) == 1)
+      stopifnot(length(match_x_in_y) == 1) # this means there were two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
       if (verbose) message("checking whether '", xdup, "' (matching '", ydup, "') has duplicated data.")
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
@@ -308,7 +308,7 @@ mergeBetter <- function(x, y, by.x, by.y,
         if (verbose) message("will drop  identical field: ", ydup)
         dropFields <- c(dropFields, ydup)
       } else {
-        if (verbose) message("renaming conflicting field")
+        if (verbose) message("renaming conflicting field (data is not identical")
         names(y)[which(names(y) == ydup)] <- affixFields(fieldNames = ydup, affix = affix,
                                                          renameHow = renameConflict)
       }
@@ -324,7 +324,8 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   m <- merge(x = x, by.x = by.x, all.x = all.x,
         y = y, by.y = by.y, all.y = all.y)
-  stopifnot(anyDuplicated(names(m) > 0))
+  message(anyDuplicated(names(m)))
+  stopifnot(anyDuplicated(names(m)) == 0)
   m
 }
 
