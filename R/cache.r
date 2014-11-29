@@ -164,7 +164,8 @@ assignCache <- function(value, varName,
   # "value" should not be evaluated until used, so a database query in 'value'
   # should be ignored if not needed, and not throw an error if database not available.
   if (force || !isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
-    assign(x = varName, value = value, envir = envir) # this evaluates 'value' and should run the db query at this point
+    # this evaluates 'value' and should run the db query at this point
+    assign(x = varName, value = value, envir = envir) 
     saveToCache(varName, startDate = startDate, endDate = endDate,
                 cacheDir = cacheDir, envir = envir)
     return(invisible(TRUE))
@@ -206,13 +207,12 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FA
   # parents: this is good when stuck e.g. in vignette sub-directory of a project
   td <- getwd() %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
-  td <- getwd() %>% dirname %>% dirname %>% file.path(cacheDirName) #parent of parent
+  td <- getwd() %>% dirname %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
-  td <- getwd() %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName) # parent of parent of parent
+  td <- getwd() %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
-  td <- getwd() %>%
-    dirname %>% dirname %>% dirname %>% dirname %>%
-    file.path(cacheDirName) # parent of parent of parent of parent (believe it or not, this has use cases)
+  # parent of parent of parent of parent (believe it or not, this has use cases)
+  td <- getwd() %>% dirname %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
 
   # now we've looked where it should be, and still not found it, let's keep

@@ -15,7 +15,7 @@ logicalToBinary <- function(dframe) {
          dim(dframe)[1], dim(dframe)[2])
 
   # can condense this code into a one-liner, but this is clearer:
-  logicalFields <- names(dframe)[sapply(dframe,class)=='logical']
+  logicalFields <- names(dframe)[sapply(dframe,class) == 'logical']
   if (is.na(logicalFields) || length(logicalFields) == 0) return(dframe)
 
   #update just the logical fields with integers
@@ -54,7 +54,8 @@ factorToDataframeLogical <- function(fctr,
   stopifnot(length(na.rm) == 1)
   stopifnot(is.logical(verbose))
   stopifnot(length(verbose) == 1)
-  if (verbose && sum(is.na(fctr)) > 0) warning("factorToCols: factor passed to factorCols contains NA")
+  if (verbose && sum(is.na(fctr)) > 0)
+    warning("factorToCols: factor passed to factorCols contains NA")
   #remove unused factor levels
   fctr <- factor(fctr)
   stopifnot(length(levels(fctr)) > 0)
@@ -74,7 +75,8 @@ factorToDataframeLogical <- function(fctr,
   }
 
   if (length(levels(fctr)) == 2) {
-    if (verbose) message("two factor levels: returning TRUE/FALSE for first level")
+    if (verbose)
+      message("two factor levels: returning TRUE/FALSE for first level")
     df <- data.frame(fctr == levels(fctr)[1])
     names(df) <- paste(prefix, levels(fctr)[1], sep = sep)
     return(df)
@@ -115,7 +117,7 @@ expandFactors <- function (dframe,
                            sep = "",
                            na.rm = TRUE,
                            verbose = FALSE) {
-  if (verbose) message("exFactor: converting factors in a data frame into logical vectors")
+  if (verbose) message("converting factors in data frame into logical vectors")
 
   #message("considerFactors: %s", paste(considerFactors, collapse=', '))
 
@@ -129,8 +131,9 @@ expandFactors <- function (dframe,
                          paste(factorNames, collapse = ", "))
     for (fn in factorNames) {
       if (verbose) message(sprintf("working on factor: %s", fn))
-      dfpart <- factorToDataframeLogical(fctr = dframe[[fn]],
-                                         prefix = fn, sep = sep, na.rm = na.rm, verbose = verbose)
+      dfpart <- factorToDataframeLogical(
+        fctr = dframe[[fn]], prefix = fn, sep = sep,
+        na.rm = na.rm, verbose = verbose)
       dframe[fn] <- NULL
       dframe <- cbind(dframe, dfpart)
     }
@@ -140,15 +143,6 @@ expandFactors <- function (dframe,
   dframe
 }
 
-# getFactorStatus <- function(dframe, considerFactors=names(dframe)) {
-#
-#   f <- list()
-#   f$factorNames    <- considerFactors[sapply(dframe[1,considerFactors], class)=="factor"]
-#   f$nonFactorNames <- considerFactors[sapply(dframe[1,considerFactors], class)!="factor"]
-#   return(f)
-# }
-#
-
 #' @title get names of the factor fields in a data frame
 #' @param dframe data frame
 #' @param considerFactors character vector of field names, default is to use all
@@ -156,12 +150,17 @@ expandFactors <- function (dframe,
 #' @return vector
 #' @export
 getFactorNames <- function(dframe, considerFactors = names(dframe)) {
-  if (length(names(dframe)) <= 0) { warning("getFactorNames: empty data frame passed in. Returning NULL."); return(NULL)}
-  if (length(considerFactors) <= 0) { warning("getFactorNames: empty considerFactors. Returning NULL."); return(NULL)}
+  if (length(names(dframe)) <= 0) { 
+    warning("getFactorNames: empty data frame passed in. Returning NULL.")
+    return()
+  }
+  if (length(considerFactors) <= 0) {
+    warning("getFactorNames: empty considerFactors. Returning NULL.")
+    return()
+  }
 
   considerFactors[sapply(dframe[1, considerFactors], class) == "factor"]
   #if (anyDuplicated) #TODO
-  #if (length(factorNames)<=0) { message("getFactorNames: found no factors. Returning NULL.") ; return(NULL)}
 }
 
 #' @rdname getFactorNames
@@ -304,7 +303,7 @@ mergeBetter <- function(x, y, by.x, by.y,
       ydup <- names(y)[match_x_in_y]
       if (verbose) message("checking whether '", xdup, "' (matching '", ydup, "') has duplicated data.")
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
-      if (identical(isAllEqual, TRUE)) { # all.equal returns true or a char vector
+      if (identical(isAllEqual, TRUE)) {  # all.equal returns true or a char vector
         if (verbose) message("will drop  identical field: ", ydup)
         dropFields <- c(dropFields, ydup)
       } else {
@@ -318,7 +317,8 @@ mergeBetter <- function(x, y, by.x, by.y,
   } else if (renameAll != "no") {
     names(y) <- affixFields(fieldNames = names(y), skipFields = by.y,
                             affix = affix, renameHow = renameAll)
-  } # end if there are duplicates (no else - we can proceed)
+  }
+  # end if there are duplicates (no else - we can proceed)
 
   if (verbose) message(sprintf("merging using id field: %s, and new id field: %s", by.x, by.y))
 
@@ -342,7 +342,7 @@ affixFields <- function(fieldNames, affix, skipFields = NULL,
                         sep = ".") {
 
   stopifnot(length(affix) == 1)
-  stopifnot(nchar(affix) >0)
+  stopifnot(nchar(affix) > 0)
   stopifnot(is.null(skipFields) || is.character(skipFields))
 
   renameHow <- match.arg(renameHow)
@@ -379,7 +379,7 @@ getDropped <- function(x, y)
 #' @return data frame without duplicate fields
 #' @export
 dropDuplicateFields <- function(df, verbose = FALSE) {
-  stopifnot(class(verbose) == "logical" && length(verbose) ==1)
+  stopifnot(class(verbose) == "logical" && length(verbose) == 1)
   dropNames <- c()
 
   # to hell with vectorization
