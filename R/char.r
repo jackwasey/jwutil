@@ -69,7 +69,7 @@ strMultiMatch <- function(pattern, text, dropEmpty = FALSE, ...) {
           pattern = pattern,
           text=x, ...),
         ...)
-    )[-1]
+    )[ - 1]
   )
   if (!dropEmpty) return(result)
   result[sapply(result, function(x) length(x) != 0)]

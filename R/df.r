@@ -233,7 +233,7 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 #'   with every field with original table name, or "no" for neither
 #' @param convertFactors Default is TRUE which causes factors to be converted to
 #'   character before merge. This is almost certainly safer.
-#'   @param verbose logical
+#' @param verbose logical
 #' @return merged data frame
 #' @export
 mergeBetter <- function(x, y, by.x, by.y,
@@ -268,8 +268,11 @@ mergeBetter <- function(x, y, by.x, by.y,
   #convert factors of keys only # TODO: as.integer may be appropriate
   #sometimes/often. TODO: tests for this
   if (convertFactors) {
-    if (class(x[[by.x]]) == "factor") x[[by.x]] <- as.character(levels(x[[by.x]])[x[[by.x]]])
-    if (class(y[[by.y]]) == "factor") y[[by.y]] <- as.character(levels(y[[by.y]])[y[[by.y]]])
+    if (class(x[[by.x]]) == "factor")
+      x[[by.x]] <- asCharacterNoWarn(x[[by.x]])
+
+    if (class(y[[by.y]]) == "factor")
+      y[[by.y]] <- asCharacterNoWarn(y[[by.y]])
   }
 
   if (verbose) {

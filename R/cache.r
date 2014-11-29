@@ -2,7 +2,7 @@
 #' @description allow use of \code{options} to search for the cache directory.
 #' @family cache
 #' @keywords character internal
-optName = "cachedir"
+optName <- "cachedir"
 
 #' @title check whether an object is in the cache
 #' @description use the same search algorithm as loading from the cache, but
@@ -17,7 +17,8 @@ optName = "cachedir"
 #' @return logical, single logical value.
 #' @family cache
 #' @export
-isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
+isCached <- function(varName, cacheDir = NULL,
+                     force = FALSE, envir = .GlobalEnv) {
   stopifnot(length(varName) == 1,
             length(cacheDir) == 1 || is.null(cacheDir),
             length(force) == 1)
@@ -42,9 +43,9 @@ isCached <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv
 #' @template startEndDate
 #' @template cacheDir
 #' @param envir environment to start searching for the cached data (it may
-#'   already be in memory). Starts off with \code{parent.frame()} by default, and
-#'   /code{inherits}, so should find already loaded cache files in .GlobalEnv
-#'   eventually.
+#'   already be in memory). Starts off with \code{parent.frame()} by default,
+#'   and /code{inherits}, so should find already loaded cache files in
+#'   .GlobalEnv eventually.
 #' @export
 saveToCache <- function(varName, startDate = NULL, endDate = NULL,
                         cacheDir = NULL, envir = parent.frame()) {
@@ -66,26 +67,30 @@ saveToCache <- function(varName, startDate = NULL, endDate = NULL,
 #' @param force logical, whether to reload from source even if found in cache
 #' @param envir environment in which to load, deafults to \code{.GlobalEnv}
 #' @export
-loadFromCache <- function(varName, cacheDir = NULL, force = FALSE, envir = .GlobalEnv) {
-  # getFromCache already (cheekily) loads into the given environment and returns the data:
-  # loadFromCache just does this silently.
-  invisible(getFromCache(varName = varName, cacheDir = cacheDir, envir = envir, force = force))
+loadFromCache <- function(varName, cacheDir = NULL,
+                          force = FALSE, envir = .GlobalEnv) {
+  # getFromCache already (cheekily) loads into the given environment and returns
+  # the data: loadFromCache just does this silently.
+  invisible(getFromCache(varName = varName, cacheDir = cacheDir,
+                         envir = envir, force = force))
 }
 
 #' @title load or get a dated variable from cache
 #' @description This is a bit tricky with environments. The basic
 #'   jwutil::getFromCache etc functions put the loaded data in the global
 #'   environment by default. Here we are just going to load the (unddated name)
-#'   data to the parent environment (by default), leaving the dated data in the global
-#'   environment.
+#'   data to the parent environment (by default), leaving the dated data in the
+#'   global environment.
 #' @template varName
 #' @template startEndDate
 #' @param envir, where to load the data, defaults to \code{.GlobalEnv}
 #' @param ... additional arguments to pass to \code{getFromCache}
 #' @family cache
 #' @export
-loadDatedFromCache <- function(varName, startDate, endDate, envir = parent.env(), ...)
-  assign(varName, getFromCache(varName, startDate, endDate, envir = envir, ...), envir = envir)
+loadDatedFromCache <- function(varName, startDate, endDate,
+                               envir = parent.env(), ...)
+  assign(varName, getFromCache(varName, startDate, endDate, envir = envir, ...),
+         envir = envir)
 
 #' @title getFromCache
 #' @template varName
@@ -110,7 +115,8 @@ getFromCache <- function(varName, startDate = NULL, endDate = NULL,
     return(get(varName, envir = envir, inherits = TRUE))
 
   fp <- findCacheFilePath(vn, cacheDir)
-  if (!file.exists(fp)) stop(sprintf("Path '%s' doesn't exist when trying to access cache", fp))
+  if (!file.exists(fp))
+    stop(sprintf("'%s' doesn't exist when trying to access cache", fp))
   load(file =  fp, envir = envir)
   # we are assuming that the .RData file contains a variable with the same name
   # as the file name (minus the file extension)
@@ -162,8 +168,10 @@ assignCache <- function(value, varName,
   if (is.null(force)) force <- FALSE
 
   # "value" should not be evaluated until used, so a database query in 'value'
-  # should be ignored if not needed, and not throw an error if database not available.
-  if (force || !isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
+  # should be ignored if not needed, and not throw an error if database not
+  # available.
+  if (force || !isCached(varName, cacheDir = cacheDir,
+                         force = FALSE, envir = searchEnv)) {
     # this evaluates 'value' and should run the db query at this point
     assign(x = varName, value = value, envir = envir)
     saveToCache(varName, startDate = startDate, endDate = endDate,
@@ -198,9 +206,11 @@ assignCache <- function(value, varName,
 #' @import magrittr
 #' @family cache
 #' @export
-findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FALSE) {
+findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache",
+                         verbose = FALSE) {
   if (!is.null(cacheDir) && file.exists(cacheDir)) return(cacheDir)
-  if (!is.null(getOption(optName)) && file.exists(getOption(optName))) return(getOption(optName))
+  if (!is.null(getOption(optName)) && file.exists(getOption(optName)))
+    return(getOption(optName))
   td <- file.path(getwd(), cacheDirName)
   if (file.exists(td)) return(td)
 
@@ -212,14 +222,15 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FA
   td <- getwd() %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
   # parent of parent of parent of parent (believe it or not, this has use cases)
-  td <- getwd() %>% dirname %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName)
+  td <- getwd() %>% dirname %>% dirname %>% dirname %>% dirname %>%
+    file.path(cacheDirName)
   if (file.exists(td)) return(td)
 
-  if (verbose) message("Could not find cache directory starting from working directory: ", getwd())
+  if (verbose) message("No cache directory within directory: ", getwd())
   if (verbose && platformIsLinux())
-    system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%
+    system(sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%
     paste(sep=", ", collapse=", ") %>% message
-  if (verbose) message("You can use the cacheDir= argument to specify it directly,
+  if (verbose) message("Use the cacheDir= argument to specify it directly,
           or check the cache was created in the correct place")
   fb <- options("jwutil.fallbackCacheDir")
   if (verbose) message("using fallback cache directory: ")
@@ -235,7 +246,8 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FA
 #' @export
 findCacheFilePath <- function(varName, cacheDir = NULL) {
   cacheDir <- findCacheDir(cacheDir)
-  if (!file.exists(cacheDir)) stop("could not find cache directory: ", cacheDir)
+  if (!file.exists(cacheDir))
+    stop("could not find cache directory: ", cacheDir)
   file.path(cacheDir, paste0(varName, ".RData"))
 }
 
@@ -272,10 +284,12 @@ rmCache <- function(varName, startDate = NULL, endDate = NULL,
   else
     vn <- varName
 
-  if (isCached(varName = varName, cacheDir = cacheDir, force = TRUE, envir = envir)) {
+  if (isCached(varName = varName, cacheDir = cacheDir,
+               force = TRUE, envir = envir)) {
     file.remove(findCacheFilePath(varName, cacheDir))
   }
-  suppressWarnings(rm(list = c(varName, vn), envir = envir, inherits = FALSE))
+  suppressWarnings(rm(list = c(varName, vn),
+                      envir = envir, inherits = FALSE))
 }
 
 #' @title list files in cache

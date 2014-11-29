@@ -1,7 +1,9 @@
 .onLoad <- function(libname, pkgname){
+  if (is.null(getOption("jwutil.cacheDirName"))) {
+    options(jwutil.cacheDirName = "jwcache")
+  }
   if (is.null(getOption("jwutil.fallbackCacheDir"))) {
-    # /tmp is not cross platform, and can't generate a temp dir in a static
-    # option. message("Setting jwutil.fallbackCacheDir")
-    options(jwutil.fallbackCacheDir = "~/jwcache")
+    options(jwutil.fallbackCacheDir =
+              paste0("~/", getOption("jwutil.cacheDirName")))
   }
 }
