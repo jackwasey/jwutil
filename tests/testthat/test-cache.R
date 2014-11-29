@@ -33,7 +33,7 @@ test_that("integration test of caching", {
   expect_true(file.exists(findCacheFilePath("jack")))
 
   # assign something else to cache
-  assignCache("oliver", value = "writing", envir = mytestenv)
+  assignCache(varName = "oliver", value = "writing", envir = mytestenv)
   expect_true(exists("oliver", envir = mytestenv))
   expect_true(file.exists(findCacheFilePath("oliver")))
 
@@ -109,6 +109,9 @@ test_that("cache with date limited files", {
 
   expect_true(isCached(
     getCacheVarDated("oliver", startDate, endDate), cacheDir = cd))
+
+  # same thing, but isCache should know what to do with date range
+  expect_true(isCached("oliver", startDate, endDate, cacheDir = cd))
 
   expect_true(any(grepl("oliver", list.files(findCacheDir(cacheDir = cd)))))
   expect_true(any(grepl("oliver", lsCache(cacheDir = cd))))
