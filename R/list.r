@@ -56,7 +56,7 @@ listTrimFlat  <-  function(x) {   # delele null/empty entries in a list
 flattenList <- function(..., na.rm = FALSE) {
   x <- list(...)
   y <- list()
-  rapply(x, function(x) y <<- c(y,x))
+  rapply(x, function(x) y <<- c(y, x))
   if (na.rm)
     return(y[!is.na(y)])
   y
