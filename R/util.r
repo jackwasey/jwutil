@@ -7,7 +7,7 @@
 #' @return logical scalar
 #' @export
 allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
-  old <- options(warn = -1)
+  old <- options(warn = - 1)
   on.exit(options(old))
   xs <- x[x %nin% c('',extras)]
   !any(is.na(as.numeric(xs)))
@@ -24,7 +24,7 @@ allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
 #' @return logical scalar
 #' @export
 allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
-  all( # don't count NA as false automatically
+  all(  # don't count NA as false automatically
     areIntegers(x, tol = tol, na.ignore = TRUE),
     na.rm = na.rm
   )
@@ -36,7 +36,7 @@ allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
 #' @return character vector, may have NA values
 #' @export
 asCharacterNoWarn <- function(x) {
-  old <- options(warn = -1)
+  old <- options(warn = - 1)
   on.exit(options(old))
   if (class(x) == 'factor') x <- levels(x)[x]
   as.character(x)
@@ -56,7 +56,7 @@ asCharacterNoWarn <- function(x) {
 #' @return numeric vector, may have NA values
 #' @export
 asNumericNoWarn <- function(x) {
-  old <- options(warn = -1)
+  old <- options(warn = - 1)
   on.exit(options(old))
   if (class(x) == 'factor') x <- levels(x)[x]
   as.numeric(x)
@@ -117,16 +117,17 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
   download.file(url = url, destfile = zipfile, quiet = TRUE)
   zipdir <- tempfile()
   dir.create(zipdir)
-  unzip(zipfile, exdir = zipdir) # files="" so extract all
+  unzip(zipfile, exdir = zipdir)  # files="" so extract all
   files <- list.files(zipdir)
   if (is.null(filename)) {
     if (length(files) == 1) {
       filename <- files
     } else {
-      stop("multiple files in zip, but no filename specified: ", paste(files, collapse = ", "))
+      stop("multiple files in zip, but no filename specified: ",
+           paste(files, collapse = ", "))
     }
-  } else { # filename specified
-    stopifnot(length(filename) ==1)
+  } else {  # filename specified
+    stopifnot(length(filename) == 1)
     stopifnot(filename %in% files)
   }
   file <- paste(zipdir, files[1], sep="/")
@@ -237,8 +238,8 @@ lsp <- function(package, all.names = TRUE, pattern) {
 add_time_to_date <- function(tms, dts, verbose = FALSE) {
 
   if (length(dts) != length(tms))
-    stop("must have matching lengths of date and time vectors. I got: %d and %d",
-         length(dts), length(tms))
+    stop("must have matching lengths of date and time vectors.
+         I got: %d and %d", length(dts), length(tms))
 
   if (class(dts) %nin% c("Date","character") && !is.na(dts))
     stop(paste("date must be of class Date, character, but received: %s",
@@ -246,7 +247,8 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 
   # if a time part is given in the date field, this is an error
   if (class(dts) == "character" && any(grepl(pattern="\\S\\s\\S", dts)))
-    stop("suspect time is already given with date argument, which invalidates this entire function. e.g. %s",
+    stop("suspect time is already given with date argument, \
+         which invalidates this entire function. e.g. %s",
          dts[grepl(pattern="\\S\\s\\S", dts)][1])
 
   # convert to Date (may already be Date, but that's fine) any conversion error
@@ -262,21 +264,24 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 
   # this is a data error, not a programming error, stop
   if (any(dts < as.Date("1850-01-01"), na.rm = TRUE)) {
-    stop("some dates are before 1850: ", dts[dts<as.Date("1850-01-01")])
+    stop("some dates are before 1850: ", dts[dts < as.Date("1850-01-01")])
     # could alternatively set NA, warn and continue:
     # dts[dts < as.Date("1850-01-01")] <- NA
   }
 
   # let NA be valid:
   if (!all(isValidTime(tms, na.rm = TRUE))) {
-    warning(sprintf("%d invalid time(s) received, replacing with NA", sum(isValidTime(tms, na.rm = TRUE))))
+    warning(sprintf("%d invalid time(s) received, replacing with NA",
+                    sum(isValidTime(tms, na.rm = TRUE))))
     tms[!isValidTime(tms)] <- NA
   }
 
   # drop colons, if any
   if (class(tms) == "character")  tms <- gsub(":", "", tms, fixed = TRUE)
 
-  if (verbose) message(paste("working with times:", tms, collapse = ", ", sep = ", "), capture = TRUE)
+  if (verbose) message(paste("working with times:", tms,
+                             collapse = ", ", sep = ", "),
+                       capture = TRUE)
 
   # convert to integer, then back to string later. THis is horrible.
   tms <- asIntegerNoWarn(tms)
@@ -300,15 +305,15 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 #' @export
 isValidTime <- function(tms, na.rm = FALSE) {
   if (na.rm) tms <- tms[!is.na(tms)]
-  grepl(pattern = "^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
+  grepl("^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
   #Don't do this, or we can't use logical test in case all vals are NA.
   #validTimes[is.na(tms)] <- NA # grepl only gives T or F output TODO: write
   #tests...
 }
 
 #' @title shuffle
-#' @description randomly shuffle the order of a vector or list. This is to improve
-#'   quality of bad data to throw at functions when testing.
+#' @description randomly shuffle the order of a vector or list. This is to
+#'   improve quality of bad data to throw at functions when testing.
 #' @param x list or vector
 #' @return list or vector of same length as input, (probably) in a different
 #'   order
@@ -336,7 +341,7 @@ permuteWithRepeats <- function(x) {
 #' @return data frame, each row being one permutation
 #' @export
 permute <- function(x) {
-  stopifnot(length(x) < 13) # this is already 5,040 permutations
+  stopifnot(length(x) < 13)  # factorial
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
 
@@ -344,7 +349,7 @@ permute <- function(x) {
 
   #take each one and place it first, then recurse the rest:
   for (element in 1:length(x)) {
-    sub_combs <- Recall(x[-element]) # recurse
+    sub_combs <- Recall(x[ - element])  # recurse
     new_combs <- cbind(x[element], sub_combs)
     res <- rbind(res, new_combs)
   }
@@ -366,23 +371,6 @@ platformIsWindows <- function()
 #' @title read .xlsx file, interpret as CSV, and return data frame
 #' @description currently relies on Linux xlsx2csv command, but could
 #'   potentially be done with VB script in Windows
-#' @details shell command is
-#' xlsx2csv --delimiter=tab --dateformat=%m-%d-%y MVJan2010-Jan2014.xlsx > MVJan2010-Jan2014.csv
-#' VB script to accomplish the same on windows, could be considered
-#'   Set objArgs = WScript.Arguments
-#'   InputName = objArgs(0)
-#'   OutputName = objArgs(1)
-#'   Set objExcel = CreateObject("Excel.application")
-#'   objExcel.application.visible=false
-#'   objExcel.application.displayalerts=false
-#'   set objExcelBook = objExcel.Workbooks.Open(InputName)
-#'   objExcelBook.SaveAs OutputName, 23
-#'   objExcel.Application.Quit
-#'   objExcel.Quit
-#'
-#'   Invoke this as:
-#'
-#'   wscript script.vbs file.xlsx file.csv
 #' @param file is the path to the .xlsx file
 #' @return data frame
 #' @export
@@ -391,9 +379,8 @@ readXlsxLinux <- function(file) {
     stop("can only convert XLSX on linux using xlsx2csv command")
 
   csvfile <- tempfile()
-  system(
-    paste0('xlsx2csv --delimiter=tab --dateformat=%m-%d-%y "', file, '" > ', csvfile)
-  )
+  system(paste0('xlsx2csv --delimiter=tab --dateformat=%m-%d-%y "',
+           file, '" > ', csvfile))
   read.delim(csvfile)
 }
 

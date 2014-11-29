@@ -165,7 +165,7 @@ assignCache <- function(value, varName,
   # should be ignored if not needed, and not throw an error if database not available.
   if (force || !isCached(varName, cacheDir = cacheDir, force = FALSE, envir = searchEnv)) {
     # this evaluates 'value' and should run the db query at this point
-    assign(x = varName, value = value, envir = envir) 
+    assign(x = varName, value = value, envir = envir)
     saveToCache(varName, startDate = startDate, endDate = endDate,
                 cacheDir = cacheDir, envir = envir)
     return(invisible(TRUE))
@@ -215,26 +215,6 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache", verbose = FA
   td <- getwd() %>% dirname %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName)
   if (file.exists(td)) return(td)
 
-  # now we've looked where it should be, and still not found it, let's keep
-  # stepping up directories and recursively searching down. This is a terrible idea, very slow.
-  #   pwd <- getwd()
-  #   lastwd <- pwd
-  #   repeat {
-  #     if ()
-  #     message("searching path: ", pwd)
-  #     td <- list.dirs(path = pwd, recursive = T) %>% grep(pattern = cacheDirName, value = TRUE)
-  #     if (length(td) == 1) return(td)
-  #     if (length(td)  > 1) {
-  #       warning("found multiple matching cache paths:", td)
-  #       return(td[1])
-  #     }
-  #     # length = 0 i.e. no subdirs in pwd matching the cache dir name
-  #     lastwd <- pwd
-  #     pwd <- dirname(pwd)
-  #     # can't go higher than root. Probably undesirable to search all the way up
-  #     # to root...
-  #     if (pwd == lastwd) break
-  #   }
   if (verbose) message("Could not find cache directory starting from working directory: ", getwd())
   if (verbose && platformIsLinux())
     system(command = sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%

@@ -6,7 +6,8 @@
 #'   aware matching for speed. This can be changed by setting useBytes to FALSE.
 #' @param x is a character vector to strip
 #' @param pattern is the non-regex of the character to strip, default " "
-#' @param useBytes logical scalar. Unlike gsub, this will default to TRUE here, therefore breaking unicode.
+#' @param useBytes logical scalar. Unlike gsub, this will default to TRUE here,
+#'   therefore breaking unicode.
 #' @return character vector
 #' @export
 strip <- function (x, pattern = " ", useBytes = TRUE) {
@@ -14,7 +15,8 @@ strip <- function (x, pattern = " ", useBytes = TRUE) {
   stopifnot(length(useBytes) == 1)
   stopifnot(class(pattern) == "character")
   stopifnot(class(useBytes) == "logical")
-  gsub(pattern = pattern, replacement = "", x, fixed = TRUE, useBytes = useBytes)
+  gsub(pattern = pattern, replacement = "", x = x,
+       fixed = TRUE, useBytes = useBytes)
 }
 
 #' @title strip a string so that it can be used as a variable name in a formula.
@@ -90,13 +92,20 @@ strPairMatch <- function(pattern, text, swap = FALSE, dropEmpty = FALSE, ...) {
   stopifnot(class(swap) == "logical")
   stopifnot(class(dropEmpty) == "logical")
 
-  res <- strMultiMatch(pattern = pattern, text = text, dropEmpty = dropEmpty, ...)
+  res <- strMultiMatch(pattern = pattern, text = text,
+                       dropEmpty = dropEmpty, ...)
   stopifnot(all(sapply(res, function(x) length(x) == 2)))
 
-  outNames <- vapply(X = res, FUN = '[', FUN.VALUE = character(1), ifelse(swap, 2, 1))
+  outNames <- vapply(X = res,
+                     FUN = '[',
+                     FUN.VALUE = character(1),
+                     ifelse(swap, 2, 1))
   stopifnot(all(!is.na(outNames)))
 
-  out <- vapply(X = res, FUN = '[', FUN.VALUE = character(1), ifelse(swap, 1, 2))
+  out <- vapply(X = res,
+                FUN = '[',
+                FUN.VALUE = character(1),
+                ifelse(swap, 1, 2))
   stopifnot(all(!is.na(out)))
 
   names(out) <- outNames

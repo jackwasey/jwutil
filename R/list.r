@@ -51,7 +51,8 @@ listTrimFlat  <-  function(x) {   # delele null/empty entries in a list
 #' @param na.rm will drop NA values if TRUE
 #' @return list without nested lists, objects with preserved data types
 #' @source
-#'   https://stackoverflow.com/questions/8139677/how-to-flatten-a-list-to-a-list-without-coercion
+#'   https://stackoverflow.com/questions/8139677/\
+#'   how-to-flatten-a-list-to-a-list-without-coercion
 #' @export
 flattenList <- function(..., na.rm = FALSE) {
   x <- list(...)

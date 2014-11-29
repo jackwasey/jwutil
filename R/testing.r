@@ -1,5 +1,6 @@
+# increasing will (randomly) cover more test cases, but quickly slow down the
+# test suite.
 nTestNumes <- 30
-# increasing will (randomly) cover more test cases, but quickly slow down the test suite.
 
 #' @title test coverage
 #' @description This function searches for all functions in a package, traces
@@ -8,36 +9,37 @@ nTestNumes <- 30
 #'   finer-grained analysis of code paths within functions is possible with this
 #'   mechanism, although it is possible to trace individual lines of the parsed
 #'   source code, I don't think it could trace within an \code{if} statement
-#'   contained on a single line. This is a lot better than nothing.
-#'   The testing relies on the tests/testthat directory to exist. It doesn't call
-#'   test() directly, because this results in tracing the wrong functions. Maybe
-#'   Hadley Wickham could incorporate this into testthat.
+#'   contained on a single line. This is a lot better than nothing. The testing
+#'   relies on the tests/testthat directory to exist. It doesn't call test()
+#'   directly, because this results in tracing the wrong functions. Maybe Hadley
+#'   Wickham could incorporate this into testthat.
 #'
 #'   This is submitted to testthat as a github pull request.
 #' @param pkg character single package name
 #' @param verbose logical
 #' @export
-testFunctionCoverage <- function(pkg = getPackageName(parent.frame()), verbose = FALSE) {
+testFunctionCoverage <- function(pkg = getPackageName(parent.frame()),
+                                 verbose = FALSE) {
   suppressPackageStartupMessages({
     library(testthat)
     library(devtools)
   })
   if (verbose) message("pkg = ", pkg)
-  pkgenvir = as.environment(paste0("package:", pkg))
-  funs <- lsf(pkg) # see function in util which lists contents of a package
+  pkgenvir <- as.environment(paste0("package:", pkg))
+  funs <- lsf(pkg)  # see function in util which lists contents of a package
   if (verbose) message(sprintf("functions found in %s are:
                                %s", pkg, paste(funs, collapse=", ")))
 
   tfcon <- file(tempfile(), open = 'w+')
   sink(file = tfcon, type = "message")
-  for (f in funs) {
-    trace(f, where = pkgenvir, print = TRUE)
-  }
-  sink()
-  #close(tfcon)
+  for (f in funs) trace(f, where = pkgenvir, print = TRUE)
 
-  trace_output <- capture.output(testthat::test_dir("tests/testthat/", reporter = testthat::SilentReporter()))
-  #trace_output <- capture.output(test_file("tests/test-all.R", reporter=SilentReporter()))
+  sink()
+  close(tfcon)
+
+  trace_output <- capture.output(
+    testthat::test_dir("tests/testthat/", reporter = testthat::SilentReporter())
+  )
 
   tfcon <- file(tempfile(), open = 'w+')
   sink(file = tfcon, type = "message")
@@ -56,17 +58,17 @@ testFunctionCoverage <- function(pkg = getPackageName(parent.frame()), verbose =
                  pattern = "^.* ([[:graph:]]*?)\\(.*",
                  text = x)
              )
-           )[-1]
+           )[ - 1]
     )
   )
   tested   <- sort(funs[ funs %in% everytestedfun])
   untested <- sort(funs[!funs %in% everytestedfun])
-  coverage <- length(tested)/length(funs)
+  coverage <- length(tested) / length(funs)
 
   if (verbose) {
     message("tested functions are: ", paste(tested, collapse = ", "))
     message("untested functions are: ", paste(untested, collapse = ", "))
-    message(sprintf("test coverage is: %.2g percent", coverage*100))
+    message(sprintf("test coverage is: %.2g percent", coverage * 100))
   }
 
   list(untested = untested, tested = tested, coverage = coverage)
@@ -92,7 +94,8 @@ lsf <- function(pkg) {
 #' @title convert numbers to long and float types
 #' @description intended for generating values for stress testing functions
 #' @param ... list of values to convert to long and double
-#' @param na.rm logical, defaults to TRUE, so output contains only long and float values.
+#' @param na.rm logical, defaults to TRUE, so output contains only long and
+#'   float values.
 #' @return list of long and double versions of convertable values from the input
 #' @export
 numbers_to_long_and_float <- function(..., na.rm = TRUE) {
@@ -101,17 +104,17 @@ numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   # drop any NA values. Very big numbers not representable by 32 bit integers,
   # give NA with warning. For test case generation, usually we will want to
   # remove NAs.
-  suppressWarnings(
-    x <- flattenList(list(as.integer(x)), list(as.double(x)), na.rm = na.rm)
-  )
-  x
+
+  suppressWarnings(flattenList(list(as.integer(x)),
+                               list(as.double(x)),
+                               na.rm = na.rm))
 }
 
 #' @title zeroes
 #' @description long and float types
 #' @keywords sysdata
 #' @export
-zeroes <- list(0L, 0.0) # long integer and double float
+zeroes <- list(0L, 0.0)
 
 #' @title bad input data for tests
 #' @description a variety of horrible data
@@ -150,11 +153,12 @@ random_test_numbers <- function(n = nTestNumes,
          pi,
          sqrt(2),
          runif(n),
-         runif(n, min = -1, max = 0),
+         runif(n, min = - 1, max = 0),
          runif(n, min = 0, max = 1),
          runif(n, max = ifelse(is.null(max), .Machine$double.xmax, max)),
-         runif(n, min = ifelse(is.null(max), -.Machine$double.xmax, min)),
-         runif(n, min = -n * .Machine$double.xmin, max = n * .Machine$double.xmin)
+         runif(n, min = ifelse(is.null(max), - .Machine$double.xmax, min)),
+         runif(n, min = - n * .Machine$double.xmin,
+               max =   n * .Machine$double.xmin)
   )
   #drop any generated numbers that didn't match the constraints
   if (!is.null(min)) { x <- x[x >= min] }
@@ -170,12 +174,14 @@ random_test_numbers <- function(n = nTestNumes,
 #' @rdname random_test_numbers
 #' @export
 random_test_integers <- function(n = nTestNumes,
-                                 min = -.Machine$integer.max,
+                                 min = - .Machine$integer.max,
                                  max = .Machine$integer.max,
                                  hole = NULL) {
-  suppressWarnings(
-    x <- unique(as.integer(random_test_numbers(n = n, min = min, max = max, hole = hole)))
-  )
+
+  x <- suppressWarnings(
+    unique(
+      as.integer(
+        random_test_numbers(n = n, min = min, max = max, hole = hole))))
   x[!is.na(x)]
 }
 
@@ -188,15 +194,15 @@ random_test_integers <- function(n = nTestNumes,
 #' @export
 random_test_dates <- function(n = nTestNumes,
                               origin = as.Date("2000-01-01"),
-                              dayspread = 365*150) {
-  as.Date(runif(n, min = -dayspread, max = dayspread), origin)
+                              dayspread = 365 * 150) {
+  as.Date(runif(n, min = - dayspread, max = dayspread), origin)
 }
 
 #' @rdname random_test_dates
 #' @export
 random_test_posixlt_datetimes <- function(n = nTestNumes,
                                           origin = as.Date("2000-01-01"),
-                                          dayspread = 365*150) {
+                                          dayspread = 365 * 150) {
   as.POSIXlt(
     as.POSIXlt(random_test_dates(n, origin, dayspread)) +
       runif(1, min = 0, max = 24 * 60 * 60)
@@ -204,7 +210,8 @@ random_test_posixlt_datetimes <- function(n = nTestNumes,
 }
 
 #' @rdname random_test_numbers
-#' @param maxStringLength integer scalar, maximum length of possible strings created, as distinct from number of strings given by \code{n}
+#' @param maxStringLength integer scalar, maximum length of possible strings
+#'   created, as distinct from number of strings given by \code{n}
 #' @export
 random_test_letters <- function(n = nTestNumes, maxStringLength = 257) {
   x <- c()
@@ -226,11 +233,11 @@ random_test_letters <- function(n = nTestNumes, maxStringLength = 257) {
 #' @export
 extreme_numbers <- c(
   .Machine$integer.max,
-  -.Machine$integer.max,
+  - .Machine$integer.max,
   .Machine$double.xmin,
   .Machine$double.xmax,
-  -.Machine$double.xmin,
-  -.Machine$double.xmax)
+  - .Machine$double.xmin,
+  - .Machine$double.xmax)
 
 #' @title alternative \code{expect_that} from \code{testthat} which permutes all
 #'   the inputs to a function which should give the same result where n args >=2
@@ -247,18 +254,18 @@ extreme_numbers <- c(
 #'   testthat::equals(6)) }
 #' @return testthat result
 #' @export
-expect_that_combine_all_args <- function(object, condition, info = NULL, label = NULL) {
-
-#   suppressPackageStartupMessages(library(testthat))
+expect_that_combine_all_args <- function(object, condition,
+                                         info = NULL, label = NULL) {
 
   cl <- substitute(object)
   #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
   #want to know whether there are multiple top-level symbols
 
   func_name <- cl[[1]]
-  args <- as.list(cl[-1])
+  args <- as.list(cl[ - 1])
   # can only handle flat lists of arguments when permuting
-  stopifnot(identical(unlist(args, recursive = TRUE), unlist(args, recursive = FALSE)))
+  stopifnot(identical(unlist(args, recursive = TRUE),
+                      unlist(args, recursive = FALSE)))
   stopifnot(length(args) >= 2)
 
   # get the combinations of arguments
@@ -266,8 +273,6 @@ expect_that_combine_all_args <- function(object, condition, info = NULL, label =
 
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
-    # create a promise in effort to mimic expect_that behaviour
-    #objective = delayedAssign("objective", do.call(as.character(func_name), as.list(arg_combs[comb,])))
     e <- expect_that(
       object    = do.call(as.character(func_name), as.list(arg_combs[comb,])),
       condition = condition,
@@ -284,7 +289,8 @@ expect_that_combine_all_args <- function(object, condition, info = NULL, label =
 
 #' @rdname expect_that_combine_all_args
 #' @export
-expect_that_combine_first_arg <- function(object, condition, info = NULL, label = NULL) {
+expect_that_combine_first_arg <- function(object, condition,
+                                          info = NULL, label = NULL) {
 
   suppressPackageStartupMessages(library(testthat))
 
@@ -293,22 +299,23 @@ expect_that_combine_first_arg <- function(object, condition, info = NULL, label 
   #want to know whether there are multiple top-level symbols
 
   func_name <- cl[[1]]
-  args <- as.list(cl[-1])
-  arg_one <- eval(args[[1]]) # e.g. c(1,2,3) would have length FOUR, because not evaluated yet.
+  args <- as.list(cl[ - 1])
+  arg_one <- eval(args[[1]])  # c(1,2,3) has len 4 because not evaluated yet
   # can only handle flat lists of arguments when permuting? Does this apply when
   # working on first argument only?
-  stopifnot(identical(unlist(args, recursive = TRUE), unlist(args, recursive = FALSE)))
-  stopifnot(length(arg_one) >= 2) # alternatively, just pass it through to a normal expect_that? TODO
+  stopifnot(identical(unlist(args, recursive = TRUE),
+                      unlist(args, recursive = FALSE)))
+  stopifnot(length(arg_one) >= 2)
 
   # get the combinations of arguments
   arg_one_combs <- jwutil::permute(arg_one)
 
   # now loop through all permutations
   for (comb in 1:dim(arg_one_combs)[1]) {
-    # create a promise in effort to mimic expect_that behaviour
-    #objective = delayedAssign("objective", do.call(as.character(func_name), as.list(arg_combs[comb,])))
     e <- expect_that(
-      object    = do.call(as.character(func_name), c(list(arg_one_combs[comb,]), args[-1])),
+      object    = do.call(as.character(func_name),
+                          c(list(arg_one_combs[comb,]),
+                            args[ - 1])),
       condition = condition,
       info      = paste0(
         info, "arg_one = ",

@@ -2,25 +2,29 @@
 context("data frame manipulation")
 
 
-f1 <-  factor(x=c(1,2,3,1,2,3,3,2,1))
-f2 <- factor(x=c(10,20,30,10,20,30,30,20,10))
-f3 <- factor(x=c("a","b","c","d","c","b","a"))
+f1 <-  factor(x = c(1,2,3,1,2,3,3,2,1))
+f2 <- factor(x = c(10,20,30,10,20,30,30,20,10))
+f3 <- factor(x = c("a","b","c","d","c","b","a"))
 fOneLevel <- factor(x = c("jack", "jack"))
 fTwoLevels <- factor(x = c("jack", "alfie", "jack", "alfie"))
-fOneExtraLevel <- factor(x = c("jack", "jack"), levels = c("jack", "alfie", "liv"))
-fTwoExtraLevel <- factor(x = c("jack", "alfie", "jack", "alfie"), levels = c("jack", "alfie", "liv"))
-f.short = factor(x=c(1))
-f.empty = factor()
+fOneExtraLevel <- factor(c("jack", "jack"),
+                         levels = c("jack", "alfie", "liv"))
+fTwoExtraLevel <- factor(c("jack", "alfie", "jack", "alfie"),
+                         levels = c("jack", "alfie", "liv"))
+f.short <- factor(x = c(1))
+f.empty <- factor()
 dframe <- data.frame(f1, f2)
 fd <- data.frame(f2, f1)
 mixed.df <- data.frame(fd, v1=as.numeric(f1))
-v1 = as.numeric(f1)
-v2 = as.numeric(f2)
+v1 <- as.numeric(f1)
+v2 <- as.numeric(f2)
 vdf <- data.frame(v1, v2)
 fdv1 <- data.frame(v2, v1)
 fdv2 <- data.frame(v2=v1, v1=v2)
 
-dfa <- dfb <- dfc <- data.frame(a = c(1,2,3,4), b = c(11,12,13,14), c = c(101,102,103,104))
+dfa <- dfb <- dfc <- data.frame(a = c(1,2,3,4),
+                                b = c(11,12,13,14),
+                                c = c(101,102,103,104))
 dfb[1, "b"] <- 999
 dfc[1, "b"] <- 999
 dfc[2, "c"] <- 888
@@ -45,7 +49,6 @@ test_that("getNonFactorNames", {
   expect_warning(getNonFactorNames(data.frame()))
   #expect_output(getNonFactorNames(data.frame()), regexp='.*WARNING.*')
   expect_warning(getNonFactorNames(data.frame(), considerFactors=NULL))
-  #expect_output(getNonFactorNames(data.frame(), considerFactors=NULL), regexp='.*WARNING.*')
 })
 
 test_that("getFactorNames",{
@@ -58,7 +61,7 @@ test_that("getFactorNames",{
   expect_identical(getFactorNames(mixed.df), c("f2","f1"))
   expect_identical(getFactorNames(vdf), character(0))
   oldWarn <- options("warn")
-  options(warn=-1)
+  options(warn = - 1)
   expect_equal(getFactorNames(data.frame()), NULL)
   expect_equal(getFactorNames(data.frame(), considerFactors=NULL), NULL)
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
@@ -132,11 +135,11 @@ test_that("factorToDataframeLogical works for extra factor levels, one and two l
 
 test_that("factorToDataframeLogical works for NA factor levels", {
 
-  f <- factor(c("jack", "alfie", NA), exclude = NULL) # make NA a level
+  f <- factor(c("jack", "alfie", NA), exclude = NULL)  # make NA a level
   df <- data.frame(fjack = c(T, F, F), falfie = c(F,T,F), fNA = c(F,F,T))
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
-  f <- factor(c("jack", "alfie", NA), exclude = NA) # make NA not a level
+  f <- factor(c("jack", "alfie", NA), exclude = NA)  # make NA not a level
   df <- data.frame(fjack = c(T, F, F), falfie = c(F,T,F), fNA = c(F,F,T))
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
@@ -180,9 +183,9 @@ test_that("drop rows with NA values in given fields good data", {
   expect_identical(dropRowsWithNAField(cars, c("speed", "dist")), cars)
 
   carsna1 <- carsna2 <- carsna3 <- cars
-  carsna1[1,1] = NA_integer_
-  carsna2[1,2] = NA_integer_
-  carsna3[1,1:2] = NA_integer_
+  carsna1[1,1] <- NA_integer_
+  carsna2[1,2] <- NA_integer_
+  carsna3[1,1:2] <- NA_integer_
 
   expect_identical(dropRowsWithNAField(cars), cars)
   expect_identical(dropRowsWithNAField(carsna1), cars[2:50, ])
@@ -209,9 +212,9 @@ test_that("drop rows with NA values in given fields good data", {
 test_that("get NA and non-NA  fields", {
 
   carsna1 <- carsna2 <- carsna3 <- cars
-  carsna1[1,1] = NA_integer_
-  carsna2[1,2] = NA_integer_
-  carsna3[1,1:2] = NA_integer_
+  carsna1[1,1] <- NA_integer_
+  carsna2[1,2] <- NA_integer_
+  carsna3[1,1:2] <- NA_integer_
 
   expect_error(getNAFields())
   expect_error(getNAFields(NA))
@@ -271,27 +274,33 @@ test_that("affix fields bad inputs", {
 
 test_that("affix good inputs", {
   expect_equal(
-    affixFields("a", affix = "x", renameHow = "prefix"),
+    affixFields("a", affix = "x",
+                renameHow = "prefix"),
     "x.a"
   )
   expect_equal(
-    affixFields(c("a", "b"), affix = "x", renameHow = "prefix"),
+    affixFields(c("a", "b"), affix = "x",
+                renameHow = "prefix"),
     c("x.a", "x.b")
   )
   expect_equal(
-    affixFields(c("a", "b"), affix = "x", renameHow = "suffix"),
+    affixFields(c("a", "b"), affix = "x",
+                renameHow = "suffix"),
     c("a.x", "b.x")
   )
   expect_equal(
-    affixFields(c("a", "b"), affix = "x", renameHow = "prefix", skipFields = "a"),
+    affixFields(c("a", "b"), affix = "x",
+                renameHow = "prefix", skipFields = "a"),
     c("a", "x.b")
   )
   expect_equal(
-    affixFields(c("a", "b"), affix = "x", renameHow = "prefix", skipFields = "b"),
+    affixFields(c("a", "b"), affix = "x",
+                renameHow = "prefix", skipFields = "b"),
     c("x.a", "b")
   )
   expect_equal(
-    affixFields(c("a", "b"), affix = "x", renameHow = "prefix", sep = "op"),
+    affixFields(c("a", "b"), affix = "x",
+                renameHow = "prefix", sep = "op"),
     c("xopa", "xopb")
   )
 })

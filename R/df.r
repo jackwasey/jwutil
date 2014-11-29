@@ -87,7 +87,7 @@ factorToDataframeLogical <- function(fctr,
 
   if (verbose) message("more than two factor levels")
   for (lev in levels(fctr)) {
-    newColName = paste(prefix, lev, sep = sep)
+    newColName <- paste(prefix, lev, sep = sep)
     if (verbose) message(sprintf("creating new column name: %s", newColName))
     df[newColName] <- fctr == lev
   }
@@ -122,7 +122,7 @@ expandFactors <- function (dframe,
   #message("considerFactors: %s", paste(considerFactors, collapse=', '))
 
   # identify which of the last of fields is actually a factor
-  factorNames = getFactorNames(dframe, considerFactors)
+  factorNames <- getFactorNames(dframe, considerFactors)
 
   #message("got factorNames: %s", paste(factorNames, collapse=", "))
 
@@ -150,7 +150,7 @@ expandFactors <- function (dframe,
 #' @return vector
 #' @export
 getFactorNames <- function(dframe, considerFactors = names(dframe)) {
-  if (length(names(dframe)) <= 0) { 
+  if (length(names(dframe)) <= 0) {
     warning("getFactorNames: empty data frame passed in. Returning NULL.")
     return()
   }
@@ -171,10 +171,13 @@ getNonFactorNames <- function(dframe, considerFactors = names(dframe)) {
 
 #' @title get NA field names from data frame
 #' @param dframe data.frame
-#' @return vector of names of fields which contain any NA values, length zero if no matches
+#' @return vector of names of fields which contain any NA values, length zero if
+#'   no matches
 #' @export
 getNAFields <- function(dframe) {
-  if (class(dframe) != "data.frame") stop(paste("getNAfields: passed an object of class: ", class(dframe), collapse=" "))
+  if (class(dframe) != "data.frame")
+    stop(paste("getNAfields: passed an object of class: ",
+               class(dframe), collapse=" "))
   naFields <- names(dframe)[sapply(dframe, countIsNa) > 0]
   if (length(naFields) == 0) return(character())
   naFields
@@ -259,11 +262,11 @@ mergeBetter <- function(x, y, by.x, by.y,
   # guess a good affix. If y is not just a variable name, use 'y'
   if (is.null(affix)) {
     affix <- deparse(substitute(y))
-    if (length(substitute(y)) > 1) affix = "y"
+    if (length(substitute(y)) > 1) affix <- "y"
   }
 
-  # convert factors of keys only # TODO: as.integer may be appropriate sometimes/often.
-  #TODO: tests for this
+  #convert factors of keys only # TODO: as.integer may be appropriate
+  #sometimes/often. TODO: tests for this
   if (convertFactors) {
     if (class(x[[by.x]]) == "factor") x[[by.x]] <- as.character(levels(x[[by.x]])[x[[by.x]]])
     if (class(y[[by.y]]) == "factor") y[[by.y]] <- as.character(levels(y[[by.y]])[y[[by.y]]])
@@ -274,8 +277,8 @@ mergeBetter <- function(x, y, by.x, by.y,
     rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
     leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
     if (leftMergeDrops > 0 || rightMergeDrops > 0) {
-      message(sprintf("mergeBetter: would drop %d out of %d from the new table", leftMergeDrops, nrow(y)))
-      message(sprintf("and %d out of %d from the existing data", rightMergeDrops, nrow(x)))
+      message(sprintf("would drop %d out of %d from new table", leftMergeDrops, nrow(y)))
+      message(sprintf("and %d out of %d from old table", rightMergeDrops, nrow(x)))
     } else {
       message("no rows will be dropped in the merge - keys match exactly.")
       message("There may still be data differences in the two data frames.")
@@ -292,16 +295,17 @@ mergeBetter <- function(x, y, by.x, by.y,
   # now i want to drop identical fields unless an explicit rename has been requested.
 
   if (length(dupeNames_x) > 0 && renameAll == "no") {
-    if (verbose) message("there are conflicting field names in the merge but no renaming was
-                         specifically requested so using renameConflict to guide the renaming of clashing fields in x: ",
-                         paste(dupeNames_x, collapse = ", "))
-    dropFields = c()
+    if (verbose) message("conflicting field names in the merge but no renaming was
+                         requested so using renameConflict to guide the renaming
+                         of clashing fields in x: ", paste(dupeNames_x, collapse = ", "))
+    dropFields <- c()
     for (xdup in dupeNames_x) {
       #rematch y - this is unsatisfying but simplifies the logic.
       match_x_in_y <- match(xdup, names(y))
-      stopifnot(length(match_x_in_y) == 1) # this means there were two conflicts with that name!
+      stopifnot(length(match_x_in_y) == 1)  # this means there were two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
-      if (verbose) message("checking whether '", xdup, "' (matching '", ydup, "') has duplicated data.")
+      if (verbose) message("checking whether '", xdup,
+                           "' (matching '", ydup, "') has duplicated data.")
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
       if (identical(isAllEqual, TRUE)) {  # all.equal returns true or a char vector
         if (verbose) message("will drop  identical field: ", ydup)
@@ -387,7 +391,7 @@ dropDuplicateFields <- function(df, verbose = FALSE) {
   for (f in 1:(dim(df)[2] - 1)) {
     for (g in (f + 1):dim(df)[2]) {
       if (identical(all.equal(df[[f]], df[[g]]), TRUE)) {
-        if (verbose) message(sprintf("found matching fields %s and %s. Dropping the latter.",
+        if (verbose) message(sprintf("found matching fields %s and %s. Dropping one.",
                                      names(df)[f], names(df)[g]))
         dropNames <- c(dropNames, names(df)[g])
       }
