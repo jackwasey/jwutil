@@ -8,6 +8,8 @@ optName <- "cachedir"
 #' @description use the same search algorithm as loading from the cache, but
 #'   only report whether the file was there.
 #' @template varName
+#' @param startDate yyyy-mm--dd
+#' @param endDate yyyy-mm--dd
 #' @template cacheDir
 #' @param force single logical. If TRUE, then actually look in the cache
 #'   directory, otherwise we are satisfied if the variable already exists in the
@@ -16,6 +18,7 @@ optName <- "cachedir"
 #'   (force = TRUE will skip this test). Default is \code{parent.frame()}
 #' @return logical, single logical value.
 #' @family cache
+#' @import magrittr
 #' @export
 isCached <- function(varName, cacheDir = NULL, startDate = NULL, endDate = NULL,
                      force = FALSE, envir = parent.frame()) {
@@ -35,8 +38,22 @@ isCached <- function(varName, cacheDir = NULL, startDate = NULL, endDate = NULL,
   else
     vn <- varName
 
-  if (!force && exists(varName, envir = envir)) return(TRUE)
-  if (findCacheFilePath(vn, cacheDir) %>% file.exists) return(TRUE)
+  stopifnot(is.null(startDate) || length(startDate) == 1)
+  stopifnot(is.null(endDate)   || length(endDate)   == 1)
+  stopifnot(is.null(startDate) || is.character(startDate))
+  stopifnot(is.null(endDate)   || is.character(endDate))
+  stopifnot(!xor(is.null(startDate), is.null(endDate)))
+
+  # if startDate is specified, we can't rely on the (un-dated) var name being
+  # correct, so we should actually look in the cache
+  if (is.null(startDate)) {
+    if (!force && exists(varName, envir = envir)) return(TRUE)
+    if (varName %>% findCacheFilePath(cacheDir) %>% file.exists) return(TRUE)
+  } else {
+    if (getCacheVarDated(varName, startDate = startDate, endDate = endDate) %>%
+          findCacheFilePath(cacheDir) %>% file.exists) return(TRUE)
+  }
+
   FALSE
 }
 
