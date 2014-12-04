@@ -170,6 +170,7 @@ assignCache <- function(value, varName,
   # should be ignored if not needed, and not throw an error if database not
   # available.
   if (force || !isCached(varName, cacheDir = cacheDir,
+                         startDate, endDate,
                          force = FALSE, envir = searchEnv)) {
     # this evaluates 'value' and should run the db query at this point
     assign(x = varName, value = value, envir = envir)
@@ -177,7 +178,9 @@ assignCache <- function(value, varName,
                 cacheDir = cacheDir, envir = envir)
     return(invisible(TRUE))
   }
-  loadFromCache(varName, cacheDir, force = FALSE, envir = searchEnv)
+  loadFromCache(varName = varName, cacheDir = cacheDir, 
+                startDate = startDate, endDate = endDate,
+                force = FALSE, envir = searchEnv)
   invisible(FALSE)
 }
 
