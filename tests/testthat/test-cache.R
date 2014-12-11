@@ -121,6 +121,8 @@ test_that("cache with date limited files", {
   expect_true(isCached("jack", startDate = startDate, endDate = endDate,
                        envir = mytestenv, force = TRUE, cacheDir = cd))
   expect_true(exists("jack", envir = mytestenv))
+  expect_false(exists("jack2010-02-01to2011-03-15", envir = mytestenv))
+  expect_false(exists("jack2012-02-01to2013-03-15", envir = mytestenv))
   expect_true(isCached("jack2010-02-01to2011-03-15", envir = mytestenv, force = TRUE, cacheDir = cd))
   expect_true(isCached("jack2010-02-01to2011-03-15", envir = mytestenv, force = FALSE, cacheDir = cd))
   expect_true(isCached("jack2012-02-01to2013-03-15", envir = mytestenv, force = TRUE, cacheDir = cd))
@@ -130,10 +132,16 @@ test_that("cache with date limited files", {
   # memory 'cache' has no trace of the old var?
   expect_that(exists("jack"), is_false())
   expect_that(exists("jack", envir = mytestenv), is_false())
-  expect_that(exists("jack2010-02-01to2011-03-15"), is_false())
-  expect_that(exists("jack2010-02-01to2011-03-15", envir = mytestenv), is_false())
-  expect_that(exists("jack2012-02-01to2013-03-15"), is_false())
-  expect_that(exists("jack2012-02-01to2013-03-15", envir = mytestenv), is_false())
+  expect_false(exists("jack2010-02-01to2011-03-15", envir = mytestenv))
+  expect_false(exists("jack2012-02-01to2013-03-15", envir = mytestenv))
+  expect_false(exists("douglas2010-02-01to2011-03-15", envir = mytestenv))
+  expect_false(exists("douglas2012-02-01to2013-03-15", envir = mytestenv))
+  expect_false(exists("jack2010-02-01to2011-03-15", envir = mytestenv))
+  expect_false(exists("jack2012-02-01to2013-03-15", envir = mytestenv))
+  expect_false(exists("jack2010-02-01to2011-03-15"))
+  expect_false(exists("jack2012-02-01to2013-03-15"))
+  expect_false(exists("douglas2010-02-01to2011-03-15"))
+  expect_false(exists("douglas2012-02-01to2013-03-15"))
   # disk cache no trace?
   expect_false("jack" %in% lsCache(cacheDir = cd))
   expect_false("jack2010-02-01to2011-03-15.RData" %in% lsCache(cacheDir = cd))
@@ -157,6 +165,8 @@ test_that("cache with date limited files", {
   expect_false(isCached("jack2012-02-01to2013-03-15", envir = mytestenv, force = TRUE, cacheDir = cd))
   expect_false(isCached("jack2012-02-01to2013-03-15", envir = mytestenv, force = FALSE, cacheDir = cd))
   # and did 'douglas' appear instead?
+  expect_true(exists("douglas", envir = mytestenv, inherits = FALSE))
+  expect_false(exists("douglas", inherits = TRUE))
   expect_false("douglas" %in% lsCache(cacheDir = cd))
   expect_true("douglas2010-02-01to2011-03-15" %in% lsCache(cacheDir = cd))
   expect_true("douglas2012-02-01to2013-03-15" %in% lsCache(cacheDir = cd))
@@ -194,7 +204,6 @@ test_that("cache with date limited files", {
                        envir = mytestenv, force = FALSE, cacheDir = cd))
 
   # are we back to where we started?
-  browser()
   renameCache("douglas", "jack", envir = mytestenv, cacheDir = cd)
 
   expect_false(file.exists(findCacheFilePath("jack", cacheDir = cd)))

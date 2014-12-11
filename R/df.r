@@ -331,7 +331,6 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   m <- merge(x = x, by.x = by.x, all.x = all.x,
         y = y, by.y = by.y, all.y = all.y)
-  message(anyDuplicated(names(m)))
   stopifnot(anyDuplicated(names(m)) == 0)
   m
 }

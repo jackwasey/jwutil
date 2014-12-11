@@ -29,7 +29,8 @@ isCached <- function(varName, cacheDir = NULL, startDate = NULL, endDate = NULL,
             is.logical(force),
             is.environment(envir))
   stopifnot(is.null(cacheDir) || is.character(cacheDir))
-  stopifnot(is.null(startDate) || length(startDate) == 1 && is.character(startDate))
+  stopifnot(is.null(startDate) ||
+              length(startDate) == 1 && is.character(startDate))
   stopifnot(is.null(endDate) || length(endDate) == 1 && is.character(endDate))
   stopifnot(!xor(is.null(startDate), is.null(endDate)))
 
@@ -93,12 +94,16 @@ saveToCache <- function(varName, startDate = NULL, endDate = NULL,
 #' @param force logical, whether to reload from source even if found in cache
 #' @param envir environment in which to load, deafults to \code{parent.frame()}
 #' @export
-loadFromCache <- function(varName, startDate = NULL, endDate = NULL,
-                          cacheDir = NULL, force = FALSE, envir = parent.frame()) {
+loadFromCache <- function(varName,
+                          startDate = NULL, endDate = NULL,
+                          cacheDir = NULL, force = FALSE,
+                          envir = parent.frame()) {
   # getFromCache already (cheekily) loads into the given environment and returns
   # the data: loadFromCache just does this silently.
-  invisible(getFromCache(varName = varName, startDate = startDate, endDate = endDate,
-                         cacheDir = cacheDir, envir = envir, force = force))
+  invisible(getFromCache(varName = varName,
+                         startDate = startDate, endDate = endDate,
+                         cacheDir = cacheDir, force = force,
+                         envir = envir))
 }
 
 #' @title getFromCache
@@ -111,8 +116,10 @@ loadFromCache <- function(varName, startDate = NULL, endDate = NULL,
 #' @param force logical whether to get the data from cache even if it is already
 #'   in an accessible environment
 #' @export
-getFromCache <- function(varName, startDate = NULL, endDate = NULL,
-                         cacheDir = NULL, envir = parent.frame(), force = FALSE) {
+getFromCache <- function(varName,
+                         startDate = NULL, endDate = NULL,
+                         cacheDir = NULL, force = FALSE,
+                         envir = parent.frame()) {
 
   stopifnot(!xor(is.null(startDate), is.null(endDate)))
   if (!is.null(startDate))
@@ -178,10 +185,28 @@ assignCache <- function(value, varName,
                 cacheDir = cacheDir, envir = envir)
     return(invisible(TRUE))
   }
-  loadFromCache(varName = varName, cacheDir = cacheDir, 
+  loadFromCache(varName = varName, cacheDir = cacheDir,
                 startDate = startDate, endDate = endDate,
                 force = FALSE, envir = searchEnv)
   invisible(FALSE)
+}
+
+#' @rdname assignCache
+#' @param fun function which accepts startDate and endDate arguments
+#' @param ... arguments to pass on to \code{fun}
+#' @export
+assignCacheByFun <- function(fun, varName,
+                             startDate, endDate,
+                             cacheDir = NULL,
+                             envir = parent.frame(),
+                             searchEnv = envir,
+                             force = FALSE, ...) {
+  assignCache(value = fun(startDate = startDate, endDate = endDate, ...),
+              varName = varName,
+              startDate, endDate, cacheDir = cacheDir,
+              envir = envir, searchEnv = searchEnv,
+              force = force)
+
 }
 
 #' @title find path to the cache directory
@@ -301,7 +326,8 @@ rmCache <- function(varName, startDate = NULL, endDate = NULL,
 #' @family cache
 #' @export
 lsCacheFiles <- function(cacheDir = NULL, pattern = ".*")
-  list.files(path = findCacheDir(cacheDir = cacheDir), pattern = paste0(pattern, "\\.RData$"))
+  list.files(path = findCacheDir(cacheDir = cacheDir),
+             pattern = paste0(pattern, "\\.RData$"))
 
 #' @title list variable names in cache
 #' @rdname lsCacheFiles
@@ -320,15 +346,19 @@ lsCache <- function(cacheDir = NULL, pattern = ".*")
 #' @param envir environment to use
 #' @family cache
 #' @export
-renameCache <- function(oldVar, newVar, cacheDir = NULL, envir = parent.frame(), verbose = TRUE) {
+renameCache <- function(oldVar, newVar,
+                        cacheDir = NULL, envir = parent.frame(),
+                        verbose = TRUE) {
 
   stopifnot(is.null(cacheDir) || length(cacheDir) == 1)
   stopifnot(is.environment(envir))
   stopifnot(exists(oldVar, envir))
-  stopifnot(!exists(newVar, envir))
+  stopifnot(!exists(newVar, envir)) # maybe allow overwrite?
 
   inmem <- ls(pattern = paste0("^", oldVar), envir = envir)
-  ondisk <- grep(pattern = paste0("^", oldVar), lsCache(cacheDir = cacheDir), value = TRUE)
+  ondisk <- grep(pattern = paste0("^", oldVar),
+                 lsCache(cacheDir = cacheDir),
+                 value = TRUE)
   # actually, I'm leaning towards having
   #only the un-dated var name in memory, and the only dated file names on disk
   #stopifnot(length(inmem) == length(ondisk))
@@ -336,18 +366,11 @@ renameCache <- function(oldVar, newVar, cacheDir = NULL, envir = parent.frame(),
 
   stopifnot(length(ondisk) > 0)
 
-  workenv = new.env()
-
   # for each cached file, load into work env, assign data to new var name
   for (vo in ondisk) {
     vn <- sub(pattern = oldVar, replacement = newVar, x = vo)
-    #vl <- load(findCacheFilePath(vo, cacheDir = cacheDir), envir = workenv, verbose = verbose)
-    #stopifnot(length(vl) == 1)
-    assignCache(
-      value = getFromCache(varName = vo, cacheDir = cacheDir, envir = envir, force = TRUE),
-      #value = get(vl, envir = workenv, inherits = FALSE)
-      varName = vn, cacheDir = cacheDir, envir = envir
-      )
+    loadFromCache(varName = vo, cacheDir = cacheDir, force = TRUE)
+    saveToCache(varName = vn, cacheDir = cacheDir)
     if (verbose) message(sprintf("removing varName '%s' from cache", vo))
     rmCache(varName = vo, cacheDir = cacheDir, envir = envir)
   }
@@ -355,6 +378,10 @@ renameCache <- function(oldVar, newVar, cacheDir = NULL, envir = parent.frame(),
   # the memory 'cache' is never dated, just the var name, so a bit simpler. if
   # there were multiple dated var names in the cache dir, we don't know which
   # was in memory, so we should just delete them.
+  for (vo in inmem) {
+    vn <- sub(pattern = oldVar, replacement = newVar, x = vo)
+    assign(vn, get(vo, envir = envir), envir = envir)
+  }
 
   if (length(ondisk) == 1) {
     vn <- sub(pattern = oldVar, replacement = newVar, x = ondisk)
