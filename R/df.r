@@ -7,9 +7,7 @@
 #' @keywords manip
 #' @export
 logicalToBinary <- function(dframe) {
-
-  if (class(dframe) != 'data.frame')
-    stop("logicalToBinary expects a data frame, but got %s", class(dframe))
+  stopifnot(is.data.frame(dframe))
   if (any(dim(dframe) == 0))
     stop("got zero in at least one dimension in data frame. %d, %d",
          dim(dframe)[1], dim(dframe)[2])
@@ -175,9 +173,7 @@ getNonFactorNames <- function(dframe, considerFactors = names(dframe)) {
 #'   no matches
 #' @export
 getNAFields <- function(dframe) {
-  if (class(dframe) != "data.frame")
-    stop(paste("getNAfields: passed an object of class: ",
-               class(dframe), collapse=" "))
+  stopifnot(is.data.frame(dframe))
   naFields <- names(dframe)[sapply(dframe, countIsNa) > 0]
   if (length(naFields) == 0) return(character())
   naFields
@@ -209,8 +205,8 @@ propNaPerField <- function(dframe)
 #'   listed in fld.
 dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
   if (verbose) message(sprintf("checking fields: %s for NA values", fld))
-  stopifnot(class(fld) == "character")
-  stopifnot(class(x) == "data.frame")
+  stopifnot(is.character(fld))
+  stopifnot(is.data.frame(x))
   cc <- complete.cases(x[fld])
   droplevels(x[cc,])
 }
@@ -247,8 +243,8 @@ mergeBetter <- function(x, y, by.x, by.y,
   renameConflict <- match.arg(renameConflict)
   renameAll <- match.arg(renameAll)
 
-  stopifnot(class(x) == "data.frame")
-  stopifnot(class(y) == "data.frame")
+  stopifnot(is.data.frame(x))
+  stopifnot(is.data.frame(y))
   stopifnot(length(by.x) == 1, length(by.y) == 1)
   stopifnot(length(all.x) == 1, length(all.y) == 1)
   stopifnot(length(verbose) == 1, length(convertFactors) == 1)
