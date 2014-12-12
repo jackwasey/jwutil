@@ -87,7 +87,7 @@ saveToCache <- function(varName, startDate = NULL, endDate = NULL,
        compress = "xz")
 }
 
-#' @title loadFromCache
+#' @title load data from cache
 #' @template varName
 #' @template startEndDate
 #' @template cacheDir
@@ -136,10 +136,12 @@ getFromCache <- function(varName,
 
   vl <- load(file =  fp, envir = envir)
   # we are assuming that the .RData file contains a variable with the same name
-  # as the file name (minus the file extension) TODO: this doesn't work when the
-  # filename and variable name therein do not match, e.g. for date-ranged
-  # variables.
+  # as the file name (minus the file extension)
+  #
+  # if the data has a date range, then we use the undated variable name. Double
+  # check this now.
   stopifnot(length(vl) == 1)
+  stopifnot(varName == vl)
   #get(varName, envir = envir)
   get(vl, envir = envir)
 }
@@ -169,7 +171,16 @@ assignCache <- function(value, varName,
                         searchEnv = envir,
                         force = FALSE) {
 
+  stopifnot(length(varName) == 1)
+  stopifnot(is.character(varName))
   stopifnot(!xor(is.null(startDate), is.null(endDate)))
+  stopifnot(length(startDate) == 1)
+  stopifnot(length(endDate) == 1)
+  stopifnot(is.character(startDate))
+  stopifnot(is.character(endDate))
+  stopifnot(is.environment(envir))
+  stopifnot(is.environment(searchEnv))
+  stopifnot(is.logical(force))
 
   if (is.null(force)) force <- FALSE
 
@@ -177,7 +188,7 @@ assignCache <- function(value, varName,
   # should be ignored if not needed, and not throw an error if database not
   # available.
   if (force || !isCached(varName, cacheDir = cacheDir,
-                         startDate, endDate,
+                         startDate = startDate, endDate = endDate,
                          force = FALSE, envir = searchEnv)) {
     # this evaluates 'value' and should run the db query at this point
     assign(x = varName, value = value, envir = envir)
@@ -196,11 +207,11 @@ assignCache <- function(value, varName,
 #' @param ... arguments to pass on to \code{fun}
 #' @export
 assignCacheByFun <- function(fun, varName,
-                             startDate, endDate,
+                             startDate, endDate, ...,
                              cacheDir = NULL,
                              envir = parent.frame(),
                              searchEnv = envir,
-                             force = FALSE, ...) {
+                             force = FALSE) {
   assignCache(value = fun(startDate = startDate, endDate = endDate, ...),
               varName = varName,
               startDate, endDate, cacheDir = cacheDir,

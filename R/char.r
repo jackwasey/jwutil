@@ -13,8 +13,8 @@
 strip <- function (x, pattern = " ", useBytes = TRUE) {
   stopifnot(length(pattern) == 1)
   stopifnot(length(useBytes) == 1)
-  stopifnot(class(pattern) == "character")
-  stopifnot(class(useBytes) == "logical")
+  stopifnot(is.character(pattern))
+  stopifnot(is.logical(useBytes))
   gsub(pattern = pattern, replacement = "", x = x,
        fixed = TRUE, useBytes = useBytes)
 }
@@ -38,7 +38,7 @@ stripForFormula <- function(x) {
 #' @return character vector
 #' @export
 trim <- function(x) {
-  if (class(x) == "data.frame")
+  if (is.data.frame(x))
     stop("trimming data.frame gives unpredictable results.
          Try trimming a column at a time using [s]apply.")
   gsub("^\\s+|\\s+$", "", x)
@@ -87,10 +87,10 @@ strPairMatch <- function(pattern, text, swap = FALSE, dropEmpty = FALSE, ...) {
   stopifnot(length(text) > 0)
   stopifnot(length(swap) == 1)
   stopifnot(length(dropEmpty) == 1)
-  stopifnot(class(pattern) == "character")
-  stopifnot(class(text) == "character")
-  stopifnot(class(swap) == "logical")
-  stopifnot(class(dropEmpty) == "logical")
+  stopifnot(is.character(pattern))
+  stopifnot(is.character(text))
+  stopifnot(is.logical(swap))
+  stopifnot(is.logical(dropEmpty))
 
   res <- strMultiMatch(pattern = pattern, text = text,
                        dropEmpty = dropEmpty, ...)

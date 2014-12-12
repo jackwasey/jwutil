@@ -38,7 +38,7 @@ allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
 asCharacterNoWarn <- function(x) {
   old <- options(warn = - 1)
   on.exit(options(old))
-  if (class(x) == 'factor') x <- levels(x)[x]
+  if (is.factor(x)) x <- levels(x)[x]
   as.character(x)
 }
 
@@ -58,7 +58,7 @@ asCharacterNoWarn <- function(x) {
 asNumericNoWarn <- function(x) {
   old <- options(warn = - 1)
   on.exit(options(old))
-  if (class(x) == 'factor') x <- levels(x)[x]
+  if (is.factor(x)) x <- levels(x)[x]
   as.numeric(x)
 }
 
@@ -246,7 +246,7 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
                class(dts)))
 
   # if a time part is given in the date field, this is an error
-  if (class(dts) == "character" && any(grepl(pattern="\\S\\s\\S", dts)))
+  if (is.character(dts) && any(grepl(pattern="\\S\\s\\S", dts)))
     stop("suspect time is already given with date argument, \
          which invalidates this entire function. e.g. %s",
          dts[grepl(pattern="\\S\\s\\S", dts)][1])
@@ -277,7 +277,7 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
   }
 
   # drop colons, if any
-  if (class(tms) == "character")  tms <- gsub(":", "", tms, fixed = TRUE)
+  if (is.character(tms))  tms <- gsub(":", "", tms, fixed = TRUE)
 
   if (verbose) message(paste("working with times:", tms,
                              collapse = ", ", sep = ", "),
