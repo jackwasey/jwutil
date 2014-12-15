@@ -39,12 +39,6 @@ isCached <- function(varName, cacheDir = NULL, startDate = NULL, endDate = NULL,
   else
     vn <- varName
 
-  stopifnot(is.null(startDate) || length(startDate) == 1)
-  stopifnot(is.null(endDate)   || length(endDate)   == 1)
-  stopifnot(is.null(startDate) || is.character(startDate))
-  stopifnot(is.null(endDate)   || is.character(endDate))
-  stopifnot(!xor(is.null(startDate), is.null(endDate)))
-
   # if startDate is specified, we can't rely on the (un-dated) var name being
   # correct, so we should actually look in the cache
   if (is.null(startDate)) {
@@ -85,6 +79,7 @@ saveToCache <- function(varName, startDate = NULL, endDate = NULL,
        envir = envir,
        file = findCacheFilePath(vn, cacheDir),
        compress = "xz")
+  invisible(get(varName, envir = envir))
 }
 
 #' @title load data from cache
@@ -160,46 +155,40 @@ getFromCache <- function(varName,
 #'   to load from cache
 #' @param force logical value, if TRUE will force the assignment to overwrite
 #'   whatever was in the cache, if anything.
-#' @return unlike assign, returns invisibly TRUE for 'did assign from cache', or
-#'   FALSE when the cache had to be touched.
+#' @return invisibly returns the value assigned
 #' @family cache
 #' @export
 assignCache <- function(value, varName,
                         startDate = NULL, endDate = NULL,
                         cacheDir = NULL,
                         envir = parent.frame(),
-                        searchEnv = envir,
                         force = FALSE) {
 
   stopifnot(length(varName) == 1)
   stopifnot(is.character(varName))
   stopifnot(!xor(is.null(startDate), is.null(endDate)))
-  stopifnot(length(startDate) == 1)
-  stopifnot(length(endDate) == 1)
-  stopifnot(is.character(startDate))
-  stopifnot(is.character(endDate))
+  stopifnot(length(startDate) <= 1)
+  stopifnot(length(endDate) <= 1)
+  stopifnot(is.null(startDate) || is.character(startDate))
+  stopifnot(is.null(endDate) || is.character(endDate))
   stopifnot(is.environment(envir))
   stopifnot(is.environment(searchEnv))
   stopifnot(is.logical(force))
-
-  if (is.null(force)) force <- FALSE
 
   # "value" should not be evaluated until used, so a database query in 'value'
   # should be ignored if not needed, and not throw an error if database not
   # available.
   if (force || !isCached(varName, cacheDir = cacheDir,
                          startDate = startDate, endDate = endDate,
-                         force = FALSE, envir = searchEnv)) {
+                         force = FALSE, envir = envir)) {
     # this evaluates 'value' and should run the db query at this point
     assign(x = varName, value = value, envir = envir)
     saveToCache(varName, startDate = startDate, endDate = endDate,
                 cacheDir = cacheDir, envir = envir)
-    return(invisible(TRUE))
   }
   loadFromCache(varName = varName, cacheDir = cacheDir,
                 startDate = startDate, endDate = endDate,
-                force = FALSE, envir = searchEnv)
-  invisible(FALSE)
+                force = FALSE, envir = envir) #TODO can i get rid of searchEnv?
 }
 
 #' @rdname assignCache
@@ -207,7 +196,7 @@ assignCache <- function(value, varName,
 #' @param ... arguments to pass on to \code{fun}
 #' @export
 assignCacheByFun <- function(fun, varName,
-                             startDate, endDate, ...,
+                             startDate = NULL, endDate = NULL, ...,
                              cacheDir = NULL,
                              envir = parent.frame(),
                              searchEnv = envir,
@@ -314,23 +303,30 @@ saveInDataDir <- function(varName, suffix) {
 #'   the calling frame.
 #' @family cache
 #' @export
-rmCache <- function(varName, startDate = NULL, endDate = NULL,
+rmCache <- function(varName = NULL, pattern = NULL, startDate = NULL, endDate = NULL,
                     cacheDir = NULL, envir = parent.frame()) {
   stopifnot(!xor(is.null(startDate), is.null(endDate)))
-  if (!is.null(startDate))
-    vn <- getCacheVarDated(varName, startDate = startDate, endDate = endDate)
-  else
-    vn <- varName
+  stopifnot(xor(is.null(varName), is.null(pattern)))
+  stopifnot(xor(is.null(startDate), is.null(pattern)))
 
-  if (isCached(varName = varName, cacheDir = cacheDir,
-               force = TRUE, envir = envir)) {
-    file.remove(findCacheFilePath(varName, cacheDir))
+  if (!is.null(varName)) {
+    if (!is.null(startDate))
+      vn <- getCacheVarDated(varName, startDate = startDate, endDate = endDate)
+    else
+      vn <- varName
+    if (isCached(varName = varName, cacheDir = cacheDir,
+                 force = TRUE, envir = envir)) {
+      file.remove(findCacheFilePath(varName, cacheDir))
+    }
+    suppressWarnings(rm(list = c(varName, vn),
+                        envir = envir, inherits = FALSE))
+  } else {
+    file.remove(lsCacheFiles(cacheDir = cacheDir, pattern = pattern))
+    suppressWarnings(rm(list = ls(pattern = pattern, envir = envir)))
   }
-  suppressWarnings(rm(list = c(varName, vn),
-                      envir = envir, inherits = FALSE))
 }
 
-#' @title list files in cache
+#' @title list cache contents
 #' @param pattern regex, ".Rdata$" is appended within the function for file name
 #'   searches
 #' @template cacheDir
@@ -340,8 +336,8 @@ lsCacheFiles <- function(cacheDir = NULL, pattern = ".*")
   list.files(path = findCacheDir(cacheDir = cacheDir),
              pattern = paste0(pattern, "\\.RData$"))
 
-#' @title list variable names in cache
 #' @rdname lsCacheFiles
+#' @export
 lsCache <- function(cacheDir = NULL, pattern = ".*")
   sub(pattern = "\\.RData", replacement = "", lsCacheFiles(cacheDir, pattern))
 
