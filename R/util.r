@@ -6,10 +6,10 @@
 #'   values, defaults to '.' and 'NA'. Also allow \code{NA}.
 #' @return logical scalar
 #' @export
-allIsNumeric <- function(x, extras = c('.', 'NA', NA)) {
+allIsNumeric <- function(x, extras = c(".", "NA", NA)) {
   old <- options(warn = - 1)
   on.exit(options(old))
-  xs <- x[x %nin% c('',extras)]
+  xs <- x[x %nin% c("", extras)]
   !any(is.na(as.numeric(xs)))
 }
 
@@ -126,11 +126,10 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
       stop("multiple files in zip, but no filename specified: ",
            paste(files, collapse = ", "))
     }
-  } else {  # filename specified
+  } else {
     stopifnot(length(filename) == 1)
     stopifnot(filename %in% files)
   }
-  file <- paste(zipdir, files[1], sep="/")
   do.call(FUN, args = c(list(file.path(zipdir, filename)), list(...)))
 }
 
@@ -285,10 +284,10 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 
   # convert to integer, then back to string later. THis is horrible.
   tms <- asIntegerNoWarn(tms)
-  badRange <- any(tms < 0 || tms > 2359)
-  if (!is.na(badRange) && badRange)  {
-    warning("invalid times found. Setting to NA:", tms, capture=T)
-    tms[badRange] <- NA
+  bad_range <- any(tms < 0 || tms > 2359)
+  if (!is.na(bad_range) && bad_range)  {
+    warning("invalid times found. Setting to NA:", tms, capture = TRUE)
+    tms[bad_range] <- NA
   }
 
   timesfourzeros <- formatC(tms, width=4, format="d", flag="0")
@@ -379,8 +378,8 @@ readXlsxLinux <- function(file) {
     stop("can only convert XLSX on linux using xlsx2csv command")
 
   csvfile <- tempfile()
-  system(paste0('xlsx2csv --delimiter=tab --dateformat=%m-%d-%y "',
-           file, '" > ', csvfile))
+  system(paste0("xlsx2csv --delimiter=tab --dateformat=%m-%d-%y \"",
+           file, "\" > ", csvfile))
   read.delim(csvfile)
 }
 

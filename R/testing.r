@@ -1,6 +1,6 @@
 # increasing will (randomly) cover more test cases, but quickly slow down the
 # test suite.
-nTestNumes <- 30
+nums_in_tests <- 30
 
 #' @title test coverage
 #' @description This function searches for all functions in a package, traces
@@ -30,10 +30,9 @@ testFunctionCoverage <- function(pkg = getPackageName(parent.frame()),
   if (verbose) message(sprintf("functions found in %s are:
                                %s", pkg, paste(funs, collapse=", ")))
 
-  tfcon <- file(tempfile(), open = 'w+')
+  tfcon <- file(tempfile(), open = "w+")
   sink(file = tfcon, type = "message")
   for (f in funs) trace(f, where = pkgenvir, print = TRUE)
-
   sink()
   close(tfcon)
 
@@ -41,7 +40,7 @@ testFunctionCoverage <- function(pkg = getPackageName(parent.frame()),
     testthat::test_dir("tests/testthat/", reporter = testthat::SilentReporter())
   )
 
-  tfcon <- file(tempfile(), open = 'w+')
+  tfcon <- file(tempfile(), open = "w+")
   sink(file = tfcon, type = "message")
   for (f in funs) {
     capture.output(untrace(f, where = pkgenvir))
@@ -61,7 +60,7 @@ testFunctionCoverage <- function(pkg = getPackageName(parent.frame()),
            )[ - 1]
     )
   )
-  tested   <- sort(funs[ funs %in% everytestedfun])
+  tested <- sort(funs[funs %in% everytestedfun])
   untested <- sort(funs[!funs %in% everytestedfun])
   coverage <- length(tested) / length(funs)
 
@@ -80,12 +79,12 @@ testFunctionCoverage <- function(pkg = getPackageName(parent.frame()),
 #' @export
 lsf <- function(pkg) {
 
-  envirName <- paste("package", pkg, sep = ":")
-  everything <- ls(pos = envirName, all.names = TRUE)
+  env_name <- paste("package", pkg, sep = ":")
+  everything <- ls(pos = env_name, all.names = TRUE)
 
   funcs <- c()
   for (e in everything) {
-    if (is.function(get(e, envir = as.environment(envirName), inherits = F)))
+    if (is.function(get(e, envir = as.environment(env_name), inherits = F)))
       funcs <- append(funcs, e)
   }
   funcs
@@ -130,7 +129,7 @@ bad_input <- c(
   data.frame(j=1:10,k=11:20),
   matrix(nrow=2,ncol=2),
   as.POSIXct(Sys.time(), "GMT"),
-  .leap.seconds
+  base::.leap.seconds
 )
 
 #' @title create extreme random numbers
@@ -145,7 +144,7 @@ bad_input <- c(
 #' @return vector length 5n+1 containing variety of difficult numbers for
 #'   testing purposes
 #' @export
-random_test_numbers <- function(n = nTestNumes,
+random_test_numbers <- function(n = nums_in_tests,
                                 min = NULL,
                                 max = NULL,
                                 hole = NULL) {
@@ -161,19 +160,19 @@ random_test_numbers <- function(n = nTestNumes,
                max =   n * .Machine$double.xmin)
   )
   #drop any generated numbers that didn't match the constraints
-  if (!is.null(min)) { x <- x[x >= min] }
-  if (!is.null(max)) { x <- x[x <= max] }
+  if (!is.null(min)) x <- x[x >= min]
+  if (!is.null(max)) x <- x[x <= max]
 
   #punch a hole in the range, if provided:
   if (!is.null(hole) && length(hole) == 2) {
-    x <- x[!(x >= hole[1] & x <= hole[2])]
+    x <- x[! (x >= hole[1] & x <= hole[2])]
   }
   x
 }
 
 #' @rdname random_test_numbers
 #' @export
-random_test_integers <- function(n = nTestNumes,
+random_test_integers <- function(n = nums_in_tests,
                                  min = - .Machine$integer.max,
                                  max = .Machine$integer.max,
                                  hole = NULL) {
@@ -192,7 +191,7 @@ random_test_integers <- function(n = nTestNumes,
 #'   dates from, defaults to 150 years.
 #' @return vector of POSIXlt datetimes or Dates
 #' @export
-random_test_dates <- function(n = nTestNumes,
+random_test_dates <- function(n = nums_in_tests,
                               origin = as.Date("2000-01-01"),
                               dayspread = 365 * 150) {
   as.Date(runif(n, min = - dayspread, max = dayspread), origin)
@@ -200,7 +199,7 @@ random_test_dates <- function(n = nTestNumes,
 
 #' @rdname random_test_dates
 #' @export
-random_test_posixlt_datetimes <- function(n = nTestNumes,
+random_test_posixlt_datetimes <- function(n = nums_in_tests,
                                           origin = as.Date("2000-01-01"),
                                           dayspread = 365 * 150) {
   as.POSIXlt(
@@ -210,16 +209,16 @@ random_test_posixlt_datetimes <- function(n = nTestNumes,
 }
 
 #' @rdname random_test_numbers
-#' @param maxStringLength integer scalar, maximum length of possible strings
+#' @param max_str_len integer scalar, maximum length of possible strings
 #'   created, as distinct from number of strings given by \code{n}
 #' @export
-random_test_letters <- function(n = nTestNumes, maxStringLength = 257) {
+random_test_letters <- function(n = nums_in_tests, max_str_len = 257) {
   x <- c()
   for (i in 1:n) {
     x[length(x) + 1] <- paste(
       sample(
         c(LETTERS,letters),
-        runif(n = 1, min = 1, max = maxStringLength),
+        runif(n = 1, min = 1, max = max_str_len),
         replace = TRUE),
       collapse = "")
   }
@@ -329,5 +328,5 @@ expect_that_combine_first_arg <- function(object, condition,
 }
 
 # put my function into the testthat namespace
-environment(expect_that_combine_all_args) <- asNamespace('testthat')
-environment(expect_that_combine_first_arg) <- asNamespace('testthat')
+environment(expect_that_combine_all_args) <- asNamespace("testthat")
+environment(expect_that_combine_first_arg) <- asNamespace("testthat")

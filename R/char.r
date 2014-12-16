@@ -97,13 +97,13 @@ strPairMatch <- function(pattern, text, swap = FALSE, dropEmpty = FALSE, ...) {
   stopifnot(all(sapply(res, function(x) length(x) == 2)))
 
   outNames <- vapply(X = res,
-                     FUN = '[',
+                     FUN = "[",
                      FUN.VALUE = character(1),
                      ifelse(swap, 2, 1))
   stopifnot(all(!is.na(outNames)))
 
   out <- vapply(X = res,
-                FUN = '[',
+                FUN = "[",
                 FUN.VALUE = character(1),
                 ifelse(swap, 1, 2))
   stopifnot(all(!is.na(out)))

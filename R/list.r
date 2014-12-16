@@ -32,7 +32,7 @@ listTrim  <-  function(x){
 #' @param x list
 #' @return trimmed list
 #' @export
-listTrimFlat  <-  function(x) {   # delele null/empty entries in a list
+listTrimFlat  <-  function(x) {
   # inefficient to do this twice if called from listTrim, but hey ho.
   stopifnot(isFlat(x))
   suppressWarnings(

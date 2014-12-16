@@ -2,28 +2,28 @@
 #' @description when saving data as text files for distribution, printing large
 #'   amounts of text containing TRUE and FALSE is inefficient. Convert to binary
 #'   takes more R memory, but allows more compact output TODO: test
-#' @param dframe dataframe which may contain logical fields
-#' @return dframe without logical fields
+#' @param x dataframe which may contain logical fields
+#' @return data frame without logical fields
 #' @keywords manip
 #' @export
-logicalToBinary <- function(dframe) {
-  stopifnot(is.data.frame(dframe))
-  if (any(dim(dframe) == 0))
+logicalToBinary <- function(x) {
+  stopifnot(is.data.frame(x))
+  if (any(dim(x) == 0))
     stop("got zero in at least one dimension in data frame. %d, %d",
-         dim(dframe)[1], dim(dframe)[2])
+         dim(x)[1], dim(x)[2])
 
   # can condense this code into a one-liner, but this is clearer:
-  logicalFields <- names(dframe)[sapply(dframe,class) == 'logical']
-  if (is.na(logicalFields) || length(logicalFields) == 0) return(dframe)
+  logical_fields <- names(x)[sapply(x, class) == 'logical']
+  if (is.na(logical_fields) || length(logical_fields) == 0) return(x)
 
   #update just the logical fields with integers
-  dframe[,logicalFields] <-
+  x[, logical_fields] <-
     vapply(
-      X         = dframe[, logicalFields],
-      FUN       = function(x) ifelse(x, 1L, 0L),
-      FUN.VALUE = integer(length = dim(dframe)[1])
+      X         = x[, logical_fields],
+      FUN       = function(y) ifelse(y, 1L, 0L),
+      FUN.VALUE = integer(length = dim(x)[1])
     )
-  dframe
+  x
 }
 
 #' @title convert factor into a data.frame of logicals
@@ -100,8 +100,8 @@ factorToDataframeLogical <- function(fctr,
 #'   rename the field to indicate that TRUE is level 1 of the factor. This works
 #'   well for gender. For multi-level factors there is redundancy with multiple
 #'   new fields now containing FALSE, with only one TRUE for the matching level.
-#' @param dframe data.frame to search for factors to convert
-#' @param considerFactors character vector of field names in the data frame to
+#' @param x data.frame to search for factors to convert
+#' @param consider character vector of field names in the data frame to
 #'   consider. Defaults to all fields
 #' @param sep character scalar used to separate field prefixes from factor
 #'   values in new column names
@@ -110,61 +110,61 @@ factorToDataframeLogical <- function(fctr,
 #' @template verbose
 #' @return data.frame with no factors
 #' @export
-expandFactors <- function (dframe,
-                           considerFactors = names(dframe),
+expandFactors <- function (x,
+                           consider = names(x),
                            sep = "",
                            na.rm = TRUE,
                            verbose = FALSE) {
   if (verbose) message("converting factors in data frame into logical vectors")
 
-  #message("considerFactors: %s", paste(considerFactors, collapse=', '))
+  #message("consider: %s", paste(consider, collapse=', '))
 
   # identify which of the last of fields is actually a factor
-  factorNames <- getFactorNames(dframe, considerFactors)
+  factor_names <- getFactorNames(x, consider)
 
-  #message("got factorNames: %s", paste(factorNames, collapse=", "))
+  #message("got factor_names: %s", paste(factor_names, collapse=", "))
 
-  if (length(factorNames) > 0) {
+  if (length(factor_names) > 0) {
     if (verbose) message("there are factors to be converted into values: ",
-                         paste(factorNames, collapse = ", "))
-    for (fn in factorNames) {
+                         paste(factor_names, collapse = ", "))
+    for (fn in factor_names) {
       if (verbose) message(sprintf("working on factor: %s", fn))
       dfpart <- factorToDataframeLogical(
-        fctr = dframe[[fn]], prefix = fn, sep = sep,
+        fctr = x[[fn]], prefix = fn, sep = sep,
         na.rm = na.rm, verbose = verbose)
-      dframe[fn] <- NULL
-      dframe <- cbind(dframe, dfpart)
+      x[fn] <- NULL
+      x <- cbind(x, dfpart)
     }
   } else {
     if (verbose) message("no factors found to convert in exFactor")
   }
-  dframe
+  x
 }
 
 #' @title get names of the factor fields in a data frame
-#' @param dframe data frame
-#' @param considerFactors character vector of field names, default is to use all
+#' @param x data frame
+#' @param consider character vector of field names, default is to use all
 #'   of them.
 #' @return vector
 #' @export
-getFactorNames <- function(dframe, considerFactors = names(dframe)) {
-  if (length(names(dframe)) <= 0) {
-    warning("getFactorNames: empty data frame passed in. Returning NULL.")
+getFactorNames <- function(x, consider = names(x)) {
+  if (length(names(x)) <= 0) {
+    warning("getFactorNames: empty data frame passed in.")
     return()
   }
-  if (length(considerFactors) <= 0) {
-    warning("getFactorNames: empty considerFactors. Returning NULL.")
+  if (length(consider) <= 0) {
+    warning("getFactorNames: empty consider.")
     return()
   }
 
-  considerFactors[sapply(dframe[1, considerFactors], class) == "factor"]
+  consider[sapply(x[1, consider], is.factor)]
   #if (anyDuplicated) #TODO
 }
 
 #' @rdname getFactorNames
 #' @export
-getNonFactorNames <- function(dframe, considerFactors = names(dframe)) {
-  considerFactors[considerFactors %nin% getFactorNames(dframe, considerFactors)]
+getNonFactorNames <- function(x, consider = names(x)) {
+  consider[consider %nin% getFactorNames(x, consider)]
 }
 
 #' @title get NA field names from data frame
@@ -227,7 +227,7 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 #'   Suffix is the default.
 #' @param renameAll - regardless of column name clashes, "prefix" or "suffix"
 #'   with every field with original table name, or "no" for neither
-#' @param convertFactors Default is TRUE which causes factors to be converted to
+#' @param convert_factors Default is TRUE which causes factors to be converted to
 #'   character before merge. This is almost certainly safer.
 #' @param verbose logical
 #' @return merged data frame
@@ -237,7 +237,7 @@ mergeBetter <- function(x, y, by.x, by.y,
                         affix = NULL,
                         renameConflict = c("suffix", "prefix"),
                         renameAll = c("no", "suffix", "prefix"),
-                        convertFactors = TRUE,
+                        convert_factors = TRUE,
                         verbose = FALSE) {
 
   renameConflict <- match.arg(renameConflict)
@@ -247,7 +247,7 @@ mergeBetter <- function(x, y, by.x, by.y,
   stopifnot(is.data.frame(y))
   stopifnot(length(by.x) == 1, length(by.y) == 1)
   stopifnot(length(all.x) == 1, length(all.y) == 1)
-  stopifnot(length(verbose) == 1, length(convertFactors) == 1)
+  stopifnot(length(verbose) == 1, length(convert_factors) == 1)
 
 
   # we don't want case sensitive names: we rely on case insensitivity, and it is
@@ -263,7 +263,7 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   #convert factors of keys only # TODO: as.integer may be appropriate
   #sometimes/often. TODO: tests for this
-  if (convertFactors) {
+  if (convert_factors) {
     if (is.factor(x[[by.x]]))
       x[[by.x]] <- asCharacterNoWarn(x[[by.x]])
 
@@ -273,90 +273,97 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   if (verbose) {
     # this informational step could itself be slow in a big merge
-    rightMergeDrops <- sum(!(x[[by.x]] %in% y[[by.y]]))
-    leftMergeDrops <- sum(!(y[[by.y]]) %in% x[[by.x]])
-    if (leftMergeDrops > 0 || rightMergeDrops > 0) {
-      message(sprintf("would drop %d out of %d from new table", leftMergeDrops, nrow(y)))
-      message(sprintf("and %d out of %d from old table", rightMergeDrops, nrow(x)))
+    right_drops <- sum(! (x[[by.x]] %in% y[[by.y]]))
+    left_drops <- sum(! (y[[by.y]]) %in% x[[by.x]])
+    if (left_drops > 0 || right_drops > 0) {
+      message(sprintf("drops %d out of %d from new table",
+                      left_drops, nrow(y)))
+      message(sprintf("and %d out of %d from old table",
+                      right_drops, nrow(x)))
     } else {
-      message("no rows will be dropped in the merge - keys match exactly.")
-      message("There may still be data differences in the two data frames.")
+      message("Keys match exactly (but data may yet differ")
     }
   }
 
   # find duplicate field names, ignoring the field we are merging on.
-  dupeNames_x <- names(x)[tolower(names(x)) %in% tolower(names(y)) &
+  dupes_x <- names(x)[tolower(names(x)) %in% tolower(names(y)) &
                             tolower(names(x)) != tolower(by.x) &
                             tolower(names(x)) != tolower(by.y)]
-  if (verbose) message("got duplicate x field names: ", paste(dupeNames_x, collapse=", "))
+  if (verbose) message("duplicate x field names: ",
+                       paste(dupes_x, collapse=", "))
 
 
-  # now i want to drop identical fields unless an explicit rename has been requested.
+  # drop identical fields unless an explicit rename has been requested.
 
-  if (length(dupeNames_x) > 0 && renameAll == "no") {
-    if (verbose) message("conflicting field names in the merge but no renaming was
-                         requested so using renameConflict to guide the renaming
-                         of clashing fields in x: ", paste(dupeNames_x, collapse = ", "))
+  if (length(dupes_x) > 0 && renameAll == "no") {
+    if (verbose) message("conflicting field names in the merge. \
+                          Using renameConflict to guide the renaming
+                          of clashing fields: ",
+                         paste(dupes_x, collapse = ", "))
     dropFields <- c()
-    for (xdup in dupeNames_x) {
+    for (xdup in dupes_x) {
       #rematch y - this is unsatisfying but simplifies the logic.
       match_x_in_y <- match(xdup, names(y))
-      stopifnot(length(match_x_in_y) == 1)  # this means there were two conflicts with that name!
+      stopifnot(length(match_x_in_y) == 1)  # two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
       if (verbose) message("checking whether '", xdup,
                            "' (matching '", ydup, "') has duplicated data.")
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
-      if (identical(isAllEqual, TRUE)) {  # all.equal returns true or a char vector
+      # all.equal returns true or a char vector, so work around
+      if (identical(isAllEqual, TRUE)) {
         if (verbose) message("will drop  identical field: ", ydup)
         dropFields <- c(dropFields, ydup)
       } else {
-        if (verbose) message("renaming conflicting field (data is not identical")
-        names(y)[which(names(y) == ydup)] <- affixFields(fieldNames = ydup, affix = affix,
-                                                         renameHow = renameConflict)
+        if (verbose) message("renaming conflicting field (data not identical")
+        names(y)[which(names(y) == ydup)] <-
+          affixFields(fields = ydup,
+                      affix = affix,
+                      renameHow = renameConflict)
       }
     }
-    # actually drop the fields: best not to do while looping through the data frames.
+    # drop the fields: best not to do while looping through the data frames.
     for (dropField in dropFields) y[dropField] <- NULL
   } else if (renameAll != "no") {
-    names(y) <- affixFields(fieldNames = names(y), skipFields = by.y,
+    names(y) <- affixFields(fields = names(y), skip = by.y,
                             affix = affix, renameHow = renameAll)
   }
   # end if there are duplicates (no else - we can proceed)
 
-  if (verbose) message(sprintf("merging using id field: %s, and new id field: %s", by.x, by.y))
+  if (verbose) message(sprintf("merging using id: %s, and new id: %s",
+                               by.x, by.y))
 
   m <- merge(x = x, by.x = by.x, all.x = all.x,
-        y = y, by.y = by.y, all.y = all.y)
+             y = y, by.y = by.y, all.y = all.y)
   stopifnot(anyDuplicated(names(m)) == 0)
   m
 }
 
 #' @title update a set of data frame field names
 #' @description prefix or suffix
-#' @param fieldNames char vector
+#' @param fields char vector
 #' @param affix character
-#' @param skipFields char vector, defaults to include all fields
+#' @param skip char vector, defaults to include all fields
 #' @param renameAll should be "suffix" or "prefix"
 #' @param sep default '.'
-#' @return character vector, same length as fieldNames
+#' @return character vector, same length as fields
 #' @export
-affixFields <- function(fieldNames, affix, skipFields = NULL,
+affixFields <- function(fields, affix, skip = NULL,
                         renameHow = c("suffix", "prefix"),
                         sep = ".") {
 
   stopifnot(length(affix) == 1)
   stopifnot(nchar(affix) > 0)
-  stopifnot(is.null(skipFields) || is.character(skipFields))
+  stopifnot(is.null(skip) || is.character(skip))
 
   renameHow <- match.arg(renameHow)
   if (renameHow == "suffix") {
-    fieldNames[fieldNames %nin% skipFields] <-
-      paste(fieldNames[fieldNames %nin% skipFields], affix, sep = sep)
+    fields[fields %nin% skip] <-
+      paste(fields[fields %nin% skip], affix, sep = sep)
   } else {
-    fieldNames[fieldNames %nin% skipFields] <-
-      paste(affix, fieldNames[fieldNames %nin% skipFields], sep = sep)
+    fields[fields %nin% skip] <-
+      paste(affix, fields[fields %nin% skip], sep = sep)
   }
-  fieldNames
+  fields
 }
 
 #' @title get items or numerics that would be dropped in a merge
@@ -383,19 +390,20 @@ getDropped <- function(x, y)
 #' @export
 dropDuplicateFields <- function(df, verbose = FALSE) {
   stopifnot(is.logical(verbose), length(verbose) == 1)
-  dropNames <- c()
+  drop <- c()
 
   # to hell with vectorization
   for (f in 1:(dim(df)[2] - 1)) {
     for (g in (f + 1):dim(df)[2]) {
       if (identical(all.equal(df[[f]], df[[g]]), TRUE)) {
-        if (verbose) message(sprintf("found matching fields %s and %s. Dropping one.",
+        if (verbose) message(sprintf("found matching fields %s and %s. \
+                                     Dropping one.",
                                      names(df)[f], names(df)[g]))
-        dropNames <- c(dropNames, names(df)[g])
+        drop <- c(drop, names(df)[g])
       }
     }
   }
 
-  for (dn in dropNames) df[dn] <- NULL
+  for (dn in drop) df[dn] <- NULL
   df
 }

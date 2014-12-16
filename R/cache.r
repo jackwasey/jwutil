@@ -308,7 +308,8 @@ saveInDataDir <- function(varName, suffix) {
 #'   the calling frame.
 #' @family cache
 #' @export
-rmCache <- function(varName = NULL, pattern = NULL, startDate = NULL, endDate = NULL,
+rmCache <- function(varName = NULL, pattern = NULL,
+                    startDate = NULL, endDate = NULL,
                     cacheDir = NULL, envir = parent.frame()) {
   stopifnot(!xor(is.null(startDate), is.null(endDate)))
   stopifnot(xor(is.null(varName), is.null(pattern)))
@@ -365,7 +366,7 @@ renameCache <- function(oldVar, newVar,
   stopifnot(is.null(cacheDir) || length(cacheDir) == 1)
   stopifnot(is.environment(envir))
   stopifnot(exists(oldVar, envir))
-  stopifnot(!exists(newVar, envir)) # maybe allow overwrite?
+  stopifnot(!exists(newVar, envir))  # maybe allow overwrite?
 
   inmem <- ls(pattern = paste0("^", oldVar), envir = envir)
   ondisk <- grep(pattern = paste0("^", oldVar),

@@ -45,10 +45,10 @@ test_that("getNonFactorNames", {
   expect_equal(getNonFactorNames(data.frame(f1,v1,f2)), c("v1"))
   expect_equal(getNonFactorNames(data.frame(v1,f1,v2)), c("v1","v2"))
   #expect_equal(getNonFactorNames(data.frame()), NULL)
-  #expect_equal(getNonFactorNames(data.frame(), considerFactors=NULL), NULL)
+  #expect_equal(getNonFactorNames(data.frame(), consider=NULL), NULL)
   expect_warning(getNonFactorNames(data.frame()))
   #expect_output(getNonFactorNames(data.frame()), regexp='.*WARNING.*')
-  expect_warning(getNonFactorNames(data.frame(), considerFactors=NULL))
+  expect_warning(getNonFactorNames(data.frame(), consider=NULL))
 })
 
 test_that("getFactorNames",{
@@ -63,15 +63,15 @@ test_that("getFactorNames",{
   oldWarn <- options("warn")
   options(warn = - 1)
   expect_equal(getFactorNames(data.frame()), NULL)
-  expect_equal(getFactorNames(data.frame(), considerFactors=NULL), NULL)
+  expect_equal(getFactorNames(data.frame(), consider=NULL), NULL)
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
   options(oldWarn)
   # TODO: DO expect warnings - logging nightmare.
   expect_warning(getFactorNames(data.frame()))
-  expect_warning(getFactorNames(data.frame(), considerFactors=NULL))
+  expect_warning(getFactorNames(data.frame(), consider=NULL))
   expect_warning(getFactorNames(data.frame(), NULL))
   #expect_output(getFactorNames(data.frame()), 'WARNING')
-  #expect_output(getFactorNames(data.frame(), considerFactors=NULL), 'WARNING')
+  #expect_output(getFactorNames(data.frame(), consider=NULL), 'WARNING')
   #expect_output(getFactorNames(data.frame(), NULL), 'WARNING')
   #check duplicate field names
   #TODO: should this error out?
@@ -81,24 +81,24 @@ test_that("getFactorNames",{
 test_that("expandFactors", {
 
   expect_equal(
-    expandFactors(dframe, considerFactors=c("f1","f2")),
+    expandFactors(dframe, consider=c("f1","f2")),
     expandFactors(dframe)
   )
 
-  expect_warning(out <- expandFactors(dframe, considerFactors = NULL))
+  expect_warning(out <- expandFactors(dframe, consider = NULL))
   expect_identical(dframe, out)
 
-  out <- expandFactors(dframe, considerFactors=c("f1","f2"), sep = ".", verbose = TRUE)
+  out <- expandFactors(dframe, consider=c("f1","f2"), sep = ".", verbose = TRUE)
   expect_equal(dim(out), c(9,6))
   expect_equal(class(out[[1]]), "logical")
   expect_equal(names(out), c("f1.1","f1.2","f1.3","f2.10","f2.20","f2.30"))
 
-  out <- expandFactors(dframe, considerFactors=c("f1"), sep = ".")
+  out <- expandFactors(dframe, consider=c("f1"), sep = ".")
   expect_equal(dim(out), c(9,4))
   expect_equal(class(out[["f1.1"]]), "logical")
   expect_equal(names(out), c("f2","f1.1","f1.2","f1.3"))
 
-  out <- expandFactors(mixed.df, considerFactors = c("v1","f1"), sep = ".")
+  out <- expandFactors(mixed.df, consider = c("v1","f1"), sep = ".")
   expect_equal(dim(out), c(9,5))
   expect_equal(class(out[["f1.1"]]), "logical")
   expect_equal(names(out), c("f2","v1","f1.1","f1.2","f1.3"))
@@ -268,7 +268,7 @@ test_that("set diff on data frame indices before merging", {
 test_that("affix fields bad inputs", {
   expect_error(affixFields(c("a", "b")))
   expect_error(affixFields(c("a", "b"), affix = ""))
-  expect_error(affixFields(c("a", "b"), affix = "x", skipFields = bad_input))
+  expect_error(affixFields(c("a", "b"), affix = "x", skip = bad_input))
   expect_error(affixFields(c("a", "b"), affix = "x", renameHow = "no"))
 })
 
@@ -290,12 +290,12 @@ test_that("affix good inputs", {
   )
   expect_equal(
     affixFields(c("a", "b"), affix = "x",
-                renameHow = "prefix", skipFields = "a"),
+                renameHow = "prefix", skip = "a"),
     c("a", "x.b")
   )
   expect_equal(
     affixFields(c("a", "b"), affix = "x",
-                renameHow = "prefix", skipFields = "b"),
+                renameHow = "prefix", skip = "b"),
     c("x.a", "b")
   )
   expect_equal(
