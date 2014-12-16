@@ -146,7 +146,9 @@ getFromCache <- function(varName,
 #'   the cache.
 #' @description Same as assign, but will only touch cache if the variable isn't
 #'   already loaded.
-#' @param value val
+#' @param value value to be lazy evaluated. Consider also enabling a call, or
+#'   expression. \code{eval} could be called on it, so a constructed expression
+#'   can be passed in. Since scoping changes, this should be self contained.
 #' @template varName
 #' @template startEndDate
 #' @template cacheDir
@@ -172,23 +174,26 @@ assignCache <- function(value, varName,
   stopifnot(is.null(startDate) || is.character(startDate))
   stopifnot(is.null(endDate) || is.character(endDate))
   stopifnot(is.environment(envir))
-  stopifnot(is.environment(searchEnv))
   stopifnot(is.logical(force))
 
   # "value" should not be evaluated until used, so a database query in 'value'
   # should be ignored if not needed, and not throw an error if database not
   # available.
-  if (force || !isCached(varName, cacheDir = cacheDir,
+  if (!force && isCached(varName = varName,
+                          startDate = startDate, endDate = endDate,
+                          cacheDir = cacheDir, envir = envir,
+                          force = FALSE)) {
+    return(loadFromCache(varName = varName, cacheDir = cacheDir,
                          startDate = startDate, endDate = endDate,
-                         force = FALSE, envir = envir)) {
-    # this evaluates 'value' and should run the db query at this point
-    assign(x = varName, value = value, envir = envir)
-    saveToCache(varName, startDate = startDate, endDate = endDate,
-                cacheDir = cacheDir, envir = envir)
+                         force = FALSE, envir = envir))
   }
-  loadFromCache(varName = varName, cacheDir = cacheDir,
-                startDate = startDate, endDate = endDate,
-                force = FALSE, envir = envir) #TODO can i get rid of searchEnv?
+
+  # this evaluates 'value' and should run the db query at this point
+  assign(x = varName, value = value, envir = envir)
+  saveToCache(varName = varName,
+              startDate = startDate, endDate = endDate,
+              cacheDir = cacheDir, envir = envir)
+
 }
 
 #' @rdname assignCache
