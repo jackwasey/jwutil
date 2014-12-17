@@ -407,9 +407,25 @@ buildLinearFormula <- function (left, right) {
 #' @return logical vector of length \code{length}
 #' @export
 invwhich <- function(which, len = max(which)) {
-  stopifnot(all(which > 0) )
+  stopifnot(all(which > 0))
   stopifnot(allIsInteger(which))
   stopifnot(length(len) > 0)
   stopifnot(identical(areIntegers(len), TRUE))
   is.element(seq_len(len), which)
+}
+
+#' @title recursive remove
+#' @description search through environments until the variables in the list
+#'   \code{x} are all gone. This doesn't delete functions. No barrier to
+#'   infinite recursion, but rm should be able to delete anything that exists
+#'   can see.
+#' @param x variables to annihilate
+#' @export
+rmRecursive <- function(x, envir = parent.frame()) {
+  suppressWarnings({
+    while(any(vapply(x, exists, logical(1),
+                     mode = "numeric", inherits = TRUE, envir = envir)))
+      rm(list = x, envir = envir, inherits = TRUE)
+
+  })
 }
