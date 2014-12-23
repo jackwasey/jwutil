@@ -86,5 +86,18 @@ test_that("merge frames forcing prefix" , {
                  class = "data.frame")
   expect_equivalent(r, e)
 
+  # should be case insensitive for field matches (but not the 'by' term)
+  dfB <- dfb
+  names(dfB) <- c("a", "B", "C")
+  r <- mergeBetter(x = dfa, y = dfB, by.x = "a", by.y = "a", renameAll = "suffix", affix = "jack")
+  e <- structure(list(a = c(1, 2, 3, 4),
+                      b = c(11, 12, 13, 14),
+                      c = c(101, 102, 103, 104),
+                      dfc.b = c(999, 12, 13, 14),
+                      dfc.c = c(101, 102, 103, 104)),
+                 .Names = c("a", "b", "c", "B.jack"),
+                 class = "data.frame")
+  expect_equivalent(r, e)
+
   skip("to do tests covering case where there are duplicate frames but rename is explicitly requested")
 })

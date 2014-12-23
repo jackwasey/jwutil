@@ -294,16 +294,13 @@ mergeBetter <- function(x, y, by.x, by.y,
 
 
   # drop identical fields unless an explicit rename has been requested.
-
   if (length(dupes_x) > 0 && renameAll == "no") {
-    if (verbose) message("conflicting field names in the merge. \
-                          Using renameConflict to guide the renaming
-                          of clashing fields: ",
+    if (verbose) message("conflicting field names in the merge. Using renameConflict to guide the renaming of clashing fields: ",
                          paste(dupes_x, collapse = ", "))
     dropFields <- c()
     for (xdup in dupes_x) {
       #rematch y - this is unsatisfying but simplifies the logic.
-      match_x_in_y <- match(xdup, names(y))
+      match_x_in_y <- match(tolower(xdup), tolower(names(y)))
       stopifnot(length(match_x_in_y) == 1)  # two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
       if (verbose) message("checking whether '", xdup,
