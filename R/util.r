@@ -355,6 +355,53 @@ permute <- function(x) {
   unname(res)
 }
 
+#' @title all unique combinations of a vector and all its non-zero subsets
+#' @param x vector to be subsetted and combined
+#' @return list of vectors with all combinations of x and its subsets
+#' @export
+combn_subset <- function(x) {
+  res <- list()
+  for (n in 1:length(x)) {
+    r <- combn(x, n, simplify = FALSE)
+    r2 <- lapply(t(r), FUN = function(y) unlist(y))
+    #print(r2)
+    res <- c(res, r2)
+  }
+  unique(res)
+}
+
+#' @title optimizes a function for all combinations of all subsets
+#' @description takes a data frame and optimization function
+#' @param fun function which takes parameters x = data.frame, n = columns
+#' @export
+opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = TRUE) {
+
+  n <- names(x)
+  all_cmbs <- combn_subset(n)
+  best_cmb <- c()
+  best_min <- 1e9
+  best_min_by_len <- c(rep(best_min, times = length(n)))
+  best_cmb_by_len <- as.list(rep("", times = length(n)))
+  for (cmb in rev(all_cmbs)) {
+    len_cmb <- length(cmb)
+    optim <- fun(x, cmb)
+    if (optim < best_min_by_len[len_cmb]) {
+      if (verbose) message("best combination for length: ", len_cmb, " is ",
+                           paste(cmb, collapse = ", "), " and optim: ", optim)
+      best_min_by_len[len_cmb] <- optim
+      best_cmb_by_len[[len_cmb]] <- cmb
+    }
+  }
+  list(best_min_by_len = best_min_by_len,
+       best_cmb_by_len = best_cmb_by_len)
+}
+
+# stupid example optimization metric function
+opt_binary_fun <- function(x, n) {
+  sum(colSums(x[n])) / length(n)
+}
+
+
 #' Are we running on Linux or Windows?
 #'
 #' @return logical
@@ -379,7 +426,7 @@ readXlsxLinux <- function(file) {
 
   csvfile <- tempfile()
   system(paste0("xlsx2csv --delimiter=tab --dateformat=%m-%d-%y \"",
-           file, "\" > ", csvfile))
+                file, "\" > ", csvfile))
   read.delim(csvfile)
 }
 
