@@ -53,6 +53,7 @@ isCached <- function(var,
 #'   already be in memory). Starts off with \code{parent.frame()} by default,
 #'   and /code{inherits}, so should find already loaded cache files in
 #'   .GlobalEnv eventually.
+#' @template verbose
 #' @export
 #' @family cache
 #' @return value in variable named by \code{var}
@@ -84,8 +85,7 @@ saveToCache <- function(var, from = NULL, to = NULL,
 #' @template var
 #' @template to_from_dates
 #' @template cacheDir
-#' @param force logical whether to get the data from cache even if it is already
-#'   in an accessible environment
+#' @template verbose
 #' @export
 getFromCache <- function(var,
                          from = NULL, to = NULL,
@@ -112,6 +112,10 @@ getFromCache <- function(var,
 }
 
 #' @rdname getFromCache
+#' @param ... params to pass on to getFromCache
+#' @param envir environment in which to load the variable, defaults to the
+#'   calling frame.
+#' @param inherits single logical, passed on to \code{assign}
 #' @export
 loadFromCache <- function(var, ..., envir = parent.frame(), inherits = FALSE) {
   assign(var, getFromCache(var, ...),
@@ -119,9 +123,16 @@ loadFromCache <- function(var, ..., envir = parent.frame(), inherits = FALSE) {
   invisible(get(var, envir = envir, inherits = inherits))
 }
 
-#' @title assign a value to an environment, but only evaluate the assignment if
-#'   it doesn't already exist on the cache. In this case, it is also saved in
-#'   the cache.
+#' @rdname cache
+#' @export
+assignCache <- function(value, var,
+                        from = NULL, to = NULL, ...,
+                        envir = parent.frame(),
+                        verbose = FALSE)
+  cache(value = value, var = var, from = from, to = to, ...,
+        envir = envir, assign = TRUE, verbose = verbose)
+
+#' @title cache and assign data to an environment
 #' @description Same as assign, but will only touch cache if the variable isn't
 #'   already loaded.
 #' @param value value to be lazy evaluated. Consider also enabling a call, or
@@ -131,24 +142,17 @@ loadFromCache <- function(var, ..., envir = parent.frame(), inherits = FALSE) {
 #' @template to_from_dates
 #' @template cacheDir
 #' @param envir environment to assign to, defaults to the calling frame
-#' @param force logical value, if TRUE will force the assignment to overwrite
-#'   whatever was in the cache, if anything.
-#' @param assign logical whether to make an assignment to given environment, in
-#'   addition to returning the data
+#' @param force single logical value whether to force re-writing of cache if
+#'   data already exists
+#' @param assign single logical value whether to assign the cached data to an
+#'   environment
+#' @param format single character value with date format
+#' @param ... arguments passed on to other functions
+#' @param fun function which accepts from and to arguments used by
+#'   \code{assignCacheByFun}
 #' @template verbose
 #' @return invisibly returns the value assigned
 #' @family cache
-#' @export
-assignCache <- function(value, var,
-                        from = NULL, to = NULL, ...,
-                        envir = parent.frame(),
-                        verbose = FALSE)
-  cache(value = value, var = var, from = from, to = to, ...,
-        envir = envir, assign = TRUE, verbose = verbose)
-
-#' @title cache the given data, and pass through value without assignment to an
-#'   environment
-#' @description should work well with magrittr
 #' @export
 cache <- function(value, var,
                   from = NULL, to = NULL,
@@ -156,9 +160,8 @@ cache <- function(value, var,
                   envir = parent.frame(),
                   force = FALSE,
                   assign = FALSE,
-                  format = "%Y-%m-%d", verbose = FALSE) {
-
-  suppressPackageStartupMessages(library(lubridate))
+                  format = "%Y-%m-%d",
+                  verbose = FALSE) {
 
   stopifnot(length(var) == 1)
   stopifnot(is.character(var))
@@ -196,19 +199,17 @@ cache <- function(value, var,
               cacheDir = cacheDir, envir = envir)
 }
 
-#' @rdname assignCache
-#' @param fun function which accepts from and to arguments
-#' @param ... arguments to pass on to \code{fun}
+#' @rdname cache
 #' @export
 assignCacheByFun <- function(fun, var,
                              from = NULL, to = NULL, ...,
                              cacheDir = NULL,
-                             envir = parent.frame(),
-                             force = FALSE)
+                             envir = parent.frame())
   assignCache(value = fun(from = from, to = to, ...),
               var = var,
-              from, to, cacheDir = cacheDir,
-              envir = envir, force = force)
+              from, to,
+              cacheDir = cacheDir,
+              envir = envir)
 
 
 #' @title find path to the cache directory
@@ -269,7 +270,7 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache",
 }
 
 #' @title find path to a file in cache directory
-#' @template var
+#' @param filename character vector of file names
 #' @template cacheDir
 #' @family cache
 #' @export
@@ -320,12 +321,9 @@ rmCache <- function(var = NULL, pattern = NULL,
     if (isCached(var = var, from = from, to = to, cacheDir = cacheDir))
       file.remove(findCacheFilePath(vn, cacheDir))
 
-    #rmRecursive(list(vn, var), envir = envir)
-
-  } else {
+  } else
     file.remove(lsCacheFiles(cacheDir = cacheDir, pattern = pattern))
-    #rmRecursive(ls(pattern = pattern, envir = envir), envir = envir)
-  }
+
 }
 
 #' @title list cache contents
@@ -352,10 +350,11 @@ lsCache <- function(pattern = ".*", cacheDir = NULL)
 #' @param oldname character vector length one
 #' @param newname character vector length one
 #' @param cacheDir character vector length one
+#' @template verbose
 #' @family cache
 #' @export
 renameCache <- function(oldname, newname, cacheDir = NULL,
-                        force = FALSE, verbose = FALSE) {
+                        verbose = FALSE) {
 
   stopifnot(is.null(cacheDir) || length(cacheDir) == 1)
   ondisk <- lsCache(pattern = paste0("^", oldname, ".*"), cacheDir = cacheDir)

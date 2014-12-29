@@ -340,8 +340,8 @@ mergeBetter <- function(x, y, by.x, by.y,
 #' @param fields char vector
 #' @param affix character
 #' @param skip char vector, defaults to include all fields
-#' @param renameAll should be "suffix" or "prefix"
-#' @param sep default '.'
+#' @param renameHow should be "suffix" or "prefix", default is suffix
+#' @param sep default "."
 #' @return character vector, same length as fields
 #' @export
 affixFields <- function(fields, affix, skip = NULL,
