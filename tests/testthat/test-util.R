@@ -375,9 +375,10 @@ test_that("allIsNumeric", {
 })
 
 test_that("allIsInteger", {
+  expect_error(allIsInteger())
+  expect_error(allIsInteger(c()))  # class = typeof = NULL
   expect_true(allIsInteger(1))
   expect_true(allIsInteger(integer(0)))
-  expect_true(allIsInteger(c()))  # class = typeof = NULL
   expect_true(allIsInteger(c(1, 2)))
   expect_true(allIsInteger(-1))
   expect_true(allIsInteger(zeroes))
@@ -404,9 +405,10 @@ test_that("allIsInteger", {
 })
 
 test_that("areIntegers", {
+  expect_error(areIntegers())
+  expect_error(areIntegers(NULL))
   expect_true(areIntegers(1))
   expect_identical(areIntegers(integer(0)), logical(0))
-  expect_that(areIntegers(c()), testthat::is_identical_to(logical(0)))  # class = typeof = NULL
   expect_that(areIntegers(c(1, 2)), testthat::equals(c(TRUE, TRUE)))
   expect_true(areIntegers(-1))
   expect_true(all(areIntegers(zeroes)))

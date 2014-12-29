@@ -76,6 +76,7 @@ asIntegerNoWarn <- function(x)
 #' @return logical vector
 #' @export
 areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
+  stopifnot(!is.null(x))
   stopifnot(is.numeric(tol), is.logical(na.ignore))
   stopifnot(length(tol) <= 1, length(na.ignore) <= 1)
   nas <- is.na(x)
@@ -113,6 +114,8 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
 #' @param \dots further arguments to FUN
 #' @export
 read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
+  stopifnot(length(filename) <= 1)
+  stopifnot(is.character(url), length(url) == 1)
   zipfile <- tempfile()
   download.file(url = url, destfile = zipfile, quiet = TRUE)
   zipdir <- tempfile()
@@ -126,11 +129,10 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
       stop("multiple files in zip, but no filename specified: ",
            paste(files, collapse = ", "))
     }
-  } else {
-    stopifnot(length(filename) == 1)
+  } else
     stopifnot(filename %in% files)
-  }
-  do.call(FUN, args = c(list(file.path(zipdir, filename)), list(...)))
+
+  do.call(FUN, args = c(list(file.path(zipdir, filename), warn = FALSE), list(...)))
 }
 
 #' @title count non-numeric elements

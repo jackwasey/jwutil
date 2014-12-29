@@ -88,7 +88,7 @@ test_that("expandFactors", {
   expect_warning(out <- expandFactors(dframe, consider = NULL))
   expect_identical(dframe, out)
 
-  out <- expandFactors(dframe, consider=c("f1","f2"), sep = ".", verbose = TRUE)
+  out <- expandFactors(dframe, consider=c("f1","f2"), sep = ".", verbose = FALSE)
   expect_equal(dim(out), c(9,6))
   expect_equal(class(out[[1]]), "logical")
   expect_equal(names(out), c("f1.1","f1.2","f1.3","f2.10","f2.20","f2.30"))
@@ -117,7 +117,7 @@ test_that("factorToDataframeLogical bad input fails", {
 })
 
 test_that("factorToDataframeLogical works", {
-  expect_equal(dim(factorToDataframeLogical(f1, prefix = "f1", verbose = TRUE)), c(9, 3))
+  expect_equal(dim(factorToDataframeLogical(f1, prefix = "f1", verbose = FALSE)), c(9, 3))
   expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
   expect_true(all(sapply(factorToDataframeLogical(f1, prefix = "f1"), is.logical)))
 
@@ -179,7 +179,7 @@ test_that("drop rows with NA values in given fields bad data", {
 })
 
 test_that("drop rows with NA values in given fields good data", {
-  expect_identical(dropRowsWithNAField(cars, "speed", verbose = TRUE), cars)
+  expect_identical(dropRowsWithNAField(cars, "speed", verbose = FALSE), cars)
   expect_identical(dropRowsWithNAField(cars, c("speed", "dist")), cars)
 
   carsna1 <- carsna2 <- carsna3 <- cars

@@ -8,7 +8,7 @@ dfc[1, "b"] <- 999
 dfc[2, "c"] <- 888
 
 test_that("merge identical frames should give identical result unless prefix or suffix requested" , {
-  r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a", verbose = TRUE)
+  r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a", verbose = FALSE)
   expect_equal(dfa, r)
 })
 
@@ -33,7 +33,7 @@ test_that("can't handle double duplicate fields, esp not keys", {
 })
 
 test_that("merge non-identical frames should suffix field name by default" , {
-  r <- mergeBetter(x = dfa, y = dfb, by.x = "a", by.y = "a", verbose = TRUE)
+  r <- mergeBetter(x = dfa, y = dfb, by.x = "a", by.y = "a", verbose = FALSE)
   e <- dfa
   e[["b.dfb"]] <- c(999,12,13,14)
   expect_equal(r, e)
@@ -66,7 +66,7 @@ test_that("merge frames forcing prefix" , {
                  class = "data.frame")
   expect_equivalent(r, e)
 
-  r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a", renameAll = "suffix", verbose = TRUE)
+  r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a", renameAll = "suffix", verbose = FALSE)
   e <- structure(list(a = c(1, 2, 3, 4),
                       b = c(11, 12, 13, 14),
                       c = c(101, 102, 103, 104),
