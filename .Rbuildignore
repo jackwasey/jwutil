@@ -2,3 +2,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 man-roxygen
+traceOutput.txt
+coverage_report.html
