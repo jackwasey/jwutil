@@ -76,6 +76,7 @@ asIntegerNoWarn <- function(x)
 #' @return logical vector
 #' @export
 areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
+  if (is.null(x)) return(FALSE)
   stopifnot(is.numeric(tol), is.logical(na.ignore))
   stopifnot(length(tol) <= 1, length(na.ignore) <= 1)
   nas <- is.na(x)

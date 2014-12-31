@@ -227,9 +227,10 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 #'   Suffix is the default.
 #' @param renameAll - regardless of column name clashes, "prefix" or "suffix"
 #'   with every field with original table name, or "no" for neither
-#' @param convert_factors Default is TRUE which causes factors to be converted to
-#'   character before merge. This is almost certainly safer.
-#' @param verbose logical
+#' @param convert_factors Default is TRUE which causes factors to be converted
+#'   to character before merge. This is almost certainly safer.
+#' @param verbose logical or numbers 0, 1 or 2. 1 or TRUE will give moderate
+#'   verbosity, 2 will give full verbosity. 0 or FALSE turns off all messages.
 #' @return merged data frame
 #' @export
 mergeBetter <- function(x, y, by.x, by.y,
@@ -248,7 +249,9 @@ mergeBetter <- function(x, y, by.x, by.y,
   stopifnot(length(by.x) == 1, length(by.y) == 1)
   stopifnot(length(all.x) == 1, length(all.y) == 1)
   stopifnot(length(verbose) == 1, length(convert_factors) == 1)
+  stopifnot(areIntegers(verbose))
 
+  verbose <- as.integer(verbose) # TRUE will become low verbosity
 
   # we don't want case sensitive names: we rely on case insensitivity, and it is
   # very common for the same data to have case-changes in the field name.
@@ -273,45 +276,50 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   if (verbose) {
     # this informational step could itself be slow in a big merge
-    right_drops <- sum(! (x[[by.x]] %in% y[[by.y]]))
-    left_drops <- sum(! (y[[by.y]]) %in% x[[by.x]])
-    if (left_drops > 0 || right_drops > 0) {
-      message(sprintf("drops %d out of %d from new table",
-                      left_drops, nrow(y)))
-      message(sprintf("and %d out of %d from old table",
-                      right_drops, nrow(x)))
-    } else {
-      message("Keys match exactly (but data may yet differ")
-    }
+    left_missing <- sum(x[[by.x]] %nin% y[[by.y]])
+    right_missing  <- sum(y[[by.y]] %nin% x[[by.x]])
+    if (right_missing + left_missing > 0) {
+      message(sprintf(ifelse(all.y,
+                             "keeping %d out of %d unmatched from y",
+                             "dropping %d out of %d from y"
+      ), right_missing, nrow(y)))
+      message(sprintf(ifelse(all.x,
+                             "keeping %d out of %d unmatched from x",
+                             "dropping %d out of %d from x"
+      ), left_missing, nrow(x)))
+    } else
+      message("Keys match exactly, so dropping no rows.")
   }
 
   # find duplicate field names, ignoring the field we are merging on.
   dupes_x <- names(x)[tolower(names(x)) %in% tolower(names(y)) &
-                            tolower(names(x)) != tolower(by.x) &
-                            tolower(names(x)) != tolower(by.y)]
-  if (verbose) message("duplicate x field names: ",
-                       paste(dupes_x, collapse=", "))
-
-
+                        tolower(names(x)) != tolower(by.x) &
+                        tolower(names(x)) != tolower(by.y)]
   # drop identical fields unless an explicit rename has been requested.
   if (length(dupes_x) > 0 && renameAll == "no") {
-    if (verbose) message("conflicting field names in the merge. Using renameConflict to guide the renaming of clashing fields: ",
-                         paste(dupes_x, collapse = ", "))
+    if (verbose)
+      message("x field names duplicated in y: ",
+              paste(dupes_x, collapse = ", "))
+
+    if (verbose > 1)
+      message(sprintf("Adding %s to rename conflicts in y: ",
+                      renameConflict))
     dropFields <- c()
     for (xdup in dupes_x) {
       #rematch y - this is unsatisfying but simplifies the logic.
       match_x_in_y <- match(tolower(xdup), tolower(names(y)))
       stopifnot(length(match_x_in_y) == 1)  # two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
-      if (verbose) message("checking whether '", xdup,
+      if (verbose > 1) message("checking whether '", xdup,
                            "' (matching '", ydup, "') has duplicated data.")
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
+
       # all.equal returns true or a char vector, so work around
       if (identical(isAllEqual, TRUE)) {
-        if (verbose) message("will drop  identical field: ", ydup)
+        if (verbose > 1) message("dropping identical field: ", ydup)
         dropFields <- c(dropFields, ydup)
       } else {
-        if (verbose) message("renaming conflicting field (data not identical")
+        if (verbose > 1) message("renaming non-identical field:", ydup)
         names(y)[which(names(y) == ydup)] <-
           affixFields(fields = ydup,
                       affix = affix,
@@ -324,13 +332,13 @@ mergeBetter <- function(x, y, by.x, by.y,
     names(y) <- affixFields(fields = names(y), skip = by.y,
                             affix = affix, renameHow = renameAll)
   }
-  # end if there are duplicates (no else - we can proceed)
 
   if (verbose) message(sprintf("merging using id: %s, and new id: %s",
                                by.x, by.y))
 
   m <- merge(x = x, by.x = by.x, all.x = all.x,
              y = y, by.y = by.y, all.y = all.y)
+
   stopifnot(anyDuplicated(names(m)) == 0)
   m
 }
@@ -403,4 +411,4 @@ dropDuplicateFields <- function(df, verbose = FALSE) {
 
   for (dn in drop) df[dn] <- NULL
   df
-}
+  }

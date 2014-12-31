@@ -375,9 +375,9 @@ test_that("allIsNumeric", {
 })
 
 test_that("allIsInteger", {
+  expect_false(allIsInteger(NULL))
   expect_true(allIsInteger(1))
   expect_true(allIsInteger(integer(0)))
-  expect_true(allIsInteger(c()))  # class = typeof = NULL
   expect_true(allIsInteger(c(1, 2)))
   expect_true(allIsInteger(-1))
   expect_true(allIsInteger(zeroes))
@@ -404,9 +404,9 @@ test_that("allIsInteger", {
 })
 
 test_that("areIntegers", {
+  expect_false(areIntegers(NULL))
   expect_true(areIntegers(1))
   expect_identical(areIntegers(integer(0)), logical(0))
-  expect_that(areIntegers(c()), testthat::is_identical_to(logical(0)))  # class = typeof = NULL
   expect_that(areIntegers(c(1, 2)), testthat::equals(c(TRUE, TRUE)))
   expect_true(areIntegers(-1))
   expect_true(all(areIntegers(zeroes)))
@@ -465,8 +465,9 @@ test_that("platform", {
 
 test_that("download zip", {
   expect_that(
-    read.zip.url("http://phs.googlecode.com/files/Download%20File%20Test.zip"),
-    testthat::not(throws_error())
+    suppressWarnings(
+      read.zip.url("http://phs.googlecode.com/files/Download%20File%20Test.zip")
+    ), testthat::not(throws_error())
   )
 })
 
