@@ -311,7 +311,7 @@ mergeBetter <- function(x, y, by.x, by.y,
       stopifnot(length(match_x_in_y) == 1)  # two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
       if (verbose > 1) message("checking whether '", xdup,
-                           "' (matching '", ydup, "') has duplicated data.")
+                               "' (matching '", ydup, "') has duplicated data.")
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
 
       # all.equal returns true or a char vector, so work around
@@ -348,8 +348,8 @@ mergeBetter <- function(x, y, by.x, by.y,
 #' @param fields char vector
 #' @param affix character
 #' @param skip char vector, defaults to include all fields
-#' @param renameAll should be "suffix" or "prefix"
-#' @param sep default '.'
+#' @param renameHow should be "suffix" or "prefix", default is suffix
+#' @param sep default "."
 #' @return character vector, same length as fields
 #' @export
 affixFields <- function(fields, affix, skip = NULL,
@@ -411,4 +411,54 @@ dropDuplicateFields <- function(df, verbose = FALSE) {
 
   for (dn in drop) df[dn] <- NULL
   df
-  }
+}
+
+#' @title filter data with diagnostics
+#' @description applies an expression to a data frame, and gives information
+#'   about the numbers of dropped rows.
+#' @param x data frame
+#' @param expr expression in the context of the data frame, i.e. the terms
+#'   should be column names.
+#' @param verbose logical default is TRUE
+#' @export
+#' @return filtered data frame
+filterBetter <- function(x, expr, verbose = TRUE) {
+  sexpr <- substitute(expr)
+  fn <- deparse(substitute(x))
+  if (fn == ".") fn <- "" else fn <- paste("'", fn, "'")
+
+  fltr <- eval(sexpr, x)
+  stopifnot(is.logical(fltr))
+
+  if (verbose) message(sprintf(
+    "Filtering %s with expression '%s' drops %d (%2.1f%%) of %d",
+    fn, deparse(sexpr),
+    sum(!fltr), 100 * sum(!fltr) / length(fltr), length(fltr)
+  ))
+  x[fltr,]
+}
+
+#' @title return names of fields which consist of only 0 and 1
+#' @description assumes columns are numeric, doesn't think about factors
+#' #TODO check for factors, etc.
+#' @param x data frame
+#' @return vector of column names
+#' @export
+binaryCols <- function(x)
+  names(x)[sapply(x, function(y) all(y %in% c(0, 1)))]
+
+#' @rdname binaryCols
+#' @export
+nonBinaryCols <- function(x)
+  names(x)[sapply(x, function(y) any(y %nin% c(0, 1)))]
+
+#' @title fill out missing combinations of factors with NA
+#' @param df data frame
+#' @details Adapated from http://www.cookbook-r.com/Manipulating_data/\
+#' Summarizing_data/#using-aggregate
+#' @export
+fillMissingCombs <- function(df) {
+  levelList <- list()
+  for (f in getFactorNames(df)) levelList[[f]] <- levels(df[,f])
+  merge(expand.grid(levelList), df, all.x = TRUE)
+}

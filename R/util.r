@@ -114,6 +114,8 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
 #' @param \dots further arguments to FUN
 #' @export
 read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
+  stopifnot(length(filename) <= 1)
+  stopifnot(is.character(url), length(url) == 1)
   zipfile <- tempfile()
   download.file(url = url, destfile = zipfile, quiet = TRUE)
   zipdir <- tempfile()
@@ -127,11 +129,10 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
       stop("multiple files in zip, but no filename specified: ",
            paste(files, collapse = ", "))
     }
-  } else {
-    stopifnot(length(filename) == 1)
+  } else
     stopifnot(filename %in% files)
-  }
-  do.call(FUN, args = c(list(file.path(zipdir, filename)), list(...)))
+
+  do.call(FUN, args = c(list(file.path(zipdir, filename), warn = FALSE), list(...)))
 }
 
 #' @title count non-numeric elements
@@ -373,7 +374,9 @@ combn_subset <- function(x) {
 
 #' @title optimizes a function for all combinations of all subsets
 #' @description takes a data frame and optimization function
+#' @param x data frame
 #' @param fun function which takes parameters x = data.frame, n = columns
+#' @template verbose
 #' @export
 opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = TRUE) {
 
@@ -468,6 +471,7 @@ invwhich <- function(which, len = max(which)) {
 #'   infinite recursion, but rm should be able to delete anything that exists
 #'   can see.
 #' @param x variables to annihilate
+#' @param envir environment to start at, defaults to calling frame.
 #' @export
 rmRecursive <- function(x, envir = parent.frame()) {
   suppressWarnings({
@@ -509,3 +513,10 @@ rmRecursive <- function(x, envir = parent.frame()) {
 lsos <- function(..., n = 10)
   .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
 
+#' @title is the object a \code{Date}
+#' @description copied from lubridate
+#' @param x object to test
+#' @return logical
+#' @export
+is.Date <- function (x)
+  is(x, "Date")
