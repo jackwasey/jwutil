@@ -26,8 +26,6 @@ isCached <- function(var,
   stopifnot(is.null(to) || length(to) == 1 && is.Date(to))
   stopifnot(!xor(is.null(from), is.null(to)))
 
-  vn <- getCacheVarDated(var, from, to)
-
   # if from is specified, we can't rely on the (un-dated) var name being
   # correct, so we should actually look in the cache
   if (is.null(from)) {
@@ -170,7 +168,8 @@ cache <- function(value, var,
   stopifnot(is.null(from) || length(from) == 1 && is.Date(from))
   stopifnot(is.null(to) || length(to) == 1 && is.Date(to))
   stopifnot(!xor(is.null(from), is.null(to)))
-  stopifnot(is.null(cacheDir) || is.character(cacheDir) && file.exists(cacheDir))
+  stopifnot(is.null(cacheDir) ||
+              is.character(cacheDir) && file.exists(cacheDir))
   stopifnot(is.environment(envir))
   stopifnot(is.logical(force))
   stopifnot(is.character(format))
@@ -183,16 +182,17 @@ cache <- function(value, var,
                          from = from, to = to,
                          cacheDir = cacheDir)) {
     if (verbose) message(sprintf("'%s' already cached and not forcing.", var))
-    if (assign) assign(var, getFromCache(var = var, from = from, to = to,
-                                         cacheDir = cacheDir, verbose = verbose),
+    if (assign) assign(var,
+                       getFromCache(var = var, from = from, to = to,
+                                    cacheDir = cacheDir, verbose = verbose),
                        envir = envir)
     return(invisible(get(var, envir = envir)))
   }
 
-  if (verbose) message(sprintf("'%s' with dates %s and %s not in cache or forced",
+  if (verbose) message(sprintf("'%s' (%s to %s) not in cache or forced",
                                var, from, to))
   # saveToCache returns the value it saved, so we just return the result here.
-  if (!assign) envir = environment()
+  if (!assign) envir <- environment()
   assign(x = var, value = value, envir = envir)
   saveToCache(var = var,
               from = from, to = to,
@@ -262,10 +262,9 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache",
     paste(sep=", ", collapse=", ") %>% message
   if (verbose) message("Use the cacheDir= argument to specify it directly,
           or check the cache was created in the correct place")
-  fb <- options("jwutil.fallbackCacheDir")
   if (verbose) message("using fallback cache directory: ")
   td <- getOption("jwutil.fallbackCacheDir")
-  if (!file.exists(td)) dir.create(td)
+  dir.create(td, showWarnings = FALSE)
   td
 }
 
@@ -294,7 +293,7 @@ findCacheFilePath <- function(filename, cacheDir = NULL) {
 saveInDataDir <- function(var, suffix) {
   save(list = var,
        envir = parent.frame(),
-       file = file.path('data', strip(paste0(var, suffix, '.RData'))),
+       file = file.path("data", strip(paste0(var, suffix, ".RData"))),
        compress = ifelse(platformIsWindows(), "bzip2", "xz")
   )
 }

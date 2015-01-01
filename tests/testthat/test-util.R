@@ -104,7 +104,8 @@ test_that("countNotNumeric", {
   expect_equal(countNotNumeric(c("1", "two", NA)), 2)
   expect_equal(countNotNumeric(c("1", "two", c(NA, 1))), 2)
   expect_equal(countNotNumeric(c("1", "two", c("2", NA, 1))), 2)
-  expect_equal(countNotNumeric(c()), 0)   # no non-numeric values in an empty vector
+  # no non-numeric values in an empty vector? NULL?
+  expect_equal(countNotNumeric(c()), 0)
 })
 
 test_that("countNumeric", {
@@ -121,7 +122,8 @@ test_that("countNumeric", {
   expect_equal(countNumeric(c(" 9.9 ", NA)), 1)
   expect_equal(countNumeric(c("9.9", "two", NA)), 1)
   expect_equal(countNumeric(c("9.9", "two", NA, 1)), 2)
-  expect_equal(countNumeric(c()), 0)   # no non-numeric values in an empty vector
+  # no non-numeric values in an empty vector?
+  expect_equal(countNumeric(c()), 0)
 })
 
 test_that("propIsNa", {
@@ -245,8 +247,10 @@ expect_true(is.na(add_time_to_date(NA, NA)))
 #expect_true(is.na(add_time_to_date(NA,as.POSIXlt(NA))))
 #expect_true(is.na(add_time_to_date(as.POSIXlt(NA),as.POSIXlt(NA))))
 
-expect_error(add_time_to_date(dts = 7.7, tms = "2020"))  # numeric class should error for Date
-expect_error(add_time_to_date(dts = 20141231, tms = "2020"))  # numeric class should error for Date
+# numeric class should error for Date
+expect_error(add_time_to_date(dts = 7.7, tms = "2020"))
+# numeric class should error for Date
+expect_error(add_time_to_date(dts = 20141231, tms = "2020"))
 
 test_that("bad dates, give errors, regardless of time input", {
   for (jd in invalid_dates) {
@@ -254,7 +258,8 @@ test_that("bad dates, give errors, regardless of time input", {
       expect_that(
         add_time_to_date(dts = jd, tms = jt),
         throws_error(),
-        info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s", class(jd), class(jt), jd, jt)
+        info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s",
+                       class(jd), class(jt), jd, jt)
       )
     }
   }
@@ -267,13 +272,15 @@ test_that("bad times give warnings, with good date input", {
       expect_that(
         add_time_to_date(dts = jd, tms = jt),
         testthat::not(testthat::throws_error()),
-        info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s", class(jd), class(jt), jd, jt)
+        info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s",
+                       class(jd), class(jt), jd, jt)
       )
 
       expect_that(
         add_time_to_date(dts = jd, tms = jt),
         testthat::gives_warning(),
-        info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s", class(jd), class(jt), jd, jt)
+        info = sprintf("class(jd)=%s, class(jt)=%s, jd=%s, jt=%s",
+                       class(jd), class(jt), jd, jt)
       )
 
     }
@@ -281,7 +288,8 @@ test_that("bad times give warnings, with good date input", {
 })
 
 #can't give datetime for as date: we're expecting just a date
-expect_error(add_time_to_date(fulldates, rep(x="1230", times=length(fulldates))))
+expect_error(add_time_to_date(fulldates,
+                              rep(x="1230", times=length(fulldates))))
 
 test_that("good inputs don't give errors or warnings, including NA", {
   for (jd in c(valid_dates, NA)) {
@@ -294,17 +302,20 @@ test_that("good inputs don't give errors or warnings, including NA", {
       expect_that(
         add_time_to_date(dts = jd, tms = jt),
         testthat::not(throws_error()),
-        info = paste("classes: ", class(jd), class(jt), " data: ", jd, jt, collapse = ", ", sep=", "))
+        info = paste("classes: ", class(jd), class(jt),
+                     " data: ", jd, jt, collapse = ", ", sep=", "))
 
       expect_that(
         add_time_to_date(dts = jd, tms = jt),
         testthat::not(gives_warning()),
-        info = paste("classes: ", class(jd), class(jt), " data: ", jd, jt, collapse = ", ", sep=", "))
+        info = paste("classes: ", class(jd), class(jt),
+                     " data: ", jd, jt, collapse = ", ", sep=", "))
 
       expect_that(
         add_time_to_date(dts = jd, tms = jt),
         is_a("POSIXlt"),
-        info = paste("classes: ", class(jd), class(jt), " data: ", jd, jt, collapse = ", ", sep=", "))
+        info = paste("classes: ", class(jd), class(jt),
+                     " data: ", jd, jt, collapse = ", ", sep=", "))
     }
   }
 })
@@ -365,7 +376,8 @@ test_that("allIsNumeric", {
   expect_true(allIsNumeric(extreme_numbers))
   expect_true(allIsNumeric(NA_integer_))
   expect_true(allIsNumeric(NA_real_))
-  #expect_false(allIsNumeric(NA_character_)) this is just an NA, so will be true.
+  #expect_false(allIsNumeric(NA_character_)) this is just an NA, so will be
+  #true.
   expect_true(allIsNumeric(random_test_dates()))  # dates are typeof 'double'
 
   expect_false(allIsNumeric(random_test_letters()))
@@ -386,11 +398,12 @@ test_that("allIsInteger", {
   expect_true(allIsInteger(NA_real_, na.rm = T))
   expect_true(allIsInteger(NA_integer_))
   expect_true(allIsInteger(NA_real_))
-  #expect_false(allIsInteger(NA_character_)) this is just an NA, so will be true.
+  #expect_false(allIsInteger(NA_character_))  # TODO:
   expect_true(allIsInteger(1.00000000005))
   expect_true(allIsInteger(1.005, tol = 0.01))
   expect_true(allIsInteger(c(1.005, NA_integer_), tol = 0.01, na.rm = T))
-  expect_true(allIsInteger(c(1.005, NA_character_), tol = 0.01, na.rm = T))  # I don't care what sort of NA is given:
+  # I don't care what sort of NA is given:
+  expect_true(allIsInteger(c(1.005, NA_character_), tol = 0.01, na.rm = T))
 
   expect_false(allIsInteger(random_test_numbers()))
   expect_false(allIsInteger(pi))
@@ -412,18 +425,25 @@ test_that("areIntegers", {
   expect_true(all(areIntegers(zeroes)))
   expect_that(all(areIntegers(random_test_integers())), is_true())
   expect_true(areIntegers(1.00000000005))  # inside default tolerance
-  expect_that(areIntegers(NA_integer_, na.ignore = T), testthat::equals(NA_integer_))
-  expect_that(areIntegers(NA_real_, na.ignore = T), testthat::equals(NA_integer_))
-  expect_that(areIntegers(NA_character_, na.ignore = T), testthat::equals(NA_integer_))
-  expect_that(areIntegers(NA_integer_, na.ignore = F), testthat::is_false())
-  expect_that(areIntegers(NA_real_, na.ignore = F), testthat::is_false())
-  expect_that(areIntegers(NA_character_, na.ignore = F), testthat::is_false())
+  expect_that(areIntegers(NA_integer_, na.ignore = T),
+              testthat::equals(NA_integer_))
+  expect_that(areIntegers(NA_real_, na.ignore = T),
+              testthat::equals(NA_integer_))
+  expect_that(areIntegers(NA_character_, na.ignore = T),
+              testthat::equals(NA_integer_))
+  expect_that(areIntegers(NA_integer_, na.ignore = F),
+              testthat::is_false())
+  expect_that(areIntegers(NA_real_, na.ignore = F),
+              testthat::is_false())
+  expect_that(areIntegers(NA_character_, na.ignore = F),
+              testthat::is_false())
   expect_true(areIntegers(1.005, tol = 0.01))
 
   # multi value:
   expect_that(areIntegers(c(1, 0, -1)), testthat::equals(c(T, T, T)))
-  expect_that(areIntegers(zeroes), testthat::equals(rep(TRUE, times = length(zeroes))))
-  expect_that(areIntegers(random_test_integers()), testthat::equals(rep(TRUE, times = length(random_test_integers()))))
+  expect_equal(areIntegers(zeroes), rep(TRUE, times = length(zeroes)))
+  expect_equal(areIntegers(random_test_integers()),
+                rep(TRUE, times = length(random_test_integers())))
   expect_that(
     areIntegers(c(1 + 1e-10, 1.1, 1 - 1e-10)),
     testthat::equals(c(TRUE, FALSE, TRUE)))  # both inside default tolerance
@@ -442,7 +462,7 @@ test_that("areIntegers", {
   expect_that(
     areIntegers(c(NA_integer_, NA_real_, NA_character_), na.ignore = F),
     testthat::equals(c(FALSE, FALSE, FALSE)))
-  expect_that(areIntegers(c(0.995, 1.005), tol = 0.01), testthat::equals(c(T, T)))
+  expect_equal(areIntegers(c(0.995, 1.005), tol = 0.01), c(T, T))
   expect_that(areIntegers(c(pi, sqrt(2))), testthat::equals(c(FALSE, FALSE)))
 
   expect_equal(areIntegers("jack"), FALSE)
@@ -487,8 +507,9 @@ test_that("recombine a vector", {
   expect_identical(v, unique(v))
 
   # we can allow up to about 12, which is 500 million rows. If each vector item
-  # is a character string, it would still use way too much RAM.
-  expect_error(permuteWithRepeats(1:8))  # even 8^8 is quite slow and memory hungry, esp for character vectors
+  # is a character string, it would still use way too much RAM. even 8^8 is
+  # quite slow and memory hungry, esp for character vectors
+  expect_error(permuteWithRepeats(1:8))
 })
 
 test_that("count non na pairs", {
@@ -499,43 +520,54 @@ test_that("count non na pairs", {
   expect_true(all(countNonNaPairs(cars) == 50))
   expect_identical(countNonNaPairs(cars),
                    structure(c(50L, 50L, 50L, 50L), .Dim = c(2L, 2L),
-                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+                             .Dimnames = list(c("speed", "dist"),
+                                              c("speed", "dist"))))
 
   c2 <- cars
   c2[1, 1] <- NA
   expect_identical(countNonNaPairs(c2),
                    structure(c(50L, 49L, 49L, 50L), .Dim = c(2L, 2L),
-                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+                             .Dimnames = list(c("speed", "dist"),
+                                              c("speed", "dist"))))
 
   c3 <- cars
   c3[1:2, 1] <- NA
   expect_identical(countNonNaPairs(c3),
                    structure(c(50L, 48L, 48L, 50L), .Dim = c(2L, 2L),
-                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+                             .Dimnames = list(c("speed", "dist"),
+                                              c("speed", "dist"))))
   c4 <- cars
   c4[1, 1:2] <- NA
   expect_identical(countNonNaPairs(c4),
                    structure(c(49L, 49L, 49L, 49L), .Dim = c(2L, 2L),
-                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+                             .Dimnames = list(c("speed", "dist"),
+                                              c("speed", "dist"))))
 
   c5 <- cars
   c5[1:2, 1:2] <- NA
   expect_identical(countNonNaPairs(c5),
                    structure(c(48L, 48L, 48L, 48L), .Dim = c(2L, 2L),
-                             .Dimnames = list(c("speed", "dist"), c("speed", "dist"))))
+                             .Dimnames = list(c("speed", "dist"),
+                                              c("speed", "dist"))))
 
   v <- VADeaths
-  expect_identical(countNonNaPairs(v),
-                   structure(c(5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L), .Dim = c(4L, 4L),
-                             .Dimnames = list(c("Rural Male", "Rural Female", "Urban Male", "Urban Female"),
-                                              c("Rural Male", "Rural Female", "Urban Male", "Urban Female"))))
+  expect_identical(
+    countNonNaPairs(v),
+    structure(c(5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L),
+              .Dim = c(4L, 4L),
+              .Dimnames = list(
+                c("Rural Male", "Rural Female", "Urban Male", "Urban Female"),
+                c("Rural Male", "Rural Female", "Urban Male", "Urban Female"))))
 
   v2 <- v
   v2[1,1] <- NA
-  expect_identical(countNonNaPairs(v2),
-                   structure(c(5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L), .Dim = c(4L, 4L),
-                             .Dimnames = list(c("Rural Male", "Rural Female", "Urban Male", "Urban Female"),
-                                              c("Rural Male", "Rural Female", "Urban Male", "Urban Female"))))
+  expect_identical(
+    countNonNaPairs(v2),
+    structure(c(5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L, 5L),
+              .Dim = c(4L, 4L),
+              .Dimnames = list(
+                c("Rural Male", "Rural Female", "Urban Male", "Urban Female"),
+                c("Rural Male", "Rural Female", "Urban Male", "Urban Female"))))
 
 })
 

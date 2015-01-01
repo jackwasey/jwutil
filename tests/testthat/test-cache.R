@@ -13,7 +13,7 @@ test_that("error, not warning, for file not found", {
   expect_error(getFromCache("badger cull"))
 })
 
-mytestenv <- new.env(parent = .GlobalEnv)
+mytestenv <- new.env(parent = globalenv())
 cachedir <- findCacheDir()
 
 test_that("integration test of caching", {
@@ -40,8 +40,10 @@ test_that("integration test of caching", {
   expect_true(file.exists(findCacheFilePath("oliver")))
 
   expect_true(isCached("oliver"))
-  expect_true(isCached("oliver", cacheDir = findCacheDir()))
-  expect_true(isCached("oliver", cacheDir = findCacheDir(cacheDir = findCacheDir())))
+  expect_true(isCached("oliver",
+                       cacheDir = findCacheDir()))
+  expect_true(isCached("oliver",
+                       cacheDir = findCacheDir(cacheDir = findCacheDir())))
 
   renameCache("oliver", "atlas")
 
@@ -57,7 +59,8 @@ test_that("integration test of caching", {
   rmCache("jack")
   rmCache("oliver")
 
-  # make sure all have been removed from cache. don't worry about the environment anymore.
+  # make sure all have been removed from cache. don't worry about the
+  # environment anymore.
   expect_false(file.exists(findCacheFilePath("jack")))
   expect_false(file.exists(findCacheFilePath("oliver")))
 
@@ -73,7 +76,7 @@ test_that("cache with date limited files", {
   # make sure this test is starting from a clean slate in current env
   suppressWarnings(rm(list = c("jack", "oliver")))
 
-  mytestenv <- new.env(parent = .GlobalEnv)
+  mytestenv <- new.env(parent = globalenv())
 
   # create a cache "file", actually a path which we make a directory
   cd <- tempfile()
@@ -189,10 +192,6 @@ test_that("cache with date limited files", {
   expect_true(any(grepl("oliver", lsCache(cacheDir = cd))))
   expect_false(any(grepl("not in the cache", lsCache(cacheDir = cd))))
 
-  # we actually don't store the dated variable name in the working environment:
-  expect_error(getDated("oliver", from = from, to = to,
-                        envir = mytestenv))
-
   expect_equal(getFromCache("oliver", from = from, to = to, cacheDir = cd),
                get("oliver", envir = mytestenv))
   # repeat, without force should just get from memory (and be the same!)
@@ -200,7 +199,8 @@ test_that("cache with date limited files", {
                get("oliver", envir = mytestenv))
 
   suppressWarnings(rm(list = "oliver", envir = mytestenv))
-  loadFromCache("oliver", from = from, to = to, cacheDir = cd, envir = mytestenv)
+  loadFromCache("oliver", from = from, to = to,
+                cacheDir = cd, envir = mytestenv)
 
   expect_true(exists("oliver", envir = mytestenv))
   expect_false(exists("oliver2010-02-01to2011-03-15", envir = mytestenv))

@@ -4,6 +4,6 @@
   }
   if (is.null(getOption("jwutil.fallbackCacheDir"))) {
     options(jwutil.fallbackCacheDir =
-              paste0("~/", getOption("jwutil.cacheDirName")))
+              paste0(tempdir(), getOption("jwutil.cacheDirName")))
   }
 }

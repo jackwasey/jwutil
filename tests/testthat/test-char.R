@@ -96,22 +96,25 @@ test_that("strip characters so they can work in a formula", {
   expect_equal(stripForFormula("\tjack"), "jack")
   expect_equal(stripForFormula("\tjac\tk"), "jack")
 
-  expect_equal(stripForFormula("\t+j-a#^&!*#(%!^$&#%!c\\&!(#)^*&^!~\t|||||k"), "jack")
+  expect_equal(stripForFormula("\t+j-a#^&!*#(%!^$&#%!c\\&!(#)^*&^!~\t|||||k"),
+               "jack")
 
   expect_equal(stripForFormula(c(" jac k", "h ayley ")), c("jack", "hayley"))
 })
 
-
-test_that("string pair match extraction" , { # don't rest regex! just my bit
+test_that("string pair match extraction" , {
   expect_error(strPairMatch())
   expect_error(strPairMatch(pattern = "(abc)def(ghi)"))
   expect_error(strPairMatch(text = "bougie"))
-  expect_error(strPairMatch(pattern = c("(a)b(c)", "(d)e(f)"), text = "abc"))
-  expect_error(strPairMatch(pattern = c("(a)b(c)", "(d)e(f)"), text = c("abc", "def")))
+  expect_error(strPairMatch(pattern = c("(a)b(c)", "(d)e(f)"),
+                            text = "abc"))
+  expect_error(strPairMatch(pattern = c("(a)b(c)", "(d)e(f)"),
+                            text = c("abc", "def")))
 
   expect_error(strPairMatch(pattern = "[", text = "abc")) # invalid regex
-  expect_error(strPairMatch(pattern = "(a).*", text = "abc")) # only one parenthesis
-  expect_error(strPairMatch(pattern = ".*(j)", text = "abc")) # only one parenthesis
+  # only one parenthesis
+  expect_error(strPairMatch(pattern = "(a).*", text = "abc"))
+  expect_error(strPairMatch(pattern = ".*(j)", text = "abc"))
   expect_equal(strPairMatch(pattern = "(a*)b(c*)", text = "abc"), c(a = "c"))
   expect_equal(strPairMatch(pattern = "([^mackarel]*)(spain)",
                             text = "togospain"),
@@ -119,7 +122,8 @@ test_that("string pair match extraction" , { # don't rest regex! just my bit
   expect_equal(strPairMatch(pattern = "([^mackarel]*)(spain)",
                             text = c("togospain", "djiboutispain")),
                c(togo = "spain", djibouti = "spain"))
-  expect_equal(strPairMatch(pattern = "(a*)b(c*)", text = c("abc", "aabcc")), c(a = "c", aa = "cc"))
+  expect_equal(strPairMatch(pattern = "(a*)b(c*)", text = c("abc", "aabcc")),
+               c(a = "c", aa = "cc"))
 })
 
 test_that("string multimatch", {

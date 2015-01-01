@@ -5,11 +5,11 @@ context("data frame manipulation")
 f1 <-  factor(x = c(1,2,3,1,2,3,3,2,1))
 f2 <- factor(x = c(10,20,30,10,20,30,30,20,10))
 f3 <- factor(x = c("a","b","c","d","c","b","a"))
-fOneLevel <- factor(x = c("jack", "jack"))
-fTwoLevels <- factor(x = c("jack", "alfie", "jack", "alfie"))
-fOneExtraLevel <- factor(c("jack", "jack"),
+f_one_level <- factor(x = c("jack", "jack"))
+f_two_levels <- factor(x = c("jack", "alfie", "jack", "alfie"))
+f_one_extra_level <- factor(c("jack", "jack"),
                          levels = c("jack", "alfie", "liv"))
-fTwoExtraLevel <- factor(c("jack", "alfie", "jack", "alfie"),
+f_two_extra_level <- factor(c("jack", "alfie", "jack", "alfie"),
                          levels = c("jack", "alfie", "liv"))
 f.short <- factor(x = c(1))
 f.empty <- factor()
@@ -60,12 +60,12 @@ test_that("getFactorNames",{
   expect_identical(getFactorNames(dframe), c("f1","f2"))
   expect_identical(getFactorNames(mixed.df), c("f2","f1"))
   expect_identical(getFactorNames(vdf), character(0))
-  oldWarn <- options("warn")
+  old_warn <- options("warn")
   options(warn = - 1)
   expect_equal(getFactorNames(data.frame()), NULL)
   expect_equal(getFactorNames(data.frame(), consider=NULL), NULL)
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
-  options(oldWarn)
+  options(old_warn)
   # TODO: DO expect warnings - logging nightmare.
   expect_warning(getFactorNames(data.frame()))
   expect_warning(getFactorNames(data.frame(), consider=NULL))
@@ -88,7 +88,8 @@ test_that("expandFactors", {
   expect_warning(out <- expandFactors(dframe, consider = NULL))
   expect_identical(dframe, out)
 
-  out <- expandFactors(dframe, consider=c("f1","f2"), sep = ".", verbose = FALSE)
+  out <- expandFactors(dframe, consider = c("f1","f2"), sep = ".",
+                       verbose = FALSE)
   expect_equal(dim(out), c(9,6))
   expect_equal(class(out[[1]]), "logical")
   expect_equal(names(out), c("f1.1","f1.2","f1.3","f2.10","f2.20","f2.30"))
@@ -117,17 +118,24 @@ test_that("factorToDataframeLogical bad input fails", {
 })
 
 test_that("factorToDataframeLogical works", {
-  expect_equal(dim(factorToDataframeLogical(f1, prefix = "f1", verbose = FALSE)), c(9, 3))
+  expect_equal(
+    dim(factorToDataframeLogical(f1, prefix = "f1", verbose = FALSE)),
+    c(9, 3))
   expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
-  expect_true(all(sapply(factorToDataframeLogical(f1, prefix = "f1"), is.logical)))
+  expect_true(all(sapply(factorToDataframeLogical(f1, prefix = "f1"),
+                         is.logical)))
 
 })
 
-test_that("factorToDataframeLogical works for extra factor levels, one and two level factors", {
-  expect_that(dim(factorToDataframeLogical(fTwoExtraLevel)), testthat::equals(c(4, 1)))
-  expect_that(dim(factorToDataframeLogical(fOneExtraLevel)), testthat::equals(c(2, 1)))
-  expect_that(dim(factorToDataframeLogical(fTwoLevels)), testthat::equals(c(4, 1)))
-  expect_that(dim(factorToDataframeLogical(fOneLevel)), testthat::equals(c(2, 1)))
+test_that("extra factor levels, 1,2 level factors", {
+  expect_that(dim(factorToDataframeLogical(f_two_extra_level)),
+              testthat::equals(c(4, 1)))
+  expect_that(dim(factorToDataframeLogical(f_one_extra_level)),
+              testthat::equals(c(2, 1)))
+  expect_that(dim(factorToDataframeLogical(f_two_levels)),
+              testthat::equals(c(4, 1)))
+  expect_that(dim(factorToDataframeLogical(f_one_level)),
+              testthat::equals(c(2, 1)))
 
   # for two-level factors, we keep the first level, drop the second.
 

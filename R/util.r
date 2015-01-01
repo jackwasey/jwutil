@@ -132,7 +132,8 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
   } else
     stopifnot(filename %in% files)
 
-  do.call(FUN, args = c(list(file.path(zipdir, filename), warn = FALSE), list(...)))
+  do.call(FUN, args = c(list(file.path(zipdir, filename), warn = FALSE),
+                        list(...)))
 }
 
 #' @title count non-numeric elements
@@ -382,7 +383,6 @@ opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = TRUE) {
 
   n <- names(x)
   all_cmbs <- combn_subset(n)
-  best_cmb <- c()
   best_min <- 1e9
   best_min_by_len <- c(rep(best_min, times = length(n)))
   best_cmb_by_len <- as.list(rep("", times = length(n)))
@@ -482,8 +482,8 @@ rmRecursive <- function(x, envir = parent.frame()) {
   })
 }
 
-.ls.objects <- function (pos = 1, pattern, order.by,
-                         decreasing=FALSE, head=FALSE, n=5) {
+ls.objects <- function (pos = 1, pattern, order.by,
+                         decreasing = FALSE, head = FALSE, n = 5) {
   napply <- function(names, fn) sapply(names, function(x)
     fn(get(x, pos = pos)))
   names <- ls(pos = pos, pattern = pattern)
@@ -505,13 +505,14 @@ rmRecursive <- function(x, envir = parent.frame()) {
 }
 
 #' @title show largest objects
-#' @description https://gist.github.com/1187166.git
-#' Credit: Taken from: http://stackoverflow.com/questions/1358003/tricks-to-manage-the-available-memory-in-an-r-session
+#' @description https://gist.github.com/1187166.git Taken from
+#'   http://stackoverflow.com/questions/1358003/\
+#'   tricks-to-manage-the-available-memory-in-an-r-session
 #' @param ... arguments passed on to \code{.ls.objects}
 #' @param n scalar integer, number of objects to show
 #' @export
 lsos <- function(..., n = 10)
-  .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
+  ls.objects(..., order.by = "Size", decreasing = TRUE, head = TRUE, n = n)
 
 #' @title is the object a \code{Date}
 #' @description copied from lubridate
