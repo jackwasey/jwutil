@@ -29,12 +29,13 @@ isCached <- function(var,
   # if from is specified, we can't rely on the (un-dated) var name being
   # correct, so we should actually look in the cache
   if (is.null(from)) {
-    if (var %>% findCacheFilePath(cacheDir) %>% file.exists) return(TRUE)
+    if (file.exists(findCacheFilePath(var, cacheDir)))
+      return(TRUE)
   } else {
-    if (getCacheVarDated(var, from = from, to = to) %>%
-          findCacheFilePath(cacheDir) %>% file.exists) return(TRUE)
+    if (file.exists(findCacheFilePath(
+        getCacheVarDated(var, from = from, to = to), cacheDir)))
+      return(TRUE)
   }
-
   FALSE
 }
 
@@ -245,21 +246,23 @@ findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache",
   if (file.exists(td)) return(td)
 
   # parents: this is good when stuck e.g. in vignette sub-directory of a project
-  td <- getwd() %>% dirname %>% file.path(cacheDirName)
+  td <- file.path(dirname(getwd()), cacheDirName)
   if (file.exists(td)) return(td)
-  td <- getwd() %>% dirname %>% dirname %>% file.path(cacheDirName)
+  td <- file.path(dirname(dirname(getwd())), cacheDirName)
   if (file.exists(td)) return(td)
-  td <- getwd() %>% dirname %>% dirname %>% dirname %>% file.path(cacheDirName)
+  td <- file.path(dirname(dirname(dirname(getwd()))), cacheDirName)
   if (file.exists(td)) return(td)
   # parent of parent of parent of parent (believe it or not, this has use cases)
-  td <- getwd() %>% dirname %>% dirname %>% dirname %>% dirname %>%
-    file.path(cacheDirName)
+  td <- file.path(dirname(dirname(dirname(dirname(getwd())))), cacheDirName)
   if (file.exists(td)) return(td)
 
   if (verbose) message("No cache directory within directory: ", getwd())
   if (verbose && platformIsLinux())
-    system(sprintf("locate --regex  %s$", cacheDirName), intern = TRUE) %>%
-    paste(sep=", ", collapse=", ") %>% message
+    message(
+      paste(
+        system(sprintf("locate --regex  %s$", cacheDirName), intern = TRUE),
+        sep = ", ", collapse = ", ")
+    )
   if (verbose) message("Use the cacheDir= argument to specify it directly,
           or check the cache was created in the correct place")
   if (verbose) message("using fallback cache directory: ")

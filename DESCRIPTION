@@ -1,17 +1,20 @@
 Package: jwutil
-Title: Simple utilities for data frame manipulation, caching, etc.
+Title: Simple utilities for data frame manipulation, disk caching, date-range objects,
 Version: 1.0
 Authors@R: person("Jack O. Wasey", "Creator", role=c("aut", "cre"),
     email="jack@jackwasey.com")
 Description: small set of simple utilities for common data manipulation tasks,
     primarily of data frames. The goal is typically to use built-in tools well,
     without bringing in huge dependencies.
+URL: https://github.com/jackwasey/jwutil
 Depends:
     R (>= 3.1.1)
-Imports:
-    magrittr
 Suggests:
     testthat,
     devtools
 License: GPL-3
 LazyData: true
+LazyDataCompression: xz
+BugReports: https://github.com/jackwasey/jwutil/issues
+Roxygen: list(wrap=FALSE)
+VignetteBuilder: knitr
