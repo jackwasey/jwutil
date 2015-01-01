@@ -11,7 +11,6 @@ optName <- "cachedir"
 #' @template to_from_dates
 #' @template cacheDir
 #' @return logical, single logical value.
-#' @import magrittr
 #' @family cache
 #' @return logical TRUE if found in cache
 #' @export
@@ -234,7 +233,6 @@ assignCacheByFun <- function(fun, var,
 #'   alone is not distinctive, and conflicts with other things, such as the
 #'   cache directory in the vignettes directory.
 #' @template verbose
-#' @import magrittr
 #' @family cache
 #' @export
 findCacheDir <- function(cacheDir = NULL, cacheDirName = "jwcache",

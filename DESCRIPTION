@@ -1,11 +1,10 @@
 Package: jwutil
-Title: Simple utilities for data frame manipulation, disk caching, date-range objects,
+Title: Simple utilities for data frame, list and string manipulation, disk caching, test coverage, and more.
 Version: 1.0
+Date: 2015-01-01
 Authors@R: person("Jack O. Wasey", "Creator", role=c("aut", "cre"),
     email="jack@jackwasey.com")
-Description: small set of simple utilities for common data manipulation tasks,
-    primarily of data frames. The goal is typically to use built-in tools well,
-    without bringing in huge dependencies.
+Description: This is a set of simple utilities for various data manipulation and caching tasks. The goal is to use base tools well, without bringing in any dependencies. Main areas of interest are data frame manipulation, such as converting factors in multiple binary indicator columns, and disk caching of data frames (which is optionally done by date range). There are testing functions which provide testthat extensions to permute arguments to function calls.
 URL: https://github.com/jackwasey/jwutil
 Depends:
     R (>= 3.1.1)
@@ -13,8 +12,6 @@ Suggests:
     testthat,
     devtools
 License: GPL-3
-LazyData: true
-LazyDataCompression: xz
 BugReports: https://github.com/jackwasey/jwutil/issues
 Roxygen: list(wrap=FALSE)
-VignetteBuilder: knitr
+Encoding: UTF-8
