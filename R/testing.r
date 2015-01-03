@@ -327,6 +327,8 @@ expect_that_combine_first_arg <- function(object, condition,
   invisible(e)
 }
 
-# put my function into the testthat namespace
-environment(expect_that_combine_all_args) <- asNamespace("testthat")
-environment(expect_that_combine_first_arg) <- asNamespace("testthat")
+if (suppressWarnings(require("testthat", quietly = TRUE))) {
+  # put my function into the testthat namespace
+  environment(expect_that_combine_all_args) <- asNamespace("testthat")
+  environment(expect_that_combine_first_arg) <- asNamespace("testthat")
+}

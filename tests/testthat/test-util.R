@@ -1,6 +1,3 @@
-#' @title unit tests for 'CaseControlFunctions'
-#' @import testthat logging
-
 context("Utility Functions")
 
 test_that("inverse of base 'which' function", {
@@ -8,7 +5,7 @@ test_that("inverse of base 'which' function", {
   expect_error(invwhich(random_test_letters))
   expect_error(invwhich())
   expect_error(invwhich(0))
-  expect_error(invwhich( - 1))
+  expect_error(invwhich(-1))
   expect_error(invwhich(1.5))
   expect_error(invwhich(1, len = "carrots"))
   expect_error(invwhich(1, len = - 1))
