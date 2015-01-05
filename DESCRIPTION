@@ -1,5 +1,5 @@
 Package: jwutil
-Title: Simple utilities for data frame, list and string manipulation, disk caching, test coverage, and more.
+Title: Utilities for Data Manipulation, Disk Caching, Test Coverage
 Version: 1.0.1
 Date: 2015-01-03
 Authors@R: person("Jack O. Wasey", role = c("aut", "cre"),
