@@ -249,8 +249,8 @@ extreme_numbers <- c(
 #'   testthat::expect_that_combine
 #' @inheritParams testthat::expect_that
 #' @examples
-#'  \dontrun{ expect_that_combine_all_args(sum(1,2,3),
-#'   testthat::equals(6)) }
+#'  expect_that_combine_all_args(sum(1, 2, 3),
+#'   testthat::equals(6))
 #' @return testthat result
 #' @export
 expect_that_combine_all_args <- function(object, condition,
@@ -272,7 +272,7 @@ expect_that_combine_all_args <- function(object, condition,
 
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
-    e <- expect_that(
+    e <- testthat::expect_that(
       object    = do.call(as.character(func_name), as.list(arg_combs[comb,])),
       condition = condition,
       info      = paste0(
@@ -311,7 +311,7 @@ expect_that_combine_first_arg <- function(object, condition,
 
   # now loop through all permutations
   for (comb in 1:dim(arg_one_combs)[1]) {
-    e <- expect_that(
+    e <- testthat::expect_that(
       object    = do.call(as.character(func_name),
                           c(list(arg_one_combs[comb,]),
                             args[ - 1])),
@@ -325,10 +325,4 @@ expect_that_combine_first_arg <- function(object, condition,
     )
   }
   invisible(e)
-}
-
-if (suppressWarnings(require("testthat", quietly = TRUE))) {
-  # put my function into the testthat namespace
-  environment(expect_that_combine_all_args) <- asNamespace("testthat")
-  environment(expect_that_combine_first_arg) <- asNamespace("testthat")
 }
