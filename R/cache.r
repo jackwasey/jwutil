@@ -291,7 +291,7 @@ findCacheFilePath <- function(filename, cacheDir = NULL) {
 #' @param suffix char additional characters before ".RData"
 #' @family cache
 #' @export
-saveInDataDir <- function(var, suffix) {
+saveInDataDir <- function(var, suffix = "") {
   save(list = var,
        envir = parent.frame(),
        file = file.path("data", strip(paste0(var, suffix, ".RData"))),
