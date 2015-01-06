@@ -2,77 +2,6 @@
 # test suite.
 nums_in_tests <- 30
 
-#' @title test coverage
-#' @description This function searches for all functions in a package, traces
-#'   them all (just to see function entry, not all code paths), and parses the
-#'   trace output from running all the testthat tests. I don't think
-#'   finer-grained analysis of code paths within functions is possible with this
-#'   mechanism, although it is possible to trace individual lines of the parsed
-#'   source code, I don't think it could trace within an \code{if} statement
-#'   contained on a single line. This is a lot better than nothing. The testing
-#'   relies on the tests/testthat directory to exist. It doesn't call test()
-#'   directly, because this results in tracing the wrong functions. Maybe Hadley
-#'   Wickham could incorporate this into testthat.
-#'
-#'   This is submitted to testthat as a github pull request.
-#' @param pkg character single package name
-#' @param verbose logical
-#' @export
-testFunctionCoverage <- function(pkg = getPackageName(parent.frame()),
-                                 verbose = FALSE) {
-  suppressPackageStartupMessages({
-    library(testthat)
-    library(devtools)
-  })
-  if (verbose) message("pkg = ", pkg)
-  pkgenvir <- as.environment(paste0("package:", pkg))
-  funs <- lsf(pkg)  # see function in util which lists contents of a package
-  if (verbose) message(sprintf("functions found in %s are:
-                               %s", pkg, paste(funs, collapse=", ")))
-
-  tfcon <- file(tempfile(), open = "w+")
-  sink(file = tfcon, type = "message")
-  for (f in funs) trace(f, where = pkgenvir, print = TRUE)
-  sink()
-  close(tfcon)
-
-  trace_output <- capture.output(
-    testthat::test_dir("tests/testthat/", reporter = testthat::SilentReporter())
-  )
-
-  tfcon <- file(tempfile(), open = "w+")
-  sink(file = tfcon, type = "message")
-  for (f in funs) {
-    capture.output(untrace(f, where = pkgenvir))
-  }
-  sink()
-  #close(tfcon)
-
-  everytestedfun <- unique(
-    lapply(trace_output,
-           function(x) unlist(
-             regmatches(
-               x = x,
-               m = regexec(
-                 pattern = "^.* ([[:graph:]]*?)\\(.*",
-                 text = x)
-             )
-           )[ - 1]
-    )
-  )
-  tested <- sort(funs[funs %in% everytestedfun])
-  untested <- sort(funs[!funs %in% everytestedfun])
-  coverage <- length(tested) / length(funs)
-
-  if (verbose) {
-    message("tested functions are: ", paste(tested, collapse = ", "))
-    message("untested functions are: ", paste(untested, collapse = ", "))
-    message(sprintf("test coverage is: %.2g percent", coverage * 100))
-  }
-
-  list(untested = untested, tested = tested, coverage = coverage)
-}
-
 #' @title list all functions in a package
 #' @param pkg character string containing package name
 #' @return character vector of functions in given package
@@ -252,6 +181,12 @@ extreme_numbers <- c(
 #'  expect_that_combine_all_args(sum(1, 2, 3),
 #'   testthat::equals(6))
 #' @return testthat result
+#' @examples
+#' \dontrun{
+#' expect_that_combine_all_args(stop("a", "b"), testthat::throws_error())
+#' expect_that_combine_all_args(sum(1, 2), testthat::equals(3))
+#' expect_that_combine_first_arg(sum(c(1, 2)), testthat::equals(3))
+#' }
 #' @export
 expect_that_combine_all_args <- function(object, condition,
                                          info = NULL, label = NULL) {
@@ -290,8 +225,6 @@ expect_that_combine_all_args <- function(object, condition,
 #' @export
 expect_that_combine_first_arg <- function(object, condition,
                                           info = NULL, label = NULL) {
-
-  suppressPackageStartupMessages(library(testthat))
 
   cl <- substitute(object)
   #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
