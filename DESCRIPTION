@@ -1,6 +1,6 @@
 Package: jwutil
 Title: Utilities for Data Manipulation, Disk Caching, Testing
-Version: 1.0.2
+Version: 1.1
 Date: 2015-01-03
 Authors@R: person("Jack O. Wasey", role = c("aut", "cre"),
     email = "jack@jackwasey.com")
@@ -17,7 +17,10 @@ URL: https://github.com/jackwasey/jwutil
 Depends:
     R (>= 3.1.1)
 Suggests:
-    testthat
+    testthat,
+    Rcpp
 License: GPL-3
 BugReports: https://github.com/jackwasey/jwutil/issues
 Encoding: UTF-8
+LinkingTo: Rcpp
+Imports: Rcpp
