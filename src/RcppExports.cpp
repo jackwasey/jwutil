@@ -5,50 +5,6 @@
 
 using namespace Rcpp;
 
-// start_profiler
-SEXP start_profiler(const CharacterVector x);
-RcppExport SEXP jwutil_start_profiler(SEXP xSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< const CharacterVector >::type x(xSEXP );
-        SEXP __result = start_profiler(x);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
-// stop_profiler
-SEXP stop_profiler();
-RcppExport SEXP jwutil_stop_profiler() {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        SEXP __result = stop_profiler();
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
-// stressprof
-LogicalVector stressprof(NumericMatrix x);
-RcppExport SEXP jwutil_stressprof(SEXP xSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
-        LogicalVector __result = stressprof(x);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
 // isRowSorted
 LogicalVector isRowSorted(NumericMatrix x);
 RcppExport SEXP jwutil_isRowSorted(SEXP xSEXP) {
