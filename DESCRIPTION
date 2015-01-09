@@ -1,6 +1,6 @@
 Package: jwutil
-Title: Utilities for Data Manipulation, Disk Caching, Testing
-Version: 1.0.2
+Title: A Set of Tools for Data Manipulation, Disk Caching, Testing
+Version: 1.0.3
 Date: 2015-01-03
 Authors@R: person("Jack O. Wasey", role = c("aut", "cre"),
     email = "jack@jackwasey.com")
