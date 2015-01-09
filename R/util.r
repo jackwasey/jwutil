@@ -90,6 +90,23 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
   i
 }
 
+#' @title which elements of a vector are numeric
+#' @description test without throwing a warning
+#' @param x vector
+#' @return logical vector of same length as input
+#' @examples
+#' areNumeric(c("1","2","3"))
+#' areNumeric(c("1L", "2.2"))
+#' areNumeric(c("NA", NA, ".", "", "-1.9"))
+#' @export
+areNumeric <- function(x, extras = c(".", "NA", NA)) {
+  if (is.null(x)) return(FALSE)
+  old <- options(warn = - 1)
+  on.exit(options(old))
+  x[x %in% c("", extras)] <- NA
+  !is.na(as.numeric(x))
+}
+
 #' @title inverse of \%in\%
 #' @description borrowed from Hmisc. See %in%. Original %in% is: match(x, table,
 #'   nomatch = 0L) > 0L
@@ -483,7 +500,7 @@ rmRecursive <- function(x, envir = parent.frame()) {
 }
 
 ls.objects <- function (pos = 1, pattern, order.by,
-                         decreasing = FALSE, head = FALSE, n = 5) {
+                        decreasing = FALSE, head = FALSE, n = 5) {
   napply <- function(names, fn) sapply(names, function(x)
     fn(get(x, pos = pos)))
   names <- ls(pos = pos, pattern = pattern)
