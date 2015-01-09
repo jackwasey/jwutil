@@ -438,11 +438,19 @@ filterBetter <- function(x, expr, verbose = TRUE) {
   x[fltr,]
 }
 
-#' @title return names of fields which consist of only 0 and 1
-#' @description assumes columns are numeric, doesn't think about factors
-#' #TODO check for factors, etc.
+#' @title names of fields which are numeric, binary or combinations thereof
+#' @description Doesn't make any allowance for factors.
 #' @param x data frame
 #' @return vector of column names
+#' @examples
+#' dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L)
+#'                   c(1L, 2L), c(0.1, 0.2), c("9", "8"))
+#' names(dat) <- c("char", "bin", "binfloat", "binint",
+#'                 "int", "float", "charint")
+#' binaryCols(dat)
+#' nonBinaryCols(dat)
+#' numericCols(dat)
+#' nonBinaryNumericCols(dat)
 #' @export
 binaryCols <- function(x)
   names(x)[sapply(x, function(y) all(y %in% c(0, 1)))]
@@ -451,6 +459,16 @@ binaryCols <- function(x)
 #' @export
 nonBinaryCols <- function(x)
   names(x)[sapply(x, function(y) any(y %nin% c(0, 1)))]
+
+#' @rdname binaryCols
+#' @export
+numericCols <- function(x)
+  names(x)[sapply(x, function(y) is.numeric(y))]
+
+#' @rdname binaryCols
+#' @export
+nonBinaryNumericCols <- function(x)
+  names(x)[sapply(x, function(y) any(y %nin% c(0, 1)) && is.numeric(y))]
 
 #' @title fill out missing combinations of factors with NA
 #' @param df data frame
