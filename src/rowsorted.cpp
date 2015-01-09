@@ -6,8 +6,8 @@ using namespace Rcpp;
 //' @description Quicky run through rows of a matrix looking for any
 //' non-ascending rows in C++
 //' @param x matrix, each row containing ordered or disordered numerics
-//' @export
 //' @import Rcpp
+//' @export
 // [[Rcpp::export]]
 LogicalVector isRowSorted(NumericMatrix x) {
   int nrow = x.nrow(), ncol = x.ncol();
@@ -27,8 +27,8 @@ LogicalVector isRowSorted(NumericMatrix x) {
 //' then sums TRUE values and takes fraction of total
 //' @param x matrix, each row containing ordered or disordered numerics
 //' @return double, the proportion from 0 to 1
-//' @export
 //' @import Rcpp
+//' @export
 // [[Rcpp::export]]
 double propRowSorted(NumericMatrix x) {
   LogicalVector lv = isRowSorted(x);
