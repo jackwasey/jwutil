@@ -6,8 +6,8 @@
 #' @description Quicky run through rows of a matrix looking for any
 #' non-ascending rows in C++
 #' @param x matrix, each row containing ordered or disordered numerics
-#' @export
 #' @import Rcpp
+#' @export
 isRowSorted <- function(x) {
     .Call('jwutil_isRowSorted', PACKAGE = 'jwutil', x)
 }
@@ -18,8 +18,8 @@ isRowSorted <- function(x) {
 #' then sums TRUE values and takes fraction of total
 #' @param x matrix, each row containing ordered or disordered numerics
 #' @return double, the proportion from 0 to 1
-#' @export
 #' @import Rcpp
+#' @export
 propRowSorted <- function(x) {
     .Call('jwutil_propRowSorted', PACKAGE = 'jwutil', x)
 }
