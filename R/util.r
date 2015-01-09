@@ -521,3 +521,14 @@ lsos <- function(..., n = 10)
 #' @export
 is.Date <- function (x)
   is(x, "Date")
+
+#' @title extract code from knitr vignette and source it
+#' @param input path to file as single character string
+#' @export
+source_purl <- function(input,
+                        output = file.path(tempdir(),
+                                           paste0(basename(input), ".R")),
+                        documentation = 1L, ...) {
+  knitr::purl(input, output, quiet = TRUE, documentation = documentation)
+  source(output, ...)
+}
