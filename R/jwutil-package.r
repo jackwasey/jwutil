@@ -3,5 +3,7 @@
 #'   tasks, primarily of data frames. The goal is typically to use built-in
 #'   tools well, without bringing in huge dependencies.
 #' @name jwutil
+#' @useDynLib jwutil
+#' @importFrom Rcpp sourceCpp
 #' @docType package
 NULL
