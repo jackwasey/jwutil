@@ -4,6 +4,5 @@
 #'   tools well, without bringing in huge dependencies.
 #' @name jwutil
 #' @useDynLib jwutil
-#' @importFrom Rcpp sourceCpp
 #' @docType package
 NULL
