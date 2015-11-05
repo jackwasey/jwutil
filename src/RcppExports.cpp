@@ -9,29 +9,21 @@ using namespace Rcpp;
 LogicalVector isRowSorted(NumericMatrix x);
 RcppExport SEXP jwutil_isRowSorted(SEXP xSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
-        LogicalVector __result = isRowSorted(x);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    __result = Rcpp::wrap(isRowSorted(x));
+    return __result;
 END_RCPP
 }
 // propRowSorted
 double propRowSorted(NumericMatrix x);
 RcppExport SEXP jwutil_propRowSorted(SEXP xSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
-        double __result = propRowSorted(x);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    __result = Rcpp::wrap(propRowSorted(x));
+    return __result;
 END_RCPP
 }
