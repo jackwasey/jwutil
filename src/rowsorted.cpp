@@ -10,11 +10,11 @@ using namespace Rcpp;
 //' @export
 // [[Rcpp::export]]
 LogicalVector isRowSorted(NumericMatrix x) {
-  int nrow = x.nrow(), ncol = x.ncol();
+  const int nrow = x.nrow(), ncol = x.ncol();
   LogicalVector out(nrow, 1); // assume all are sorted to start with
 
-  for (int i = 0; i < nrow; i++) {
-    for (int j = 1; j < ncol; j++) {
+  for (int i = 0; i < nrow; ++i) {
+    for (int j = 1; j < ncol; ++j) {
       if (x(i,j-1) > x(i,j)) { out(i) = 0; break; }
     }
   }
