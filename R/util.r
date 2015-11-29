@@ -93,6 +93,9 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
 #' @title which elements of a vector are numeric
 #' @description test without throwing a warning
 #' @param x vector
+#' @param extras character vector containing acceptable alternatives to numeric
+#'   values which will result in returning \code{TRUE} for that element. Default
+#'   is \code{c(".", "NA", NA)}.
 #' @return logical vector of same length as input
 #' @examples
 #' areNumeric(c("1","2","3"))
@@ -101,7 +104,7 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
 #' @export
 areNumeric <- function(x, extras = c(".", "NA", NA)) {
   if (is.null(x)) return(FALSE)
-  old <- options(warn = - 1)
+  old <- options(warn = -1)
   on.exit(options(old))
   x[x %in% c("", extras)] <- NA
   !is.na(as.numeric(x))
@@ -173,6 +176,7 @@ countNumeric <- function(x)
   length(x) - countNotNumeric(x)
 
 #' @title count NA in vector
+#' @description count the number of NAs in a vector
 #' @param x vector
 #' @return integer
 #' @export
@@ -180,11 +184,16 @@ countIsNa <- function(x)
   sum(is.na(x))
 
 #' @title Proportion of NA values in a vector
+#' @description get fraction of NA in a vector
 #' @param x is a vector which may have NA values
 #' @return numeric proportion of NAs in the supplied vector
 #' @export
 propIsNa <- function(x)
-  ifelse(length(x) == 0, 0, countIsNa(x) / length(x))
+  if (length(x)) {
+    countIsNa(x) / length(x)
+  } else {
+    0
+  }
 
 #' @title count which combinations of fields have at least one non-NA
 #' @description cycles through the given data frame twice, and applies logical
@@ -310,8 +319,8 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
     tms[bad_range] <- NA
   }
 
-  timesfourzeros <- formatC(tms, width=4, format="d", flag="0")
-  strptime(paste(dts, timesfourzeros, sep=" "), "%Y-%m-%d %H%M")
+  timesfourzeros <- formatC(tms, width = 4, format="d", flag="0")
+  strptime(paste(dts, timesfourzeros, sep = " "), "%Y-%m-%d %H%M")
 }
 
 #' @title check if a time is valid in 24h clock
@@ -368,7 +377,7 @@ permute <- function(x) {
 
   #take each one and place it first, then recurse the rest:
   for (element in 1:length(x)) {
-    sub_combs <- Recall(x[ - element])  # recurse
+    sub_combs <- Recall(x[ -element])  # recurse
     new_combs <- cbind(x[element], sub_combs)
     res <- rbind(res, new_combs)
   }
@@ -376,6 +385,7 @@ permute <- function(x) {
 }
 
 #' @title all unique combinations of a vector and all its non-zero subsets
+#' @description all unique combinations of a vector and all its non-zero subsets
 #' @param x vector to be subsetted and combined
 #' @return list of vectors with all combinations of x and its subsets
 #' @export
@@ -422,7 +432,6 @@ opt_binary_fun <- function(x, n) {
   sum(colSums(x[n])) / length(n)
 }
 
-
 #' Are we running on Linux or Windows?
 #'
 #' @return logical
@@ -452,16 +461,18 @@ readXlsxLinux <- function(file) {
 }
 
 #' @title build simple linear formula from variable names
+#' @description build simple linear formula from variable names given by two
+#'   character vectors. TODO: allow unquoted names.
 #' @param left character vector
 #' @param right character vector
 #' @return formula
 #' @export
-buildLinearFormula <- function (left, right) {
+buildLinearFormula <- function(left, right) {
   as.formula(
     paste(
       paste(left, collapse = "+"),
       paste(right, collapse = "+"),
-      sep="~")
+      sep = "~")
   )
 }
 
@@ -492,15 +503,15 @@ invwhich <- function(which, len = max(which)) {
 #' @export
 rmRecursive <- function(x, envir = parent.frame()) {
   suppressWarnings({
-    while(any(vapply(x, exists, logical(1),
-                     mode = "numeric", inherits = TRUE, envir = envir)))
+    while (any(vapply(x, exists, logical(1),
+                      mode = "numeric", inherits = TRUE, envir = envir)))
       rm(list = x, envir = envir, inherits = TRUE)
 
   })
 }
 
-ls.objects <- function (pos = 1, pattern, order.by,
-                        decreasing = FALSE, head = FALSE, n = 5) {
+ls.objects <- function(pos = 1, pattern, order.by,
+                       decreasing = FALSE, head = FALSE, n = 5) {
   napply <- function(names, fn) sapply(names, function(x)
     fn(get(x, pos = pos)))
   names <- ls(pos = pos, pattern = pattern)
@@ -515,7 +526,7 @@ ls.objects <- function (pos = 1, pattern, order.by,
   out <- data.frame(obj.type, obj.size, obj.dim)
   names(out) <- c("Type", "Size", "Rows", "Columns")
   if (!missing(order.by))
-    out <- out[order(out[[order.by]], decreasing=decreasing), ]
+    out <- out[order(out[[order.by]], decreasing = decreasing), ]
   if (head)
     out <- head(out, n)
   out
@@ -536,16 +547,28 @@ lsos <- function(..., n = 10)
 #' @param x object to test
 #' @return logical
 #' @export
-is.Date <- function (x)
+is.Date <- function(x)
   is(x, "Date")
 
 #' @title extract code from knitr vignette and source it
+#' @description extract code from knitr vignette and source it
 #' @param input path to file as single character string
+#' @param output output file path, defaults to a file in a temporary name based
+#'   on \code{input}
+#' @param documentation single integer value passed on to \code{knitr::purl}. An
+#'   integer specifying the level of documentation to go the tangled script: 0
+#'   means pure code (discard all text chunks); 1 (default) means add the chunk
+#'   headers to code; 2 means add all text chunks to code as roxygen comments
+#' @param ... further parameters passed to \code{source}
 #' @export
 source_purl <- function(input,
                         output = file.path(tempdir(),
                                            paste0(basename(input), ".R")),
                         documentation = 1L, ...) {
+  requireNamespace("knitr")
+  checkmate::assertFile(input)
+  checkmate::assertPathForOutput(output)
+  checkmate::assertInt(documentation)
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
-  source(output, ...)
+  # source(output, ...)
 }

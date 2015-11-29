@@ -29,6 +29,7 @@ listTrim  <-  function(x){
 }
 
 #' @title trim null or empty values from a list
+#' @description Trim \code{NULL} or empty values from a flat list.
 #' @param x list
 #' @return trimmed list
 #' @export
@@ -63,6 +64,7 @@ flattenList <- function(..., na.rm = FALSE) {
 }
 
 #' @title determine whether a list is nested
+#' @description Returns TRUE if the given list is not nested.
 #' @param x list
 #' @return single logical
 #' @export

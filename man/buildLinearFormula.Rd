@@ -14,4 +14,8 @@ buildLinearFormula(left, right)
 \value{
 formula
 }
+\description{
+build simple linear formula from variable names given by two
+  character vectors. TODO: allow unquoted names.
+}
 

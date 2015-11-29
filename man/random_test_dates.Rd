@@ -22,4 +22,7 @@ dates from, defaults to 150 years.}
 \value{
 vector of POSIXlt datetimes or Dates
 }
+\description{
+generate random \code{Date}s and \code{POSIXlt} test datetimes
+}
 

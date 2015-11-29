@@ -9,6 +9,9 @@ fillMissingCombs(df)
 \arguments{
 \item{df}{data frame}
 }
+\description{
+fill out missing combinations of factors with NA
+}
 \details{
 Adapated from http://www.cookbook-r.com/Manipulating_data/\
 Summarizing_data/#using-aggregate

@@ -9,5 +9,18 @@ source_purl(input, output = file.path(tempdir(), paste0(basename(input),
 }
 \arguments{
 \item{input}{path to file as single character string}
+
+\item{output}{output file path, defaults to a file in a temporary name based
+on \code{input}}
+
+\item{documentation}{single integer value passed on to \code{knitr::purl}. An
+integer specifying the level of documentation to go the tangled script: 0
+means pure code (discard all text chunks); 1 (default) means add the chunk
+headers to code; 2 means add all text chunks to code as roxygen comments}
+
+\item{...}{further parameters passed to \code{source}}
+}
+\description{
+extract code from knitr vignette and source it
 }
 

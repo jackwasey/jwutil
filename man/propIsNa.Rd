@@ -12,4 +12,7 @@ propIsNa(x)
 \value{
 numeric proportion of NAs in the supplied vector
 }
+\description{
+get fraction of NA in a vector
+}
 

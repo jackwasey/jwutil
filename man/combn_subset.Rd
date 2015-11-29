@@ -12,4 +12,7 @@ combn_subset(x)
 \value{
 list of vectors with all combinations of x and its subsets
 }
+\description{
+all unique combinations of a vector and all its non-zero subsets
+}
 

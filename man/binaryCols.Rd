@@ -25,7 +25,7 @@ vector of column names
 Doesn't make any allowance for factors.
 }
 \examples{
-dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L)
+dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
                   c(1L, 2L), c(0.1, 0.2), c("9", "8"))
 names(dat) <- c("char", "bin", "binfloat", "binint",
                 "int", "float", "charint")

@@ -12,10 +12,13 @@ getNonFactorNames(x, consider = names(x))
 \arguments{
 \item{x}{data frame}
 
-\item{consider}{character vector of field names, default is to use all
-of them.}
+\item{consider}{character vector of field names of the data frame to test,
+default is to use all of them.}
 }
 \value{
 vector
+}
+\description{
+Get the names of those fields in a data frame which are factors.
 }
 

@@ -8,6 +8,10 @@ areNumeric(x, extras = c(".", "NA", NA))
 }
 \arguments{
 \item{x}{vector}
+
+\item{extras}{character vector containing acceptable alternatives to numeric
+values which will result in returning \code{TRUE} for that element. Default
+is \code{c(".", "NA", NA)}.}
 }
 \value{
 logical vector of same length as input

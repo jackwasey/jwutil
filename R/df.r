@@ -44,14 +44,11 @@ factorToDataframeLogical <- function(fctr,
                                      sep = "",
                                      na.rm = TRUE,
                                      verbose = FALSE) {
-  stopifnot(is.factor(fctr))
-  stopifnot(is.character(prefix))
-  stopifnot(length(prefix) == 1)
-  stopifnot(length(sep) == 1)
-  stopifnot(is.logical(na.rm))
-  stopifnot(length(na.rm) == 1)
-  stopifnot(is.logical(verbose))
-  stopifnot(length(verbose) == 1)
+  checkmate::assertFactor(fctr)
+  checkmate::assertString(prefix)
+  checkmate::assertString(sep)
+  checkmate::assertFlag(na.rm)
+  checkmate::assertFlag(verbose)
   if (verbose && sum(is.na(fctr)) > 0)
     warning("factorToCols: factor passed to factorCols contains NA")
   #remove unused factor levels
@@ -83,7 +80,8 @@ factorToDataframeLogical <- function(fctr,
   # set-up data frame with empty logical
   df <- data.frame(tmp = logical(length = length(fctr)))
 
-  if (verbose) message("more than two factor levels")
+  if (verbose)
+    message("more than two factor levels")
   for (lev in levels(fctr)) {
     newColName <- paste(prefix, lev, sep = sep)
     if (verbose) message(sprintf("creating new column name: %s", newColName))
@@ -142,9 +140,10 @@ expandFactors <- function (x,
 }
 
 #' @title get names of the factor fields in a data frame
+#' @description Get the names of those fields in a data frame which are factors.
 #' @param x data frame
-#' @param consider character vector of field names, default is to use all
-#'   of them.
+#' @param consider character vector of field names of the data frame to test,
+#'   default is to use all of them.
 #' @return vector
 #' @export
 getFactorNames <- function(x, consider = names(x)) {
@@ -168,6 +167,8 @@ getNonFactorNames <- function(x, consider = names(x)) {
 }
 
 #' @title get NA field names from data frame
+#' @description Get the names of any columns in a data frame which have NA
+#'   values.
 #' @param dframe data.frame
 #' @return vector of names of fields which contain any NA values, length zero if
 #'   no matches
@@ -175,8 +176,10 @@ getNonFactorNames <- function(x, consider = names(x)) {
 getNAFields <- function(dframe) {
   stopifnot(is.data.frame(dframe))
   naFields <- names(dframe)[sapply(dframe, countIsNa) > 0]
-  if (length(naFields) == 0) return(character())
-  naFields
+  if (length(naFields) == 0)
+    character()
+  else
+    naFields
 }
 
 #' @rdname getNAFields
@@ -185,6 +188,8 @@ getNonNAFields <- function(dframe)
   names(dframe)[names(dframe) %nin% getNAFields(dframe)]
 
 #' @title return proportion of NA values per field
+#' @description Return proportion of values which are \code{NA} in each field of
+#'   the given data frame.
 #' @param dframe is a data frame
 #' @return numeric vector
 #' @export
@@ -241,15 +246,16 @@ mergeBetter <- function(x, y, by.x, by.y,
                         convert_factors = TRUE,
                         verbose = FALSE) {
 
+  checkmate::assertDataFrame(x, )
+  checkmate::assertDataFrame(y)
+  checkmate::assertString(by.x)
+  checkmate::assertString(by.y)
+  checkmate::assertFlag(all.x)
+  checkmate::assertFlag(all.y)
   renameConflict <- match.arg(renameConflict)
   renameAll <- match.arg(renameAll)
-
-  stopifnot(is.data.frame(x))
-  stopifnot(is.data.frame(y))
-  stopifnot(length(by.x) == 1, length(by.y) == 1)
-  stopifnot(length(all.x) == 1, length(all.y) == 1)
-  stopifnot(length(verbose) == 1, length(convert_factors) == 1)
-  stopifnot(areIntegers(verbose))
+  checkmate::assertFlag(convert_factors)
+  checkmate::assert(checkmate::checkFlag(verbose), checkmate::checkInt(verbose))
 
   verbose <- as.integer(verbose) # TRUE will become low verbosity
 
@@ -264,8 +270,8 @@ mergeBetter <- function(x, y, by.x, by.y,
     if (length(substitute(y)) > 1) affix <- "y"
   }
 
-  #convert factors of keys only # TODO: as.integer may be appropriate
-  #sometimes/often. TODO: tests for this
+  # convert factors of keys only # TODO: as.integer may be appropriate
+  # sometimes/often. TODO: tests for this
   if (convert_factors) {
     if (is.factor(x[[by.x]]))
       x[[by.x]] <- asCharacterNoWarn(x[[by.x]])
@@ -443,7 +449,7 @@ filterBetter <- function(x, expr, verbose = TRUE) {
 #' @param x data frame
 #' @return vector of column names
 #' @examples
-#' dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L)
+#' dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
 #'                   c(1L, 2L), c(0.1, 0.2), c("9", "8"))
 #' names(dat) <- c("char", "bin", "binfloat", "binint",
 #'                 "int", "float", "charint")
@@ -471,6 +477,7 @@ nonBinaryNumericCols <- function(x)
   names(x)[sapply(x, function(y) any(y %nin% c(0, 1)) && is.numeric(y))]
 
 #' @title fill out missing combinations of factors with NA
+#' @description fill out missing combinations of factors with NA
 #' @param df data frame
 #' @details Adapated from http://www.cookbook-r.com/Manipulating_data/\
 #' Summarizing_data/#using-aggregate

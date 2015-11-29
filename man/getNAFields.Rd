@@ -16,4 +16,8 @@ getNonNAFields(dframe)
 vector of names of fields which contain any NA values, length zero if
   no matches
 }
+\description{
+Get the names of any columns in a data frame which have NA
+  values.
+}
 
