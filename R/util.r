@@ -572,3 +572,24 @@ source_purl <- function(input,
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
   # source(output, ...)
 }
+
+#' Save given variable in package data directory
+#'
+#' File is named varname.RData with an optional suffix before .RData
+#'
+#' @param var_name character or symbol, e.g. "myvar" or \code{myvar}, either of which
+#'   would find \code{myvar} in the parent environment, and save it as
+#'   \code{myvar.RData} in \code{package_root/data}.
+#' @param suffix character scalar
+#' @keywords internal
+save_in_data_dir <- function(var_name, suffix = "") {
+  checkmate::assertString(suffix)
+  var_name <- as.character(substitute(var_name))
+  checkmate::assertString(var_name)
+  stopifnot(exists(var_name, envir = parent.frame()))
+  save(list = var_name,
+       envir = parent.frame(),
+       file = file.path("data", strip(paste0(var_name, suffix, ".RData"))),
+       compress = "xz")
+  message("Now reload package to enable updated/new data: ", var_name)
+}
