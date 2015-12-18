@@ -570,7 +570,7 @@ source_purl <- function(input,
   checkmate::assertPathForOutput(output)
   checkmate::assertInt(documentation)
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
-  # source(output, ...)
+  source(output, ...)
 }
 
 #' Save given variable in package data directory
