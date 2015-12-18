@@ -567,7 +567,7 @@ source_purl <- function(input,
                         documentation = 1L, ...) {
   requireNamespace("knitr")
   checkmate::assertFile(input)
-  checkmate::assertPathForOutput(output)
+  checkmate::assertPathForOutput(output, overwrite = TRUE)
   checkmate::assertInt(documentation)
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
   source(output, ...)
