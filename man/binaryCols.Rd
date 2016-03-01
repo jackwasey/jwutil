@@ -4,12 +4,15 @@
 \alias{binaryCols}
 \alias{nonBinaryCols}
 \alias{nonBinaryNumericCols}
+\alias{non_binary_cols}
 \alias{numericCols}
 \title{names of fields which are numeric, binary or combinations thereof}
 \usage{
 binaryCols(x)
 
 nonBinaryCols(x)
+
+non_binary_cols(data, col_names)
 
 numericCols(x)
 

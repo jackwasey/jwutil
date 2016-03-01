@@ -33,4 +33,7 @@ For a two level factor, this is relatively easy, since we just
   well for gender. For multi-level factors there is redundancy with multiple
   new fields now containing FALSE, with only one TRUE for the matching level.
 }
+\seealso{
+\code{\link[PSAgraphics]{cv.trans.psa}}
+}
 

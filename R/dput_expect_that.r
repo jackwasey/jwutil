@@ -16,10 +16,10 @@ dput_expect_equal <- function(...) {
     conn <- textConnection("res_str", "w", local = TRUE)
     res <- dput(to_eval, file = conn)
     close(conn)
-    cat('expect_equal(')
+    cat("expect_equal(")
     cat(deparse(substitute(to_eval)))
-    cat(', ')
+    cat(", ")
     cat(eval(res))
-    cat(')\n')
+    cat(")\n")
   }
 }

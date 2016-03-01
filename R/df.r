@@ -108,19 +108,17 @@ factorToDataframeLogical <- function(fctr,
 #' @template verbose
 #' @return data.frame with no factors
 #' @export
-expandFactors <- function (x,
-                           consider = names(x),
-                           sep = "",
-                           na.rm = TRUE,
-                           verbose = FALSE) {
-  if (verbose) message("converting factors in data frame into logical vectors")
-
-  #message("consider: %s", paste(consider, collapse=', '))
+#' @seealso \code{\link[PSAgraphics]{cv.trans.psa}}
+expandFactors <- function(x,
+                          consider = names(x),
+                          sep = "",
+                          na.rm = TRUE,
+                          verbose = FALSE) {
+  if (verbose)
+    message("converting factors in data frame into logical vectors")
 
   # identify which of the last of fields is actually a factor
   factor_names <- getFactorNames(x, consider)
-
-  #message("got factor_names: %s", paste(factor_names, collapse=", "))
 
   if (length(factor_names) > 0) {
     if (verbose) message("there are factors to be converted into values: ",
@@ -465,6 +463,13 @@ binaryCols <- function(x)
 #' @export
 nonBinaryCols <- function(x)
   names(x)[sapply(x, function(y) any(y %nin% c(0, 1)))]
+
+#' @rdname binaryCols
+#' @export
+non_binary_cols <- function(data, col_names) {
+  # more magrittr friendly?
+  nonBinaryCols(data[col_names])
+}
 
 #' @rdname binaryCols
 #' @export

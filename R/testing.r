@@ -28,7 +28,6 @@ lsf <- function(pkg) {
 #' @return list of long and double versions of convertable values from the input
 #' @export
 numbers_to_long_and_float <- function(..., na.rm = TRUE) {
-  #browser()
   x <- flattenList(list(...))
   # drop any NA values. Very big numbers not representable by 32 bit integers,
   # give NA with warning. For test case generation, usually we will want to
@@ -194,8 +193,7 @@ expect_that_combine_all_args <- function(object, condition,
                                          info = NULL, label = NULL) {
 
   cl <- substitute(object)
-  #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
-  #want to know whether there are multiple top-level symbols
+  # TODO: I now want to test for whether there are multiple top-level symbols
 
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
@@ -229,8 +227,7 @@ expect_that_combine_first_arg <- function(object, condition,
                                           info = NULL, label = NULL) {
 
   cl <- substitute(object)
-  #stopifnot(sum(sapply(cl, is.symbol)) <= 1) # this isn't quite right, I just
-  #want to know whether there are multiple top-level symbols
+  # TODO: see above
 
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
