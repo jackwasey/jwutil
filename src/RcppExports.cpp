@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// setAttrInPlace
+void setAttrInPlace(Rcpp::RObject& x, Rcpp::String name, SEXP value);
+RcppExport SEXP jwutil_setAttrInPlace(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::String >::type name(nameSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type value(valueSEXP);
+    setAttrInPlace(x, name, value);
+    return R_NilValue;
+END_RCPP
+}
 // isRowSorted
 LogicalVector isRowSorted(NumericMatrix x);
 RcppExport SEXP jwutil_isRowSorted(SEXP xSEXP) {
