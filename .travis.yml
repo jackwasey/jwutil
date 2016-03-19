@@ -1,10 +1,16 @@
 language: r
+sudo: false
+cache: packages
+r:
+  - oldrel # when oldrel = 3.1, there are S3 method problems I can't debug
+  - release
+  - devel
 
-sudo: required
+os:
+  - linux
+  - osx
 
 warnings_are_errors: true
-
-env: R_CHECK_CRAN_INCOMING_=FALSE
 
 r_github_packages:
  - jimhester/covr
@@ -13,7 +19,6 @@ r_github_packages:
 after_success:
  - Rscript -e 'devtools::install()'
  - Rscript -e 'devtools::session_info()'
- - env: COVR=true
  - Rscript -e 'library(covr); coveralls(quiet = FALSE)'
 
 notifications:
