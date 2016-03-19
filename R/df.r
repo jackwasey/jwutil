@@ -445,41 +445,46 @@ filterBetter <- function(x, expr, verbose = TRUE) {
 #' @title names of fields which are numeric, binary or combinations thereof
 #' @description Doesn't make any allowance for factors.
 #' @param x data frame
+#' @param invert single logical, if true, will return non-binary columns
 #' @return vector of column names
 #' @examples
 #' dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
 #'                   c(1L, 2L), c(0.1, 0.2), c("9", "8"))
 #' names(dat) <- c("char", "bin", "binfloat", "binint",
 #'                 "int", "float", "charint")
-#' binaryCols(dat)
-#' nonBinaryCols(dat)
-#' numericCols(dat)
-#' nonBinaryNumericCols(dat)
+#' binary_cols(dat)
+#' binary_col_names(dat)
+#' binary_col_names(dat, invert = TRUE)
 #' @export
-binaryCols <- function(x)
-  names(x)[sapply(x, function(y) all(y %in% c(0, 1)))]
-
-#' @rdname binaryCols
-#' @export
-nonBinaryCols <- function(x)
-  names(x)[sapply(x, function(y) any(y %nin% c(0, 1)))]
-
-#' @rdname binaryCols
-#' @export
-non_binary_cols <- function(data, col_names) {
-  # more magrittr friendly?
-  nonBinaryCols(data[col_names])
+binary_col_names <- function(x, invert = FALSE) {
+  checkmate::assertDataFrame(x)
+  checkmate::assertFlag(invert)
+  names(x)[sapply(x, function(y) all(y %in% c(0, 1))) & !invert]
 }
 
-#' @rdname binaryCols
+#' @rdname binary_col_names
 #' @export
-numericCols <- function(x)
-  names(x)[sapply(x, function(y) is.numeric(y))]
+binary_cols <- function(x, invert = FALSE) {
+  checkmate::assertDataFrame(x)
+  checkmate::assertFlag(invert)
+  x[binary_col_names(x = x, invert = invert)]
+}
 
-#' @rdname binaryCols
+#' @rdname binary_col_names
 #' @export
-nonBinaryNumericCols <- function(x)
-  names(x)[sapply(x, function(y) any(y %nin% c(0, 1)) && is.numeric(y))]
+numeric_col_names <- function(x, invert = FALSE) {
+  checkmate::assertDataFrame(x)
+  checkmate::assertFlag(invert)
+  names(x)[sapply(x, function(y) is.numeric(y)) & !invert]
+}
+
+#' @rdname binary_col_names
+#' @export
+numeric_cols <- function(x, invert = FALSE) {
+  checkmate::assertDataFrame(x)
+  checkmate::assertFlag(invert)
+  x[numeric_col_names(x = x, invert = invert)]
+}
 
 #' @title fill out missing combinations of factors with NA
 #' @description fill out missing combinations of factors with NA

@@ -2,7 +2,7 @@
 
 //' Set attribute on any SEXP in place
 //'
-//' #' @examples
+//' @examples
 //' \dontrun{
 //' # benchmark to see whether setting an attribute on a function argument and returning it does a copy.
 //' f <- function(x) { attr(x, "a") <- FALSE; x }
@@ -27,6 +27,10 @@
 //'
 //'
 //' }
+//' @param x Any R object for which an attribute can be set
+//' @param name The name of the attribute, as length one character vector
+//' @param value Value to be assigned to that attribute
+//' @export
 // [[Rcpp::export(set_attr_in_place)]]
 void setAttrInPlace(Rcpp::RObject& x, Rcpp::String name, SEXP value) {
   x.attr(name) = value;

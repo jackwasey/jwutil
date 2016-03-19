@@ -3,7 +3,7 @@
 
 #' Set attribute on any SEXP in place
 #'
-#' #' @examples
+#' @examples
 #' \dontrun{
 #' # benchmark to see whether setting an attribute on a function argument and returning it does a copy.
 #' f <- function(x) { attr(x, "a") <- FALSE; x }
@@ -28,6 +28,10 @@
 #'
 #'
 #' }
+#' @param x Any R object for which an attribute can be set
+#' @param name The name of the attribute, as length one character vector
+#' @param value Value to be assigned to that attribute
+#' @export
 set_attr_in_place <- function(x, name, value) {
     invisible(.Call('jwutil_setAttrInPlace', PACKAGE = 'jwutil', x, name, value))
 }

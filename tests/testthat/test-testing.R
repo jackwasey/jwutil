@@ -1,6 +1,7 @@
 context("test testing extensions for testthat")
 
 test_that("combinations of commutative arguments", {
+  skip("needs rewrite for new testthat")
   # result has 'info' for the last test before returning.
   result <- expect_that_combine_all_args(sum(1, 2), testthat::equals(3))
   expect_true(result$passed)
@@ -24,6 +25,7 @@ test_that("combinations of commutative arguments", {
 })
 
 test_that("throw error or warning for ?every iteration", {
+  skip("needs rewrite for new testthat")
   result <- expect_that_combine_all_args(stop("a", "b"),
                                          testthat::throws_error())
   expect_true(result$passed)
