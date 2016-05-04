@@ -7,12 +7,12 @@ dfb[1, "b"] <- 999
 dfc[1, "b"] <- 999
 dfc[2, "c"] <- 888
 
-test_that("merge identical frames give identical result unless affix" , {
+test_that("merge identical frames give identical result unless affix", {
   r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a", verbose = FALSE)
   expect_equal(dfa, r)
 })
 
-test_that("identical frames with reordered should give identical result" , {
+test_that("identical frames with reordered should give identical result", {
   expect_equal(mergeBetter(x = dfa, y = dfa[c("a", "c", "b")],
                            by.x = "a", by.y = "a"), dfa)
   expect_equal(mergeBetter(x = dfa, y = dfa[c("c", "b", "a")],
@@ -34,14 +34,14 @@ test_that("can't handle double duplicate fields, esp not keys", {
   expect_error(mergeBetter(x = dfa, y =  df_a, by.x = "a", by.y = "a"))
 })
 
-test_that("merge non-identical frames should suffix field name by default" , {
+test_that("merge non-identical frames should suffix field name by default", {
   r <- mergeBetter(x = dfa, y = dfb, by.x = "a", by.y = "a", verbose = FALSE)
   e <- dfa
-  e[["b.dfb"]] <- c(999,12,13,14)
+  e[["b.dfb"]] <- c(999, 12, 13, 14)
   expect_equal(r, e)
 })
 
-test_that("merge identical frames should give identical result" , {
+test_that("merge identical frames should give identical result", {
   r <- mergeBetter(x = dfa, y = dfc, by.x = "a", by.y = "a")
   e <- dfa
   e[["b.dfc"]] <- c(999, 12, 13, 14)
@@ -55,7 +55,7 @@ test_that("merge with missing id field fails with error", {
               throws_error())
 })
 
-test_that("merge frames forcing prefix" , {
+test_that("merge frames forcing prefix", {
 
   r <- mergeBetter(x = dfa, y = dfa, by.x = "a", by.y = "a",
                    renameAll = "prefix")

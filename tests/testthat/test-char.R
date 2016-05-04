@@ -1,16 +1,16 @@
 context("test character processing functions")
 
-test_that("trim with bad inputs fails" , {
+test_that("trim with bad inputs fails", {
   expect_error(trim())
-  expect_error(trim(data.frame(a = c("jack", "hayley"), b = c(1,2))))
+  expect_error(trim(data.frame(a = c("jack", "hayley"), b = c(1, 2))))
 })
 
-test_that("trim with empty inputs" , {
+test_that("trim with empty inputs", {
   expect_equal(trim(character(0)), character(0))
   expect_equal(trim(""), "")
 })
 
-test_that("trim with acceptable inputs" , {
+test_that("trim with acceptable inputs", {
   expect_equal(trim(NA_character_), NA_character_)
   # not necesarily desirable, but this states the expectation.
   expect_equal(trim(NA_integer_), NA_character_)
@@ -31,12 +31,10 @@ test_that("trim with acceptable inputs" , {
 })
 
 test_that("strip whitespace", {
-  expect_error(strip())
-  expect_error(strip(pattern="j")) # no x
-  expect_error(strip(x="jack", pattern = c(1, 2)))
-  expect_error(strip(x="jack", pattern = c("1", "2")))
-  expect_error(strip(x="jack", useBytes = "yes"))
-  expect_error(strip(x="jack", useBytes = c(TRUE, FALSE)))
+  expect_error(strip(x = "jack", pattern = c(1, 2)))
+  expect_error(strip(x = "jack", pattern = c("1", "2")))
+  expect_error(strip(x = "jack", useBytes = "yes"))
+  expect_error(strip(x = "jack", useBytes = c(TRUE, FALSE)))
 
   expect_equal(strip(NA_integer_), NA_character_)
 
@@ -102,7 +100,7 @@ test_that("strip characters so they can work in a formula", {
   expect_equal(stripForFormula(c(" jac k", "h ayley ")), c("jack", "hayley"))
 })
 
-test_that("string pair match extraction" , {
+test_that("string pair match extraction", {
   expect_error(strPairMatch())
   expect_error(strPairMatch(pattern = "(abc)def(ghi)"))
   expect_error(strPairMatch(text = "bougie"))
@@ -127,5 +125,5 @@ test_that("string pair match extraction" , {
 })
 
 test_that("string multimatch", {
- skip("todo")
+  skip("todo")
 })

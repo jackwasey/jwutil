@@ -197,9 +197,9 @@ propNaPerField <- function(dframe)
   })
 
 #' @title drops rows with NA values in specified fields
-#' @description employs complete.cases which is fast internal C code. Returns a
-#'   data frame with unused factor levels dropped (these may have been
-#'   introduced by dropping rows with some NA values)
+#' @description employs \code{stats::complete.cases} which is fast internal C
+#'   code. Returns a data frame with unused factor levels dropped (these may
+#'   have been introduced by dropping rows with some NA values)
 #' @param x data frame
 #' @param fld vector with names of fields which must have no NA values
 #' @template verbose
@@ -207,11 +207,13 @@ propNaPerField <- function(dframe)
 #'   There may be NA values in the resulting data frame in fields which are not
 #'   listed in fld.
 dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
-  if (verbose) message(sprintf("checking fields: %s for NA values", fld))
+  if (verbose)
+    message(sprintf("checking fields: %s for NA values",
+                    paste(fld, sep = ", ")))
   stopifnot(is.character(fld))
   stopifnot(is.data.frame(x))
-  cc <- complete.cases(x[fld])
-  droplevels(x[cc,])
+  cc <- stats::complete.cases(x[fld])
+  droplevels(x[cc, ])
 }
 
 #' @title merge better
@@ -439,7 +441,7 @@ filterBetter <- function(x, expr, verbose = TRUE) {
     fn, deparse(sexpr),
     sum(!fltr), 100 * sum(!fltr) / length(fltr), length(fltr)
   ))
-  x[fltr,]
+  x[fltr, ]
 }
 
 #' @title names of fields which are numeric, binary or combinations thereof
@@ -489,12 +491,12 @@ numeric_cols <- function(x, invert = FALSE) {
 #' @title fill out missing combinations of factors with NA
 #' @description fill out missing combinations of factors with NA
 #' @param df data frame
-#' @details Adapated from http://www.cookbook-r.com/Manipulating_data/\
-#' Summarizing_data/#using-aggregate
+#' @details Adapated from
+#'   \url{http://www.cookbook-r.com/Manipulating_data/Summarizing_data/#using-aggregate}
 #' @export
 fillMissingCombs <- function(df) {
   levelList <- list()
-  for (f in getFactorNames(df)) levelList[[f]] <- levels(df[,f])
+  for (f in getFactorNames(df)) levelList[[f]] <- levels(df[, f])
   merge(expand.grid(levelList), df, all.x = TRUE)
 }
 
@@ -507,7 +509,7 @@ fillMissingCombs <- function(df) {
 #' @param  ignore cahracter vector of columns names to ignore
 #' @param verbose TRUE or FALSE
 #' @export
-zeroNAs <- function(df, cols = names(df), ignore = character(), verbose = FALSE) {
+zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE) {
   checkmate::assertDataFrame(df)
   checkmate::assertCharacter(cols)
   checkmate::assertCharacter(ignore)
@@ -518,7 +520,7 @@ zeroNAs <- function(df, cols = names(df), ignore = character(), verbose = FALSE)
     x <- df[[n]]
     if (verbose)
       message(sprintf("zeroing NA values in %s", n))
-    if (!is(x, "POSIXt") && !is.Date(x) && !is.factor(x)) {
+    if (!methods::is(x, "POSIXt") && !is.Date(x) && !is.factor(x)) {
       df[is.na(x), n] <- 0
     } else if (verbose)
       message(sprintf("skipping factor or Date: %s", n))

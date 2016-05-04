@@ -10,7 +10,7 @@
 #'   therefore breaking unicode.
 #' @return character vector
 #' @export
-strip <- function (x, pattern = " ", useBytes = TRUE) {
+strip <- function(x, pattern = " ", useBytes = TRUE) {
   stopifnot(length(pattern) == 1)
   stopifnot(length(useBytes) == 1)
   stopifnot(is.character(pattern))
@@ -67,9 +67,9 @@ strMultiMatch <- function(pattern, text, dropEmpty = FALSE, ...) {
         x = x,
         m = regexec(
           pattern = pattern,
-          text=x, ...),
+          text = x, ...),
         ...)
-    )[ - 1]
+    )[ -1]
   )
   if (!dropEmpty) return(result)
   result[sapply(result, function(x) length(x) != 0)]

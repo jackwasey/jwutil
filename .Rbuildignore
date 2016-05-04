@@ -1,4 +1,7 @@
 ^\.travis\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-man-roxygen
+^man-roxygen$
+^.lintr$
+^.git$
+^cran-comments.md$

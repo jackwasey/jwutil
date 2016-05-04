@@ -20,8 +20,8 @@ data frame without rows containing NA in the specified data fields.
   listed in fld.
 }
 \description{
-employs complete.cases which is fast internal C code. Returns a
-  data frame with unused factor levels dropped (these may have been
-  introduced by dropping rows with some NA values)
+employs \code{stats::complete.cases} which is fast internal C
+  code. Returns a data frame with unused factor levels dropped (these may
+  have been introduced by dropping rows with some NA values)
 }
 

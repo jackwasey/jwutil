@@ -1,23 +1,17 @@
 context("list functions")
 
 test_that("merge lists of vectors", {
-  expect_error(mergeLists())
-  expect_error(mergeLists(list(a = 1)))
-  expect_error(mergeLists(bad_input))
-  expect_error(mergeLists(list(list(1,2), list(a=3,b=4))))
+  x <- list(a = 1, b = 10)
+  y <- list(b = 20, c = 100)
 
-  x <- list(a=1, b=10)
-  y <- list(b=20, c=100)
-
-  expect_equal(mergeLists(x, x), list(a = c(1,1), b = c(10,10)))
-  expect_equal(mergeLists(x, y), list(a = 1, b = c(10,20), c = 100))
+  expect_equal(mergeLists(x, x), list(a = c(1, 1), b = c(10, 10)))
+  expect_equal(mergeLists(x, y), list(a = 1, b = c(10, 20), c = 100))
 
   expect_equal(mergeLists(x, c(x, 1)), list(a = c(1, 1), b = c(10, 10)))
-  expect_equal(mergeLists(c(x, 5), y), list(a = 1, b = c(10,20), c = 100))
+  expect_equal(mergeLists(c(x, 5), y), list(a = 1, b = c(10, 20), c = 100))
 })
 
 test_that("trim a list", {
-  expect_error(listTrim())
   expect_error(listTrim(random_test_integers()))
 
   cl <- as.list(cars)
@@ -31,9 +25,7 @@ test_that("trim a list", {
 })
 
 test_that("is a list flat", {
-  expect_error(isFlat())
-
   expect_true(isFlat(list(1)))
-  expect_true(isFlat(list(1,2,3)))
+  expect_true(isFlat(list(1, 2, 3)))
   expect_that(length(isFlat(bad_input)), testthat::equals(1))
 })

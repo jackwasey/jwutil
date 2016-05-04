@@ -1,116 +1,102 @@
-
 context("data frame manipulation")
 
-
-f1 <-  factor(x = c(1,2,3,1,2,3,3,2,1))
-f2 <- factor(x = c(10,20,30,10,20,30,30,20,10))
-f3 <- factor(x = c("a","b","c","d","c","b","a"))
+f1 <-  factor(x = c(1, 2, 3, 1, 2, 3, 3, 2, 1))
+f2 <- factor(x = c(10, 20, 30, 10, 20, 30, 30, 20, 10))
+f3 <- factor(x = c("a", "b", "c", "d", "c", "b", "a"))
 f_one_level <- factor(x = c("jack", "jack"))
 f_two_levels <- factor(x = c("jack", "alfie", "jack", "alfie"))
 f_one_extra_level <- factor(c("jack", "jack"),
-                         levels = c("jack", "alfie", "liv"))
+                            levels = c("jack", "alfie", "liv"))
 f_two_extra_level <- factor(c("jack", "alfie", "jack", "alfie"),
-                         levels = c("jack", "alfie", "liv"))
+                            levels = c("jack", "alfie", "liv"))
 f.short <- factor(x = c(1))
 f.empty <- factor()
 dframe <- data.frame(f1, f2)
 fd <- data.frame(f2, f1)
-mixed.df <- data.frame(fd, v1=as.numeric(f1))
+mixed.df <- data.frame(fd, v1 = as.numeric(f1))
 v1 <- as.numeric(f1)
 v2 <- as.numeric(f2)
 vdf <- data.frame(v1, v2)
 fdv1 <- data.frame(v2, v1)
-fdv2 <- data.frame(v2=v1, v1=v2)
+fdv2 <- data.frame(v2 = v1, v1 = v2)
 
-dfa <- dfb <- dfc <- data.frame(a = c(1,2,3,4),
-                                b = c(11,12,13,14),
-                                c = c(101,102,103,104))
+dfa <- dfb <- dfc <- data.frame(
+  a = c(1, 2, 3, 4),
+  b = c(11, 12, 13, 14),
+  c = c(101, 102, 103, 104)
+)
 dfb[1, "b"] <- 999
 dfc[1, "b"] <- 999
 dfc[2, "c"] <- 888
 
 test_that("getNonFactorNames", {
-
-  expect_identical(
-    sort(getNonFactorNames(vdf)),
-    sort(getNonFactorNames(fdv1))
-  )
-  expect_identical(
-    sort(getNonFactorNames(vdf)),
-    sort(getNonFactorNames(fdv2))
-  )
-  expect_equal(getNonFactorNames(vdf), c("v1","v2"))
-  expect_equal(getNonFactorNames(fdv1), c("v2","v1"))
+  expect_identical(sort(getNonFactorNames(vdf)),
+                   sort(getNonFactorNames(fdv1)))
+  expect_identical(sort(getNonFactorNames(vdf)),
+                   sort(getNonFactorNames(fdv2)))
+  expect_equal(getNonFactorNames(vdf), c("v1", "v2"))
+  expect_equal(getNonFactorNames(fdv1), c("v2", "v1"))
   expect_equal(getNonFactorNames(mixed.df), c("v1"))
-  expect_equal(getNonFactorNames(data.frame(f1,v1,f2)), c("v1"))
-  expect_equal(getNonFactorNames(data.frame(v1,f1,v2)), c("v1","v2"))
-  #expect_equal(getNonFactorNames(data.frame()), NULL)
-  #expect_equal(getNonFactorNames(data.frame(), consider=NULL), NULL)
+  expect_equal(getNonFactorNames(data.frame(f1, v1, f2)), c("v1"))
+  expect_equal(getNonFactorNames(data.frame(v1, f1, v2)), c("v1", "v2"))
   expect_warning(getNonFactorNames(data.frame()))
-  #expect_output(getNonFactorNames(data.frame()), regexp='.*WARNING.*')
-  expect_warning(getNonFactorNames(data.frame(), consider=NULL))
+  expect_warning(getNonFactorNames(data.frame(), consider = NULL))
 })
 
-test_that("getFactorNames",{
-
-  expect_identical(
-    sort(getFactorNames(dframe)),
-    sort(getFactorNames(fd))
-  )
-  expect_identical(getFactorNames(dframe), c("f1","f2"))
-  expect_identical(getFactorNames(mixed.df), c("f2","f1"))
+test_that("getFactorNames", {
+  expect_identical(sort(getFactorNames(dframe)),
+                   sort(getFactorNames(fd)))
+  expect_identical(getFactorNames(dframe), c("f1", "f2"))
+  expect_identical(getFactorNames(mixed.df), c("f2", "f1"))
   expect_identical(getFactorNames(vdf), character(0))
   old_warn <- options("warn")
-  options(warn = - 1)
+  options(warn = -1)
   expect_equal(getFactorNames(data.frame()), NULL)
-  expect_equal(getFactorNames(data.frame(), consider=NULL), NULL)
+  expect_equal(getFactorNames(data.frame(), consider = NULL), NULL)
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
   options(old_warn)
   # TODO: DO expect warnings - logging nightmare.
   expect_warning(getFactorNames(data.frame()))
-  expect_warning(getFactorNames(data.frame(), consider=NULL))
+  expect_warning(getFactorNames(data.frame(), consider = NULL))
   expect_warning(getFactorNames(data.frame(), NULL))
-  #expect_output(getFactorNames(data.frame()), 'WARNING')
-  #expect_output(getFactorNames(data.frame(), consider=NULL), 'WARNING')
-  #expect_output(getFactorNames(data.frame(), NULL), 'WARNING')
   #check duplicate field names
   #TODO: should this error out?
-  expect_equal(getFactorNames(cbind(mixed.df, dframe)), c("f2","f1","f1","f2"))
+  expect_equal(getFactorNames(cbind(mixed.df, dframe)), c("f2", "f1", "f1", "f2"))
 })
 
 test_that("expandFactors", {
-
-  expect_equal(
-    expandFactors(dframe, consider=c("f1","f2")),
-    expandFactors(dframe)
-  )
+  expect_equal(expandFactors(dframe, consider = c("f1", "f2")),
+               expandFactors(dframe))
 
   expect_warning(out <- expandFactors(dframe, consider = NULL))
   expect_identical(dframe, out)
 
-  out <- expandFactors(dframe, consider = c("f1","f2"), sep = ".",
-                       verbose = FALSE)
-  expect_equal(dim(out), c(9,6))
+  out <- expandFactors(
+    dframe,
+    consider = c("f1", "f2"),
+    sep = ".",
+    verbose = FALSE
+  )
+  expect_equal(dim(out), c(9, 6))
   expect_equal(class(out[[1]]), "logical")
-  expect_equal(names(out), c("f1.1","f1.2","f1.3","f2.10","f2.20","f2.30"))
+  expect_equal(names(out),
+               c("f1.1", "f1.2", "f1.3", "f2.10", "f2.20", "f2.30"))
 
-  out <- expandFactors(dframe, consider=c("f1"), sep = ".")
-  expect_equal(dim(out), c(9,4))
+  out <- expandFactors(dframe, consider = c("f1"), sep = ".")
+  expect_equal(dim(out), c(9, 4))
   expect_equal(class(out[["f1.1"]]), "logical")
-  expect_equal(names(out), c("f2","f1.1","f1.2","f1.3"))
+  expect_equal(names(out), c("f2", "f1.1", "f1.2", "f1.3"))
 
-  out <- expandFactors(mixed.df, consider = c("v1","f1"), sep = ".")
-  expect_equal(dim(out), c(9,5))
+  out <- expandFactors(mixed.df, consider = c("v1", "f1"), sep = ".")
+  expect_equal(dim(out), c(9, 5))
   expect_equal(class(out[["f1.1"]]), "logical")
-  expect_equal(names(out), c("f2","v1","f1.1","f1.2","f1.3"))
+  expect_equal(names(out), c("f2", "v1", "f1.1", "f1.2", "f1.3"))
 })
 
 test_that("factorToDataframeLogical bad input fails", {
-
-  expect_error(factorToDataframeLogical())
   expect_error(factorToDataframeLogical(dframe))
   expect_error(factorToDataframeLogical(bad_input))
-  expect_error(factorToDataframeLogical(c("some","string of characters")))
+  expect_error(factorToDataframeLogical(c("some", "string of characters")))
 
   expect_error(factorToDataframeLogical(f1, prefix = c("1", "2")))
   expect_error(factorToDataframeLogical(f1, prefix = 1))
@@ -118,12 +104,15 @@ test_that("factorToDataframeLogical bad input fails", {
 })
 
 test_that("factorToDataframeLogical works", {
-  expect_equal(
-    dim(factorToDataframeLogical(f1, prefix = "f1", verbose = FALSE)),
-    c(9, 3))
+  expect_equal(dim(factorToDataframeLogical(
+    f1, prefix = "f1", verbose = FALSE
+  )),
+  c(9, 3))
   expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
-  expect_true(all(sapply(factorToDataframeLogical(f1, prefix = "f1"),
-                         is.logical)))
+  expect_true(all(sapply(
+    factorToDataframeLogical(f1, prefix = "f1"),
+    is.logical
+  )))
 
 })
 
@@ -142,21 +131,32 @@ test_that("extra factor levels, 1,2 level factors", {
 })
 
 test_that("factorToDataframeLogical works for NA factor levels", {
-
-  f <- factor(c("jack", "alfie", NA), exclude = NULL)  # make NA a level
-  df <- data.frame(fjack = c(T, F, F), falfie = c(F,T,F), fNA = c(F,F,T))
+  f <-
+    factor(c("jack", "alfie", NA), exclude = NULL)  # make NA a level
+  df <-
+    data.frame(
+      fjack = c(T, F, F),
+      falfie = c(F, T, F),
+      fNA = c(F, F, T)
+    )
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
-  f <- factor(c("jack", "alfie", NA), exclude = NA)  # make NA not a level
-  df <- data.frame(fjack = c(T, F, F), falfie = c(F,T,F), fNA = c(F,F,T))
+  f <-
+    factor(c("jack", "alfie", NA), exclude = NA)  # make NA not a level
+  df <-
+    data.frame(
+      fjack = c(T, F, F),
+      falfie = c(F, T, F),
+      fNA = c(F, F, T)
+    )
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
   f <- factor(c("jack", NA))
-  df <- data.frame(fjack =c(T,F))
+  df <- data.frame(fjack = c(T, F))
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
   f <- factor(c("jack", "alfie"), levels = c("jack", "alfie", NA))
-  df <- data.frame(fjack = c(T,F))
+  df <- data.frame(fjack = c(T, F))
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
 })
@@ -169,7 +169,7 @@ test_that("drop duplicate fields in a data frame", {
   expect_error(dropDuplicateFields(dfa, dfa))
   expect_error(dropDuplicateFields(extreme_numbers))
   expect_equal(dropDuplicateFields(dfa), dfa)
-  expect_equal(dropDuplicateFields(dfa[c("a","b","c","c")]), dfa)
+  expect_equal(dropDuplicateFields(dfa[c("a", "b", "c", "c")]), dfa)
   expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c")]), dfa)
   expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c", "c")]), dfa)
 })
@@ -177,7 +177,7 @@ test_that("drop duplicate fields in a data frame", {
 
 test_that("drop rows with NA values in given fields bad data", {
   # don't test \code{complete.cases}, just my function
-  expect_error(dropRowsWithNAField(c(4,5)))
+  expect_error(dropRowsWithNAField(c(4, 5)))
   expect_error(dropRowsWithNAField(bad_input))
   expect_error(dropRowsWithNAField(random_test_dates()))
   expect_error(dropRowsWithNAField())
@@ -191,9 +191,9 @@ test_that("drop rows with NA values in given fields good data", {
   expect_identical(dropRowsWithNAField(cars, c("speed", "dist")), cars)
 
   carsna1 <- carsna2 <- carsna3 <- cars
-  carsna1[1,1] <- NA_integer_
-  carsna2[1,2] <- NA_integer_
-  carsna3[1,1:2] <- NA_integer_
+  carsna1[1, 1] <- NA_integer_
+  carsna2[1, 2] <- NA_integer_
+  carsna3[1, 1:2] <- NA_integer_
 
   expect_identical(dropRowsWithNAField(cars), cars)
   expect_identical(dropRowsWithNAField(carsna1), cars[2:50, ])
@@ -218,11 +218,10 @@ test_that("drop rows with NA values in given fields good data", {
 })
 
 test_that("get NA and non-NA  fields", {
-
   carsna1 <- carsna2 <- carsna3 <- cars
-  carsna1[1,1] <- NA_integer_
-  carsna2[1,2] <- NA_integer_
-  carsna3[1,1:2] <- NA_integer_
+  carsna1[1, 1] <- NA_integer_
+  carsna2[1, 2] <- NA_integer_
+  carsna3[1, 1:2] <- NA_integer_
 
   expect_error(getNAFields())
   expect_error(getNAFields(NA))
@@ -250,26 +249,32 @@ test_that("set diff on data frame indices before merging", {
   expect_error(getDropped(1))
   expect_error(getDropped("two"))
 
-  expect_equal(getDropped(c("1","2"), c("2","3")),
+  expect_equal(getDropped(c("1", "2"), c("2", "3")),
                list(missing_from_x = "3",
                     missing_from_y = "1"))
   expect_equal(getDropped(c(1L, 2L), c(2L, 3L)),
                list(missing_from_x = 3L,
                     missing_from_y = 1L))
-  expect_equal(getDropped(c(1.1,2.2), c(2.2,3.3)),
+  expect_equal(getDropped(c(1.1, 2.2), c(2.2, 3.3)),
                list(missing_from_x = 3.3,
                     missing_from_y = 1.1))
 
   # both sides the same
-  expect_equal(getDropped(c("1","2","3"), c("1","2","3")),
-               list(missing_from_x = character(0),
-                    missing_from_y = character(0)))
-  expect_equal(getDropped(c(1,2,3), c(1,2,3)),
-               list(missing_from_x = numeric(0),
-                    missing_from_y = numeric(0)))
+  expect_equal(getDropped(c("1", "2", "3"), c("1", "2", "3")),
+               list(
+                 missing_from_x = character(0),
+                 missing_from_y = character(0)
+               ))
+  expect_equal(getDropped(c(1, 2, 3), c(1, 2, 3)),
+               list(
+                 missing_from_x = numeric(0),
+                 missing_from_y = numeric(0)
+               ))
   expect_equal(getDropped(c(1L, 2L, 3L), c(1L, 2L, 3L)),
-               list(missing_from_x = integer(0),
-                    missing_from_y = integer(0)))
+               list(
+                 missing_from_x = integer(0),
+                 missing_from_y = integer(0)
+               ))
 
 })
 
@@ -281,34 +286,34 @@ test_that("affix fields bad inputs", {
 })
 
 test_that("affix good inputs", {
-  expect_equal(
-    affixFields("a", affix = "x",
-                renameHow = "prefix"),
-    "x.a"
-  )
-  expect_equal(
-    affixFields(c("a", "b"), affix = "x",
-                renameHow = "prefix"),
-    c("x.a", "x.b")
-  )
-  expect_equal(
-    affixFields(c("a", "b"), affix = "x",
-                renameHow = "suffix"),
-    c("a.x", "b.x")
-  )
-  expect_equal(
-    affixFields(c("a", "b"), affix = "x",
-                renameHow = "prefix", skip = "a"),
-    c("a", "x.b")
-  )
-  expect_equal(
-    affixFields(c("a", "b"), affix = "x",
-                renameHow = "prefix", skip = "b"),
-    c("x.a", "b")
-  )
-  expect_equal(
-    affixFields(c("a", "b"), affix = "x",
-                renameHow = "prefix", sep = "op"),
-    c("xopa", "xopb")
-  )
+  expect_equal(affixFields("a", affix = "x",
+                           renameHow = "prefix"),
+               "x.a")
+  expect_equal(affixFields(c("a", "b"), affix = "x",
+                           renameHow = "prefix"),
+               c("x.a", "x.b"))
+  expect_equal(affixFields(c("a", "b"), affix = "x",
+                           renameHow = "suffix"),
+               c("a.x", "b.x"))
+  expect_equal(affixFields(
+    c("a", "b"),
+    affix = "x",
+    renameHow = "prefix",
+    skip = "a"
+  ),
+  c("a", "x.b"))
+  expect_equal(affixFields(
+    c("a", "b"),
+    affix = "x",
+    renameHow = "prefix",
+    skip = "b"
+  ),
+  c("x.a", "b"))
+  expect_equal(affixFields(
+    c("a", "b"),
+    affix = "x",
+    renameHow = "prefix",
+    sep = "op"
+  ),
+  c("xopa", "xopb"))
 })

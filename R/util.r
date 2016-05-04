@@ -7,7 +7,7 @@
 #' @return logical scalar
 #' @export
 allIsNumeric <- function(x, extras = c(".", "NA", NA)) {
-  old <- options(warn = - 1)
+  old <- options(warn = -1)
   on.exit(options(old))
   xs <- x[x %nin% c("", extras)]
   !any(is.na(as.numeric(xs)))
@@ -36,7 +36,7 @@ allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
 #' @return character vector, may have NA values
 #' @export
 asCharacterNoWarn <- function(x) {
-  old <- options(warn = - 1)
+  old <- options(warn = -1)
   on.exit(options(old))
   if (is.factor(x)) x <- levels(x)[x]
   as.character(x)
@@ -56,7 +56,7 @@ asCharacterNoWarn <- function(x) {
 #' @return numeric vector, may have NA values
 #' @export
 asNumericNoWarn <- function(x) {
-  old <- options(warn = - 1)
+  old <- options(warn = -1)
   on.exit(options(old))
   if (is.factor(x)) x <- levels(x)[x]
   as.numeric(x)
@@ -124,6 +124,7 @@ areNumeric <- function(x, extras = c(".", "NA", NA)) {
 #' @description downloads zip file, and opens named file \code{filename}, or the
 #'   single file in zip if \code{filename} is not specified. FUN is a function,
 #'   with additional arguments to FUN given by \dots.
+#'   @details TODO: update from \code{icd} package
 #' @param url character vector of length one containing URL of zip file.
 #' @param filename character vector of length one containing name of file to
 #'   extract from zip. If not specified, and the zip contains a single file,
@@ -137,10 +138,12 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
   stopifnot(length(filename) <= 1)
   stopifnot(is.character(url), length(url) == 1)
   zipfile <- tempfile()
-  download.file(url = url, destfile = zipfile, quiet = TRUE)
+  on.exit(unlink(zipfile), add = TRUE)
+  utils::download.file(url = url, destfile = zipfile, quiet = TRUE)
   zipdir <- tempfile()
+  on.exit(unlink(zipfile, recursive = TRUE), add = TRUE)
   dir.create(zipdir)
-  unzip(zipfile, exdir = zipdir)  # files="" so extract all
+  utils::unzip(zipfile, exdir = zipdir)  # files="" so extract all
   files <- list.files(zipdir)
   if (is.null(filename)) {
     if (length(files) == 1) {
@@ -230,7 +233,7 @@ countNonNaCumulative <- function(d) {
         MARGIN = 2,
         FUN = function(x, envir) {
           #update running total of non-NA count
-          assign("running", running | x, envir=envir)
+          assign("running", running | x, envir = envir)
           sum(running)
         },
         environment()
@@ -269,15 +272,15 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
     stop("must have matching lengths of date and time vectors.
          I got: %d and %d", length(dts), length(tms))
 
-  if (class(dts) %nin% c("Date","character") && !is.na(dts))
+  if (class(dts) %nin% c("Date", "character") && !is.na(dts))
     stop(paste("date must be of class Date, character, but received: %s",
                class(dts)))
 
   # if a time part is given in the date field, this is an error
-  if (is.character(dts) && any(grepl(pattern="\\S\\s\\S", dts)))
+  if (is.character(dts) && any(grepl(pattern = "\\S\\s\\S", dts)))
     stop("suspect time is already given with date argument, \
          which invalidates this entire function. e.g. %s",
-         dts[grepl(pattern="\\S\\s\\S", dts)][1])
+         dts[grepl(pattern = "\\S\\s\\S", dts)][1])
 
   # convert to Date (may already be Date, but that's fine) any conversion error
   # in any item will result in an error. an alternative strategy would be to
@@ -286,7 +289,7 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
   dts <- as.Date(dts)
 
   # a single NA value could appear as type logical
-  if (class(tms) %nin% c("numeric","integer","character") && !is.na(tms))
+  if (class(tms) %nin% c("numeric", "integer", "character") && !is.na(tms))
     stop("time must be numeric or character, but got class for times of '%s'.",
          class(tms))
 
@@ -294,7 +297,6 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
   if (any(dts < as.Date("1850-01-01"), na.rm = TRUE)) {
     stop("some dates are before 1850: ", dts[dts < as.Date("1850-01-01")])
     # could alternatively set NA, warn and continue:
-    # dts[dts < as.Date("1850-01-01")] <- NA
   }
 
   # let NA be valid:
@@ -319,7 +321,7 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
     tms[bad_range] <- NA
   }
 
-  timesfourzeros <- formatC(tms, width = 4, format="d", flag="0")
+  timesfourzeros <- formatC(tms, width = 4, format = "d", flag = "0")
   strptime(paste(dts, timesfourzeros, sep = " "), "%Y-%m-%d %H%M")
 }
 
@@ -334,9 +336,6 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
 isValidTime <- function(tms, na.rm = FALSE) {
   if (na.rm) tms <- tms[!is.na(tms)]
   grepl("^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
-  #Don't do this, or we can't use logical test in case all vals are NA.
-  #validTimes[is.na(tms)] <- NA # grepl only gives T or F output TODO: write
-  #tests...
 }
 
 #' @title shuffle
@@ -392,9 +391,8 @@ permute <- function(x) {
 combn_subset <- function(x) {
   res <- list()
   for (n in 1:length(x)) {
-    r <- combn(x, n, simplify = FALSE)
+    r <- utils::combn(x, n, simplify = FALSE)
     r2 <- lapply(t(r), FUN = function(y) unlist(y))
-    #print(r2)
     res <- c(res, r2)
   }
   unique(res)
@@ -444,20 +442,23 @@ platformIsLinux <- function()
 platformIsWindows <- function()
   Sys.info()[["sysname"]] == "Windows"
 
-#' @title read .xlsx file, interpret as CSV, and return data frame
+#' @title read \code{.xlsx} file, interpret as CSV, and return a data frame
 #' @description currently relies on Linux xlsx2csv command, but could
-#'   potentially be done with VB script in Windows
-#' @param file is the path to the .xlsx file
+#'   potentially be done with VB script in Windows. This offers a different
+#'   backend to other Excel parsing functions in R,
+#' @param file is the path to the \code{.xlsx} file
 #' @return data frame
+#' @seealso \code{readxl} package by Hadley Wickham
 #' @export
-readXlsxLinux <- function(file) {
+read_xlsx_linux <- function(file) {
   if (jwutil::platformIsWindows())
     stop("can only convert XLSX on linux using xlsx2csv command")
 
   csvfile <- tempfile()
+  on.exit(unlink(csvfile), add = TRUE)
   system(paste0("xlsx2csv --delimiter=tab --dateformat=%m-%d-%y \"",
                 file, "\" > ", csvfile))
-  read.delim(csvfile)
+  utils::read.delim(csvfile)
 }
 
 #' @title build simple linear formula from variable names
@@ -468,7 +469,7 @@ readXlsxLinux <- function(file) {
 #' @return formula
 #' @export
 buildLinearFormula <- function(left, right) {
-  as.formula(
+  stats::as.formula(
     paste(
       paste(left, collapse = "+"),
       paste(right, collapse = "+"),
@@ -496,12 +497,12 @@ invwhich <- function(which, len = max(which)) {
 #' @title recursive remove
 #' @description search through environments until the variables in the list
 #'   \code{x} are all gone. This doesn't delete functions. No barrier to
-#'   infinite recursion, but rm should be able to delete anything that exists
-#'   can see.
+#'   infinite recursion, but \code{rm} should be able to delete anything that
+#'   \code{exists} can see.
 #' @param x variables to annihilate
 #' @param envir environment to start at, defaults to calling frame.
 #' @export
-rmRecursive <- function(x, envir = parent.frame()) {
+rm_r <- function(x, envir = parent.frame()) {
   suppressWarnings({
     while (any(vapply(x, exists, logical(1),
                       mode = "numeric", inherits = TRUE, envir = envir)))
@@ -518,9 +519,8 @@ ls.objects <- function(pos = 1, pattern, order.by,
   obj.class <- napply(names, function(x) as.character(class(x))[1])
   obj.mode <- napply(names, mode)
   obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
-  obj.size <- napply(names, object.size)
-  obj.dim <- t(napply(names, function(x)
-    as.numeric(dim(x))[1:2]))
+  obj.size <- napply(names, utils::object.size)
+  obj.dim <- t(napply(names, function(x) as.numeric(dim(x))[1:2]))
   vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
   obj.dim[vec, 1] <- napply(names, length)[vec]
   out <- data.frame(obj.type, obj.size, obj.dim)
@@ -548,7 +548,7 @@ lsos <- function(..., n = 10)
 #' @return logical
 #' @export
 is.Date <- function(x)
-  is(x, "Date")
+  methods::is(x, "Date")
 
 #' @title extract code from knitr vignette and source it
 #' @description extract code from knitr vignette and source it
@@ -577,8 +577,8 @@ source_purl <- function(input,
 #'
 #' File is named varname.RData with an optional suffix before .RData
 #'
-#' @param var_name character or symbol, e.g. "myvar" or \code{myvar}, either of which
-#'   would find \code{myvar} in the parent environment, and save it as
+#' @param var_name character or symbol, e.g. "myvar" or \code{myvar}, either of
+#'   which would find \code{myvar} in the parent environment, and save it as
 #'   \code{myvar.RData} in \code{package_root/data}.
 #' @param suffix character scalar
 #' @keywords internal
