@@ -24,7 +24,8 @@ Imports:
 Suggests:
     testthat,
     knitr,
-    DiagrammeR
+    DiagrammeR,
+    lintr
 License: GPL-3
 BugReports: https://github.com/jackwasey/jwutil/issues
 Encoding: UTF-8
