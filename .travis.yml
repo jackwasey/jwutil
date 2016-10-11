@@ -2,20 +2,20 @@ language: r
 sudo: false
 cache: packages
 r:
-  - oldrel # when oldrel = 3.1, there are S3 method problems I can't debug
+  - oldrel
   - release
   - devel
 
 os:
   - linux
-  - osx
 
 warnings_are_errors: true
 
 after_success:
  - Rscript -e 'devtools::install()'
  - Rscript -e 'devtools::session_info()'
- - Rscript -e 'library(covr); coveralls(quiet = FALSE)'
+ - Rscript -e 'covr::coveralls()'
+ - Rscript -e 'covr::codecov()'
 
 notifications:
   email:
