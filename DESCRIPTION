@@ -1,6 +1,6 @@
 Package: jwutil
 Title: Tools for Data Manipulation and Testing
-Version: 1.2
+Version: 1.1
 Date: 2016-10-11
 Authors@R: person("Jack O. Wasey", role = c("aut", "cre", "cph"),
     email = "jack@jackwasey.com")
