@@ -1,3 +1,6 @@
+## Update
+Since last (failed) submission, 'testthat' quoted correctly in DESCRIPTION Description. Many thanks.
+
 ## Test environments
 * Ubuntu 16.04 R 3.3.1, clang 3.9 trunk and gcc 5.3.1
 * Ubuntu 12.04 (on travis-ci) R 3.3.0 patched, gcc 4.6.3
