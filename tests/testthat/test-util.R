@@ -290,15 +290,15 @@ test_that("good inputs don't give errors or warnings, including NA", {
         tms = jt
       )
 
-      expect_that(
+      expect_error(
         add_time_to_date(dts = jd, tms = jt),
-        testthat::not(throws_error()),
+        regex = NA,
         info = paste("classes: ", class(jd), class(jt),
                      " data: ", jd, jt, collapse = ", ", sep = ", "))
 
-      expect_that(
+      expect_warning(
         add_time_to_date(dts = jd, tms = jt),
-        testthat::not(gives_warning()),
+        regex = NA,
         info = paste("classes: ", class(jd), class(jt),
                      " data: ", jd, jt, collapse = ", ", sep = ", "))
 
@@ -460,15 +460,14 @@ test_that("areIntegers", {
 })
 
 test_that("platform", {
-  expect_that(platformIsLinux() & platformIsWindows(), testthat::not(is_true()))
+  expect_false(platformIsLinux() & platformIsWindows())
+  expect_false(platformIsLinux() & platformIsMac())
+  expect_false(platformIsWindows() & platformIsMac())
 })
 
 test_that("download zip", {
-  expect_that(
-    suppressWarnings(
-      read.zip.url("http://phs.googlecode.com/files/Download%20File%20Test.zip")
-    ), testthat::not(throws_error())
-  )
+  url <- "https://github.com/jackwasey/jwutil/archive/v1.0.2.zip"
+  read.zip.url(url, filename = "jwutil-1.0.2/NAMESPACE")
 })
 
 test_that("permute a vector", {

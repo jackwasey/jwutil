@@ -7,8 +7,8 @@
 \title{Tools for data manipulation not found elsewhere, and testthat extensions}
 \description{
 This is a set of simple utilities for various data manipulation tasks.
-The goal is to use base tools well, without bringing in any
-dependencies. Main areas of interest are data frame manipulation, such as
+The goal is to use base tools well, without bringing in many
+dependencies. Main areas of interest are semi-automated data frame manipulation, such as
 converting factors in multiple binary indicator columns. There are testing
 functions which provide testthat expectations to permute arguments to
 function calls. There are functions and data to test extreme numbers, dates,

@@ -34,6 +34,6 @@ For a two level factor, this is relatively easy, since we just
   new fields now containing FALSE, with only one TRUE for the matching level.
 }
 \seealso{
-\code{\link[PSAgraphics]{cv.trans.psa}}
+\code{PSAgraphics::cv.trans.psa}
 }
 

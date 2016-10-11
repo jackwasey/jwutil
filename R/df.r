@@ -108,7 +108,7 @@ factorToDataframeLogical <- function(fctr,
 #' @template verbose
 #' @return data.frame with no factors
 #' @export
-#' @seealso \code{\link[PSAgraphics]{cv.trans.psa}}
+#' @seealso \code{PSAgraphics::cv.trans.psa}
 expandFactors <- function(x,
                           consider = names(x),
                           sep = "",
@@ -145,14 +145,8 @@ expandFactors <- function(x,
 #' @return vector
 #' @export
 getFactorNames <- function(x, consider = names(x)) {
-  if (length(names(x)) <= 0) {
-    warning("getFactorNames: empty data frame passed in.")
+  if (length(names(x)) <= 0 || length(consider) <= 0)
     return()
-  }
-  if (length(consider) <= 0) {
-    warning("getFactorNames: empty consider.")
-    return()
-  }
 
   consider[sapply(x[1, consider], is.factor)]
   #if (anyDuplicated) #TODO

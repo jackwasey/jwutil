@@ -7,10 +7,8 @@
 #' @return logical scalar
 #' @export
 allIsNumeric <- function(x, extras = c(".", "NA", NA)) {
-  old <- options(warn = -1)
-  on.exit(options(old))
   xs <- x[x %nin% c("", extras)]
-  !any(is.na(as.numeric(xs)))
+  suppressWarnings(!any(is.na(as.numeric(xs))))
 }
 
 #' @title check whether vector represents all integer values, not that the same
@@ -56,10 +54,8 @@ asCharacterNoWarn <- function(x) {
 #' @return numeric vector, may have NA values
 #' @export
 asNumericNoWarn <- function(x) {
-  old <- options(warn = -1)
-  on.exit(options(old))
   if (is.factor(x)) x <- levels(x)[x]
-  as.numeric(x)
+  suppressWarnings(as.numeric(x))
 }
 
 #' @rdname asNumericNoWarn
@@ -144,7 +140,7 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
   on.exit(unlink(zipfile, recursive = TRUE), add = TRUE)
   dir.create(zipdir)
   utils::unzip(zipfile, exdir = zipdir)  # files="" so extract all
-  files <- list.files(zipdir)
+  files <- list.files(zipdir, recursive = TRUE)
   if (is.null(filename)) {
     if (length(files) == 1) {
       filename <- files
@@ -166,7 +162,7 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
 #' @param x is usually a charcter vector
 #' @return integer
 #' @export
-countNotNumeric <- function (x)
+countNotNumeric <- function(x)
   countIsNa(asNumericNoWarn(x))
 
 #' @title count numeric elements
@@ -430,7 +426,7 @@ opt_binary_fun <- function(x, n) {
   sum(colSums(x[n])) / length(n)
 }
 
-#' Are we running on Linux or Windows?
+#' Are we running on Linux, Mac or Windows?
 #'
 #' @return logical
 #' @export
@@ -441,6 +437,11 @@ platformIsLinux <- function()
 #' @export
 platformIsWindows <- function()
   Sys.info()[["sysname"]] == "Windows"
+
+#' @rdname platformIsLinux
+#' @export
+platformIsMac <- function()
+  Sys.info()[["sysname"]] == "Darwin"
 
 #' @title read \code{.xlsx} file, interpret as CSV, and return a data frame
 #' @description currently relies on Linux xlsx2csv command, but could

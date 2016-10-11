@@ -39,8 +39,6 @@ test_that("getNonFactorNames", {
   expect_equal(getNonFactorNames(mixed.df), c("v1"))
   expect_equal(getNonFactorNames(data.frame(f1, v1, f2)), c("v1"))
   expect_equal(getNonFactorNames(data.frame(v1, f1, v2)), c("v1", "v2"))
-  expect_warning(getNonFactorNames(data.frame()))
-  expect_warning(getNonFactorNames(data.frame(), consider = NULL))
 })
 
 test_that("getFactorNames", {
@@ -55,12 +53,7 @@ test_that("getFactorNames", {
   expect_equal(getFactorNames(data.frame(), consider = NULL), NULL)
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
   options(old_warn)
-  # TODO: DO expect warnings - logging nightmare.
-  expect_warning(getFactorNames(data.frame()))
-  expect_warning(getFactorNames(data.frame(), consider = NULL))
-  expect_warning(getFactorNames(data.frame(), NULL))
-  #check duplicate field names
-  #TODO: should this error out?
+
   expect_equal(getFactorNames(cbind(mixed.df, dframe)), c("f2", "f1", "f1", "f2"))
 })
 
@@ -68,7 +61,7 @@ test_that("expandFactors", {
   expect_equal(expandFactors(dframe, consider = c("f1", "f2")),
                expandFactors(dframe))
 
-  expect_warning(out <- expandFactors(dframe, consider = NULL))
+  expect_warning(out <- expandFactors(dframe, consider = NULL), NA)
   expect_identical(dframe, out)
 
   out <- expandFactors(
