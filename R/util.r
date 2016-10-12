@@ -364,7 +364,9 @@ permuteWithRepeats <- function(x) {
 #' @return data frame, each row being one permutation
 #' @export
 permute <- function(x) {
-  stopifnot(length(x) < 13)  # factorial
+  if (is.null(x)) return()
+
+  stopifnot(length(x) < 13)  # factorial size, so limit for sanity
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
 
@@ -593,4 +595,60 @@ save_in_data_dir <- function(var_name, suffix = "") {
        file = file.path("data", strip(paste0(var_name, suffix, ".RData"))),
        compress = "xz")
   message("Now reload package to enable updated/new data: ", var_name)
+}
+
+utils::globalVariables(c(".", "%>%"))
+
+#' Find minimum R version required for package
+#'
+#' Recursively search dependencies for R version, and find the highest stated R
+#' version requirement.
+#' @source Based on ideas from
+#'   http://stackoverflow.com/questions/38686427/determine-minimum-r-version-for-all-package-dependencies
+#'
+#' @param pkg string with name of package to check
+#' @examples
+#' base <- c("base", "compiler", "datasets", "grDevices", "graphics",
+#' "grid", "methods", "parallel", "profile", "splines", "stats",
+#'  "stats4", "tcltk", "tools", "translations")
+#'
+#' base_reqs <- lapply(base, min_r_version)
+#'
+#' contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
+#' "class", "cluster", "codetools", "foreign", "lattice",
+#'  "mgcv", "nlme", "nnet", "rpart", "spatial", "survival")
+#'
+#' contrib_reqs <- lapply(contrib, min_r_version)
+#'
+#' min_r_version("devtools")
+#' @export
+min_r_version <- function(pkg) {
+  requireNamespace("tools")
+  requireNamespace("utils")
+  avail <- utils::available.packages(utils::contrib.url(repo))
+  deps <- tools::package_dependencies(pkg, db = avail, recursive = TRUE)
+  if (is.null(deps))
+    stop("package not found")
+
+  pkgs <- deps[[1]]
+  repo = getOption("repo")
+  if (is.null(repo))
+    repo <- "https://cloud.r-project.org"
+
+  matches <- avail[ , "Package"] %in% pkgs
+  pkg_list <- avail[matches, "Depends"]
+  vers <- grep("^R$|^R \\(.*\\)$", pkg_list, value = TRUE)
+  vers <- gsub("[^0-9.]", "", vers)
+  if (length(vers) == 0)
+    return("Not specified")
+
+  max_ver = vers[1]
+  if (length(vers) == 1)
+    return(max_ver)
+
+  for (v in 2:length(vers))
+    if (utils::compareVersion(vers[v], max_ver) > 0)
+      max_ver <- vers[v]
+
+  max_ver
 }

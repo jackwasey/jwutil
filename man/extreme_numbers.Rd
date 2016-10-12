@@ -4,7 +4,7 @@
 \name{extreme_numbers}
 \alias{extreme_numbers}
 \title{extreme numbers}
-\format{An object of class \code{numeric} of length 6.}
+\format{An object of class \code{numeric} of length 8.}
 \usage{
 extreme_numbers
 }

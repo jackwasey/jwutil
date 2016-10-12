@@ -200,25 +200,28 @@ expect_that_combine_all_args <- function(object, condition,
 
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
+  arg_names <- names(args)
   # can only handle flat lists of arguments when permuting
   stopifnot(identical(unlist(args, recursive = TRUE),
                       unlist(args, recursive = FALSE)))
   stopifnot(length(args) >= 2)
 
-  # get the combinations of arguments
   arg_combs <- jwutil::permute(unlist(args))
+  arg_name_combs <- jwutil::permute(arg_names)
 
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
+    arg_list <- as.list(arg_combs[comb, ])
+    names(arg_list) <- arg_name_combs[comb, ]
     e <- testthat::expect_that(
-      object    = do.call(as.character(func_name), as.list(arg_combs[comb, ])),
+      object    = do.call(as.character(func_name), arg_list),
       condition = condition,
       info      = paste0(
         info, "args = ",
         paste(arg_combs[comb, ], collapse = " ", sep = ","),
         sprintf(" (test iteration %d)", comb)
       ),
-      label     = label
+      label = label
     )
   }
   invisible(e)
