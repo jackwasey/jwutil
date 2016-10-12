@@ -1,0 +1,49 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r desc, echo = FALSE}
+packageDescription("rmarkdown")
+suppressPackageStartupMessages(library(jwutil, warn.conflicts = FALSE))
+suppressPackageStartupMessages(library(testthat, warn.conflicts = FALSE))
+```
+
+# Stress and Fuzz testing
+
+`jwutil` has some minimal features to allow fuzz and stress testing functions. This is a complicated topic, but at a minimum, the following functions allow you to to give enexpected input to a function, with the expectation it should still work. The packge \code{fuzzr} does more, but does different things.
+
+## Extreme integers
+Maximum magnitude positive and negative doubles and integers
+```{r extreme}
+extreme_numbers
+```
+
+## Permuting
+
+If the order of arguments in a function should not matter, the result should be the same each time. `expect_that_comabine_all_args` tests this.
+
+```{r combine}
+expect_that_combine_all_args(sum(1, 2), testthat::equals(3))
+```
+
+is equivalent to
+```{r combine_alt}
+expect_that(sum(1, 2), testthat::equals(3))
+expect_that(sum(2, 1), testthat::equals(3))
+```
+
+This becomes more interesting with named arguments, where the order also should not matter. Beware of testing features of R, rather than your code: R has a complicated but standard way of matching arguments, described in [Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html). If your function does complicated argument manipulation, and maybe uses `...`, this function could verify that named argument order doesn't matter.
+
+```{r combine_named}
+res <- gsub(pattern = "the", replacement = "le", x = "Pierre the chat")
+expect_that_combine_all_args(
+  gsub(pattern = "the", replacement = "le", x = "Pierre the chat"),
+  testthat::equals(res)
+  )
+```

@@ -38,3 +38,11 @@ test_that("throw error or warning for ?every iteration", {
   expect_that(result$error, testthat::not(testthat::is_true()))
 
 })
+
+test_that("named arguments are permuted successfully", {
+  res <- gsub(pattern = "the", replacement = "le", x = "Pierre the chat")
+  expect_that_combine_all_args(
+    gsub(pattern = "the", replacement = "le", x = "Pierre the chat"),
+    testthat::equals(res)
+  )
+})

@@ -164,6 +164,8 @@ random_test_letters <- function(n = nums_in_tests, max_str_len = 257) {
 extreme_numbers <- c(
   .Machine$integer.max,
   -.Machine$integer.max,
+  1L,
+  -1L,
   .Machine$double.xmin,
   .Machine$double.xmax,
   -.Machine$double.xmin,
