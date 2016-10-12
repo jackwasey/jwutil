@@ -26,6 +26,11 @@ Maximum magnitude positive and negative doubles and integers
 ```{r extreme}
 extreme_numbers
 ```
+There are several types of zero in R (excluding string representations):
+```{r zero}
+zeroes
+sapply(zeroes, class)
+```
 
 ## Permuting
 
@@ -50,3 +55,16 @@ expect_that_combine_all_args(
   testthat::equals(res)
   )
 ```
+
+For functions where the first argument is a vector, and the order of elements in the vector should not matter, `expect_that_combine_first_arg` will permute all combinations of the first argument, and expect the same result. A large number of elements will take a very long time.
+```{r combine_first}
+expect_that_combine_first_arg(sum(extreme_numbers), testthat::equals(0))
+```
+
+## Other
+
+`lsf` lists all the functions in a package, which may be useful to start an attack on all functions with a range of absurd data, looking perhaps for crashes in C/C++ code rather than R errors.
+```{r lsf}
+lsf("jwutil")[1:10]
+```
+

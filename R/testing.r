@@ -39,10 +39,10 @@ numbers_to_long_and_float <- function(..., na.rm = TRUE) {
 }
 
 #' @title zeroes
-#' @description long and float types
+#' @description long, float and complex types
 #' @keywords sysdata
 #' @export
-zeroes <- list(0L, 0.0)
+zeroes <- list(0L, 0.0, complex(length.out = 1))
 
 #' @title bad input data for tests
 #' @description a variety of horrible data
