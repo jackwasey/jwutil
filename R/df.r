@@ -242,8 +242,8 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   checkmate::assertDataFrame(x, )
   checkmate::assertDataFrame(y)
-  checkmate::assertString(by.x)
-  checkmate::assertString(by.y)
+  checkmate::assertCharacter(by.x, min.len = 1, min.chars = 1)
+  checkmate::assertCharacter(by.y, min.len = 1, min.chars = 1)
   checkmate::assertFlag(all.x)
   checkmate::assertFlag(all.y)
   renameConflict <- match.arg(renameConflict)
@@ -265,19 +265,21 @@ mergeBetter <- function(x, y, by.x, by.y,
   }
 
   # convert factors of keys only # TODO: as.integer may be appropriate
-  # sometimes/often. TODO: tests for this
+  # sometimes/often. TODO: tests for this. Ultimately may be better to
+  # use data.table, and just index these columns properly.
   if (convert_factors) {
-    if (is.factor(x[[by.x]]))
-      x[[by.x]] <- asCharacterNoWarn(x[[by.x]])
-
-    if (is.factor(y[[by.y]]))
-      y[[by.y]] <- asCharacterNoWarn(y[[by.y]])
+    for (by_col in c(by.x, by.y)) {
+      if (is.factor(x[[by_col]]))
+        x[[by_col]] <- asCharacterNoWarn(x[[by_col]])
+    }
   }
 
   if (verbose) {
-    # this informational step could itself be slow in a big merge
-    left_missing <- sum(x[[by.x]] %nin% y[[by.y]])
-    right_missing  <- sum(y[[by.y]] %nin% x[[by.x]])
+    # this would be more efficient with data table or sql type query
+    comb_key_x <- apply(x[by.x], 1, paste, collapse = "j")
+    comb_key_y <- apply(y[by.y], 1, paste, collapse = "j")
+    left_missing <- sum(comb_key_x %nin% comb_key_y)
+    right_missing  <- sum(comb_key_y %nin% comb_key_x)
     if (right_missing + left_missing > 0) {
       message(sprintf(ifelse(all.y,
                              "keeping %d out of %d unmatched from y",
@@ -293,8 +295,8 @@ mergeBetter <- function(x, y, by.x, by.y,
 
   # find duplicate field names, ignoring the field we are merging on.
   dupes_x <- names(x)[tolower(names(x)) %in% tolower(names(y)) &
-                        tolower(names(x)) != tolower(by.x) &
-                        tolower(names(x)) != tolower(by.y)]
+                        tolower(names(x)) %nin% tolower(by.x) &
+                        tolower(names(x)) %nin% tolower(by.y)]
   # drop identical fields unless an explicit rename has been requested.
   if (length(dupes_x) > 0 && renameAll == "no") {
     if (verbose)
@@ -333,7 +335,7 @@ mergeBetter <- function(x, y, by.x, by.y,
                             affix = affix, renameHow = renameAll)
   }
 
-  if (verbose) message(sprintf("merging using id: %s, and new id: %s",
+  if (verbose) message(sprintf("merging using id: %s, and new id: %s\n",
                                by.x, by.y))
 
   m <- merge(x = x, by.x = by.x, all.x = all.x,
@@ -455,7 +457,7 @@ filterBetter <- function(x, expr, verbose = TRUE) {
 binary_col_names <- function(x, invert = FALSE) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  names(x)[sapply(x, function(y) all(y %in% c(0, 1))) & !invert]
+  names(x)[xor(sapply(x, function(y) all(y %in% c(0, 1))), invert)]
 }
 
 #' @rdname binary_col_names
@@ -466,12 +468,34 @@ binary_cols <- function(x, invert = FALSE) {
   x[binary_col_names(x = x, invert = invert)]
 }
 
+#' @describeIn binary_col_names Find character columns which are really numeric
+#' @param attrition If less than this proportion of rows become \code{NA} on
+#'   conversion to numeric, then accept this is a numeric column after all.
+#' @export
+numeric_char_col_names <- function(x, invert = FALSE, attrition = 0.05) {
+  checkmate::assertDataFrame(x)
+  checkmate::assertFlag(invert)
+
+  char_cols <- sapply(x, is.character)
+  was_na <- colSums(is.na(x[char_cols]))
+  numberish <- colSums(is.na(asNumericNoWarn(x[char_cols])))
+  new_na_ratio <- (numberish - was_na) / (nrow(x) - was_na)
+  new_na_ratio
+}
+
 #' @rdname binary_col_names
 #' @export
 numeric_col_names <- function(x, invert = FALSE) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  names(x)[sapply(x, function(y) is.numeric(y)) & !invert]
+
+  names(x)[sapply(x, function(y) {
+    z <- is.numeric(y)
+    if (invert)
+      !z
+    else
+      z
+  })]
 }
 
 #' @rdname binary_col_names
@@ -520,4 +544,50 @@ zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE)
       message(sprintf("skipping factor or Date: %s", n))
   }
   df
+}
+
+#' minimal basic pre-processing metrics
+#' @param x data.frame input
+#' @export
+jw_df_basics <- function(x, df_list) {
+  stopifnot(xor(missing(x), missing(df_list)))
+  if (!missing(x))
+    df_list <- list(x)
+
+  checkmate::assertList(df_list, types = "data.frame", min.len = 1)
+
+  out <- lapply(df_list, .jw_df_basics_impl)
+  if (length(out) > 1)
+    out
+  else
+    out[[1]]
+
+}
+
+.jw_df_basics_impl <- function(x) {
+  checkmate::assertDataFrame(x)
+
+  n <- nrow(x)
+  cl = lapply(x, class)
+  f <- vapply(x, is.factor, logical(1))
+  u <- sapply(iris, function(y) length(unique(y)))
+  n_na <- colSums(is.na(x))
+  suppressWarnings({
+    n_neg <- colSums(x < 0)
+    n_zero <- colSums(x == 0)
+  })
+
+  n_neg[f] <- NA
+  n_zero[f] <- NA
+
+  cbind(
+    name = names(x),
+    class = cl,
+    typeof = lapply(x, typeof),
+    n_na, p_na = n_na / n,
+    n_neg, p_neg = n_neg / n,
+    n_zero, p_zero = n_zero / n,
+    n_uniq = u,
+    p_uniq = u / n
+  )
 }

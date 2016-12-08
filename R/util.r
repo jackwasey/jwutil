@@ -631,18 +631,18 @@ min_r_version <- function(pkg) {
     stop("package not found")
 
   pkgs <- deps[[1]]
-  repo = getOption("repo")
+  repo <- getOption("repo")
   if (is.null(repo))
     repo <- "https://cloud.r-project.org"
 
-  matches <- avail[ , "Package"] %in% pkgs
+  matches <- avail[, "Package"] %in% pkgs
   pkg_list <- avail[matches, "Depends"]
   vers <- grep("^R$|^R \\(.*\\)$", pkg_list, value = TRUE)
   vers <- gsub("[^0-9.]", "", vers)
   if (length(vers) == 0)
     return("Not specified")
 
-  max_ver = vers[1]
+  max_ver <- vers[1]
   if (length(vers) == 1)
     return(max_ver)
 
