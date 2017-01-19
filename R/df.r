@@ -149,7 +149,7 @@ getFactorNames <- function(x, consider = names(x)) {
     return()
 
   consider[sapply(x[1, consider], is.factor)]
-  #if (anyDuplicated) #TODO
+  # TODO if any duplicated
 }
 
 #' @rdname getFactorNames
@@ -244,7 +244,7 @@ mergeBetter <- function(x, y, by.x, by.y,
                         convert_factors = TRUE,
                         verbose = FALSE) {
 
-  checkmate::assertDataFrame(x, )
+  checkmate::assertDataFrame(x)
   checkmate::assertDataFrame(y)
   checkmate::assertCharacter(by.x, min.len = 1, min.chars = 1)
   checkmate::assertCharacter(by.y, min.len = 1, min.chars = 1)
@@ -266,10 +266,8 @@ mergeBetter <- function(x, y, by.x, by.y,
   y_name <- deparse(substitute(y))
 
   # guess a good affix: `y` might be an expression and not suitable
-  if (is.null(affix)) {
+  if (is.null(affix))
     affix <- make.names(y_name)
-    #if (length(substitute(y)) > 1) affix <- "y"
-  }
 
   # convert factors of keys only # TODO: as.integer may be appropriate
   # sometimes/often. TODO: tests for this. Ultimately may be better to
@@ -575,7 +573,7 @@ jw_df_basics <- function(x, df_list) {
   checkmate::assertDataFrame(x)
 
   n <- nrow(x)
-  cl = lapply(x, class)
+  cl <- lapply(x, class)
   f <- vapply(x, is.factor, logical(1))
   u <- sapply(iris, function(y) length(unique(y)))
   n_na <- colSums(is.na(x))
