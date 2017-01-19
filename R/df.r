@@ -231,6 +231,10 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 #' @param verbose logical or numbers 0, 1 or 2. 1 or TRUE will give moderate
 #'   verbosity, 2 will give full verbosity. 0 or FALSE turns off all messages.
 #' @return merged data frame
+#' @examples
+#' df <- data.frame(a= c("1","2"), b = 1:2, stringsAsFactors = FALSE)
+#' eg <- data.frame(a= c("1","3"), b = 3:4, stringsAsFactors = FALSE)
+#' mergeBetter(x = df, y = eg, by.x = "a", by.y = "a", verbose = TRUE)
 #' @export
 mergeBetter <- function(x, y, by.x, by.y,
                         all.x = FALSE, all.y = FALSE,
@@ -258,10 +262,13 @@ mergeBetter <- function(x, y, by.x, by.y,
   stopifnot(all(!duplicated(tolower(names(x)))))
   stopifnot(all(!duplicated(tolower(names(y)))))
 
-  # guess a good affix. If y is not just a variable name, use 'y'
+  x_name <- deparse(substitute(x))
+  y_name <- deparse(substitute(y))
+
+  # guess a good affix: `y` might be an expression and not suitable
   if (is.null(affix)) {
-    affix <- deparse(substitute(y))
-    if (length(substitute(y)) > 1) affix <- "y"
+    affix <- make.names(y_name)
+    #if (length(substitute(y)) > 1) affix <- "y"
   }
 
   # convert factors of keys only # TODO: as.integer may be appropriate
@@ -282,13 +289,13 @@ mergeBetter <- function(x, y, by.x, by.y,
     right_missing  <- sum(comb_key_y %nin% comb_key_x)
     if (right_missing + left_missing > 0) {
       message(sprintf(ifelse(all.y,
-                             "keeping %d out of %d unmatched from y",
-                             "dropping %d out of %d from y"
-      ), right_missing, nrow(y)))
+                             "keeping %d out of %d unmatched from %s",
+                             "dropping %d out of %d from %s"
+      ), right_missing, nrow(y), y_name, y_name))
       message(sprintf(ifelse(all.x,
-                             "keeping %d out of %d unmatched from x",
-                             "dropping %d out of %d from x"
-      ), left_missing, nrow(x)))
+                             "keeping %d out of %d unmatched from %s",
+                             "dropping %d out of %d from %s"
+      ), left_missing, nrow(x), x_name, x_name))
     } else
       message("Keys match exactly, so dropping no rows.")
   }
@@ -300,11 +307,11 @@ mergeBetter <- function(x, y, by.x, by.y,
   # drop identical fields unless an explicit rename has been requested.
   if (length(dupes_x) > 0 && renameAll == "no") {
     if (verbose)
-      message("x field names duplicated in y: ",
-              paste(dupes_x, collapse = ", "))
+      message(sprintf("%s field names duplicated in %s: %s", x_name, y_name,
+              paste(dupes_x, collapse = ", ")))
 
     if (verbose > 1)
-      message(sprintf("Adding %s to rename conflicts in y: ",
+      message(sprintf("Adding %s to rename conflicts in %s: %s", y_name,
                       renameConflict))
     dropFields <- c()
     for (xdup in dupes_x) {
