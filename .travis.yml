@@ -13,9 +13,11 @@ warnings_are_errors: true
 
 r_github_packages:
  - jimhester/covr
+ - jimhester/lintr
 
 after_success:
  - Rscript -e 'covr::coveralls()'
+ - Rscript -e 'lintr::lint_package()'
 
 notifications:
   email:
