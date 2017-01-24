@@ -11,9 +11,10 @@ os:
 
 warnings_are_errors: true
 
+r_github_packages:
+ - covr
+
 after_success:
- - Rscript -e 'devtools::install()'
- - Rscript -e 'devtools::session_info()'
  - Rscript -e 'covr::coveralls()'
  - Rscript -e 'covr::codecov()'
 
