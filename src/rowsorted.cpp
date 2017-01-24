@@ -8,6 +8,7 @@ using namespace Rcpp;
 //' @param x matrix, each row containing ordered or disordered numerics
 //' @import Rcpp
 //' @export
+// [[Rcpp::interfaces(r, cpp)]]
 // [[Rcpp::export]]
 LogicalVector isRowSorted(NumericMatrix x) {
   const int nrow = x.nrow(), ncol = x.ncol();

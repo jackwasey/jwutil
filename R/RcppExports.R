@@ -36,13 +36,6 @@ set_attr_in_place <- function(x, name, value) {
     invisible(.Call('jwutil_setAttrInPlace', PACKAGE = 'jwutil', x, name, value))
 }
 
-#' @name isRowSorted
-#' @title is every row sorted?
-#' @description Quicky run through rows of a matrix looking for any
-#' non-ascending rows in C++
-#' @param x matrix, each row containing ordered or disordered numerics
-#' @import Rcpp
-#' @export
 isRowSorted <- function(x) {
     .Call('jwutil_isRowSorted', PACKAGE = 'jwutil', x)
 }
@@ -59,3 +52,37 @@ propRowSorted <- function(x) {
     .Call('jwutil_propRowSorted', PACKAGE = 'jwutil', x)
 }
 
+#' @name fastIntToString
+#' @title Fast convert integer vector to character vector
+#' @description Fast conversion from integer vector to character vector using C++
+#' @param x vector of integers
+#' @param bufferSize int if any input strings are longer than this number
+#'   (default 16) there will be memory errors. No checks done for speed.
+#' @examples
+#' \dontrun{
+#' pts <- generate_random_pts(1e7)
+#' # conclusion: buffer size matters little (so default to be more generous),
+#' # and Rcpp version fastest.
+#' microbenchmark::microbenchmark(fastIntToStringStd(pts$visit_id, buffer = 8),
+#'                                fastIntToStringStd(pts$visit_id, buffer = 16),
+#'                                fastIntToStringStd(pts$visit_id, buffer = 64),
+#'                                fastIntToStringRcpp(pts$visit_id, buffer = 8),
+#'                                fastIntToStringRcpp(pts$visit_id, buffer = 16),
+#'                                fastIntToStringRcpp(pts$visit_id, buffer = 64),
+#'                                as.character(pts$visit_id),
+#'                                as_char_no_warn(pts$visit_id), times = 5)
+#' }
+#' @keywords internal
+fastIntToStringStd <- function(x) {
+    .Call('jwutil_fastIntToStringStd', PACKAGE = 'jwutil', x)
+}
+
+#' @describeIn fastIntToString Same using Rcpp
+fastIntToStringRcpp <- function(x) {
+    .Call('jwutil_fastIntToStringRcpp', PACKAGE = 'jwutil', x)
+}
+
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call('jwutil_RcppExport_registerCCallable', PACKAGE = 'jwutil')
+})

@@ -54,7 +54,8 @@ test_that("getFactorNames", {
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
   options(old_warn)
 
-  expect_equal(getFactorNames(cbind(mixed.df, dframe)), c("f2", "f1", "f1", "f2"))
+  expect_equal(getFactorNames(cbind(mixed.df, dframe)),
+               c("f2", "f1", "f1", "f2"))
 })
 
 test_that("expandFactors", {

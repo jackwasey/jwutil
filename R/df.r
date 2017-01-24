@@ -275,7 +275,7 @@ mergeBetter <- function(x, y, by.x, by.y,
   if (convert_factors) {
     for (by_col in c(by.x, by.y)) {
       if (is.factor(x[[by_col]]))
-        x[[by_col]] <- asCharacterNoWarn(x[[by_col]])
+        x[[by_col]] <- as_char_no_warn(x[[by_col]])
     }
   }
 
@@ -553,6 +553,7 @@ zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE)
 
 #' minimal basic pre-processing metrics
 #' @param x data.frame input
+#' @param df_list list of data frames
 #' @export
 jw_df_basics <- function(x, df_list) {
   stopifnot(xor(missing(x), missing(df_list)))
@@ -575,7 +576,7 @@ jw_df_basics <- function(x, df_list) {
   n <- nrow(x)
   cl <- lapply(x, class)
   f <- vapply(x, is.factor, logical(1))
-  u <- sapply(iris, function(y) length(unique(y)))
+  u <- sapply(x, function(y) length(unique(y)))
   n_na <- colSums(is.na(x))
   suppressWarnings({
     n_neg <- colSums(x < 0)

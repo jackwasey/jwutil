@@ -27,17 +27,21 @@ allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
     na.rm = na.rm
   )
 
-#' @title convert factor or vector to character without warnings
-#' @description correctly converts factors to vectors, and then converts to
-#'   character, which may silently introduce NAs
-#' @param x is a vector, probably of numbers of characters
-#' @return character vector, may have NA values
+#' convert to character vector without warning
+#' @param x vector, typically numeric or a factor
+#' @return character vector
 #' @export
-asCharacterNoWarn <- function(x) {
+as_char_no_warn <- function(x) {
+  if (is.character(x))
+    return(x)
   old <- options(warn = -1)
   on.exit(options(old))
-  if (is.factor(x)) x <- levels(x)[x]
-  as.character(x)
+  if (is.integer(x))
+    fastIntToStringRcpp(x)
+  if (is.factor(x))
+    levels(x)[x]
+  else
+    as.character(x)
 }
 
 #' @title convert factor or vector to numeric without warnings
@@ -584,15 +588,19 @@ source_purl <- function(input,
 #'   which would find \code{myvar} in the parent environment, and save it as
 #'   \code{myvar.RData} in \code{package_root/data}.
 #' @param suffix character scalar
-#' @keywords internal
-save_in_data_dir <- function(var_name, suffix = "") {
+#' @param package_dir character containing the directory root of the package
+#'   tree in which to save the data. Default is the current working directory.
+#' @param envir environment in which to look for the variable to save
+#' @export
+save_in_data_dir <- function(var_name, suffix = "",
+                             package_dir = getwd(), envir = parent.frame()) {
   checkmate::assertString(suffix)
   var_name <- as.character(substitute(var_name))
   checkmate::assertString(var_name)
-  stopifnot(exists(var_name, envir = parent.frame()))
+  stopifnot(exists(var_name, envir = envir))
   save(list = var_name,
-       envir = parent.frame(),
-       file = file.path("data", strip(paste0(var_name, suffix, ".RData"))),
+       envir = envir,
+       file = file.path(package_dir, "data", strip(paste0(var_name, suffix, ".RData"))),
        compress = "xz")
   message("Now reload package to enable updated/new data: ", var_name)
 }
@@ -625,7 +633,7 @@ utils::globalVariables(c(".", "%>%"))
 min_r_version <- function(pkg) {
   requireNamespace("tools")
   requireNamespace("utils")
-  avail <- utils::available.packages(utils::contrib.url(repo))
+  avail <- utils::available.packages(utils::contrib.url("https://cloud.r-project.org"))
   deps <- tools::package_dependencies(pkg, db = avail, recursive = TRUE)
   if (is.null(deps))
     stop("package not found")
@@ -652,3 +660,64 @@ min_r_version <- function(pkg) {
 
   max_ver
 }
+
+#' Fast Factor Generation
+#'
+#' This function generates factors more quickly, without leveraging
+#' \code{fastmatch}. The speed increase with \code{fastmatch} for ICD-9 codes
+#' was about 33% reduction for 10 million codes. SOMEDAY could be faster still
+#' using \code{Rcpp}, and a hashed matching algorithm.
+#'
+#' \code{NaN}s are converted to \code{NA} when used on numeric values. Extracted
+#' from https://github.com/kevinushey/Kmisc.git
+#'
+#' These feature from base R are missing: \code{exclude = NA, ordered =
+#' is.ordered(x), nmax = NA}
+#' @author Kevin Ushey, adapted by Jack Wasey
+#' @param x An object of atomic type \code{integer}, \code{numeric},
+#'   \code{character} or \code{logical}.
+#' @param levels An optional character vector of levels. Is coerced to the same
+#'   type as \code{x}. By default, we compute the levels as
+#'   \code{sort(unique.default(x))}.
+#' @param labels A set of labels used to rename the levels, if desired.
+#' @examples
+#' \dontrun{
+#' pts <- icd:::random_unordered_patients(1e7)
+#' u <- unique.default(pts$code)
+#' # this shows that stringr (which uses stringi) sort takes 50% longer than
+#' # built-in R sort.
+#' microbenchmark::microbenchmark(sort(u), str_sort(u))
+#'
+#' # this shows that \code{factor_} is about 50% faster than \code{factor} for
+#' # big vectors of strings
+#'
+#' # without sorting is much faster:
+#' microbenchmark::microbenchmark(factor(pts$code),
+#'                                # factor_(pts$code),
+#'                                factor_nosort(pts$code),
+#'                                times = 25)
+#' }
+#' @details I don't think there is any requirement for factor levels to be
+#'   sorted in advance, especially not for ICD-9 codes where a simple
+#'   alphanumeric sorting will likely be completely wrong.
+#' @export
+factor_nosort <- function(x, levels = NULL, labels = levels) {
+  if (is.factor(x)) return(x)
+  if (is.null(levels)) levels <- unique.default(x)
+  suppressWarnings(f <- match(x, levels))
+  levels(f) <- as.character(labels)
+  class(f) <- "factor"
+  f
+}
+
+#' Pipe
+#'
+#' Use the pipe function, \code{\%>\%} to turn function composition into a
+#' series of imperative statements.
+#'
+#' @importFrom magrittr "%>%" "%<>%" set_names extract2
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @param lhs,rhs chained functions and results
+NULL

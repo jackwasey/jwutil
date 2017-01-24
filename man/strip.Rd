@@ -18,9 +18,29 @@ therefore breaking unicode.}
 character vector
 }
 \description{
-could do this with regular expression, but slow, and this
-  function is called frequently. My only use case works with removal of all
-  space character whitespace, and I don't expect <TAB>. This uses non-unicode
-  aware matching for speed. This can be changed by setting useBytes to FALSE.
+could do this with regular expression, but slow, and this function is called
+frequently. My only use case works with removal of all space character
+whitespace, and I don't expect <TAB>. This uses non-unicode aware matching
+for speed. This can be changed by setting useBytes to FALSE.
+}
+\details{
+\code{gsub} is probably quicker than \code{stringr}/\code{stringi}. For
+comorbidity processing, this package prefers the faster \link{base}
+functions, whereas \code{stringr} is used for tasks which are not time
+critical, e.g. parsing source data to be included in the distributed
+\code{icd} package.
+}
+\examples{
+\dontrun{
+requireNamespace("microbenchmark")
+requireNamespace("stringr")
+x <- random_string(25000);
+microbenchmark::microbenchmark(
+  gsub(x = x, pattern = "A", replacement = "", fixed = TRUE, useBytes = TRUE),
+  gsub(x = x, pattern = "A", replacement = "", fixed = TRUE, useBytes = TRUE, perl = TRUE),
+  gsub(x = x, pattern = "A", replacement = ""),
+  stringr::str_replace_all(x, "A", "")
+  )
+}
 }
 

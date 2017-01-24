@@ -5,3 +5,4 @@
 ^.lintr$
 ^.git$
 ^cran-comments.md$
+^wercker\.yml$

@@ -1,15 +1,34 @@
 
-#' @title strip all whitespace
-#' @description could do this with regular expression, but slow, and this
-#'   function is called frequently. My only use case works with removal of all
-#'   space character whitespace, and I don't expect <TAB>. This uses non-unicode
-#'   aware matching for speed. This can be changed by setting useBytes to FALSE.
+#' strip all whitespace
+#'
+#' could do this with regular expression, but slow, and this function is called
+#' frequently. My only use case works with removal of all space character
+#' whitespace, and I don't expect <TAB>. This uses non-unicode aware matching
+#' for speed. This can be changed by setting useBytes to FALSE.
+#'
+#' \code{gsub} is probably quicker than \code{stringr}/\code{stringi}. For
+#' comorbidity processing, this package prefers the faster \link{base}
+#' functions, whereas \code{stringr} is used for tasks which are not time
+#' critical, e.g. parsing source data to be included in the distributed
+#' \code{icd} package.
 #' @param x is a character vector to strip
 #' @param pattern is the non-regex of the character to strip, default " "
 #' @param useBytes logical scalar. Unlike gsub, this will default to TRUE here,
 #'   therefore breaking unicode.
 #' @return character vector
 #' @export
+#' @examples
+#' \dontrun{
+#' requireNamespace("microbenchmark")
+#' requireNamespace("stringr")
+#' x <- random_string(25000);
+#' microbenchmark::microbenchmark(
+#'   gsub(x = x, pattern = "A", replacement = "", fixed = TRUE, useBytes = TRUE),
+#'   gsub(x = x, pattern = "A", replacement = "", fixed = TRUE, useBytes = TRUE, perl = TRUE),
+#'   gsub(x = x, pattern = "A", replacement = ""),
+#'   stringr::str_replace_all(x, "A", "")
+#'   )
+#' }
 strip <- function(x, pattern = " ", useBytes = TRUE) {
   stopifnot(length(pattern) == 1)
   stopifnot(length(useBytes) == 1)

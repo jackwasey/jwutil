@@ -8,6 +8,8 @@ jw_df_basics(x, df_list)
 }
 \arguments{
 \item{x}{data.frame input}
+
+\item{df_list}{list of data frames}
 }
 \description{
 minimal basic pre-processing metrics
