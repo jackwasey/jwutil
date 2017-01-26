@@ -22,6 +22,7 @@ base <- c("base", "compiler", "datasets", "grDevices", "graphics",
 "grid", "methods", "parallel", "profile", "splines", "stats",
  "stats4", "tcltk", "tools", "translations")
 
+\dontrun{
 base_reqs <- lapply(base, min_r_version)
 
 contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
@@ -29,7 +30,7 @@ contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
  "mgcv", "nlme", "nnet", "rpart", "spatial", "survival")
 
 contrib_reqs <- lapply(contrib, min_r_version)
-
-min_r_version("devtools")
+}
+min_r_version("icd")
 }
 

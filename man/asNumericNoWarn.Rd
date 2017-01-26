@@ -32,8 +32,9 @@ correctly converts factors to vectors, and then converts to
   errors can be a problem going from numeric to integer, so consider adding
   tolerance to this conversion. \code{asIntegerNoWarn} silently
   \code{\link{floor}}s.
-
-  "are" functions return a value for each input, where is "allIs" functions
+}
+\details{
+"are" functions return a value for each input, where is "allIs" functions
   return a single logical.
 }
 

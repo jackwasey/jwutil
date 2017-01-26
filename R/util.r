@@ -1,6 +1,24 @@
-#' @title check whether character vector represents all numeric values
-#' @description check whether all the items of input vector are numeric without
-#'   throwing warning derived from Hmsic package
+# Copyright (C) 2014 - 2017  Jack O. Wasey
+#
+# This file is part of jwutil.
+#
+# jwutil is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# jwutil is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with jwutil If not, see <http:#www.gnu.org/licenses/>.
+
+#' check whether character vector represents all numeric values
+#'
+#' check whether all the items of input vector are numeric without throwing
+#' warning derived from Hmsic package
 #' @param x is a character vector to be tested
 #' @param extras is a vector of character strings which are counted as NA
 #'   values, defaults to '.' and 'NA'. Also allow \code{NA}.
@@ -11,10 +29,10 @@ allIsNumeric <- function(x, extras = c(".", "NA", NA)) {
   suppressWarnings(!any(is.na(as.numeric(xs))))
 }
 
-#' @title check whether vector represents all integer values, not that the same
-#'   as \code{is.integer}
-#' @description check whether all the items of input vector are integer
-#'   as.integer
+#' check whether vector represents all integer values, not that the same as
+#' \code{is.integer}
+#'
+#' check whether all the items of input vector are integer as.integer
 #' @param x is a vector to be tested
 #' @param tol single numeric, default if less than 1e-9 from an integer then
 #'   considered an integer.
@@ -44,9 +62,9 @@ as_char_no_warn <- function(x) {
     as.character(x)
 }
 
-#' @title convert factor or vector to numeric without warnings
-#' @aliases asIntegerNoWarn
-#' @description correctly converts factors to vectors, and then converts to
+#' convert factor or vector to numeric without warnings
+#'
+#' correctly converts factors to vectors, and then converts to
 #'   numeric or integer, which may silently introduce NAs. Invisible rounding
 #'   errors can be a problem going from numeric to integer, so consider adding
 #'   tolerance to this conversion. \code{asIntegerNoWarn} silently
@@ -56,6 +74,7 @@ as_char_no_warn <- function(x) {
 #'   return a single logical.
 #' @param x is a vector, probably of numbers of characters
 #' @return numeric vector, may have NA values
+#' @aliases asIntegerNoWarn
 #' @export
 asNumericNoWarn <- function(x) {
   if (is.factor(x)) x <- levels(x)[x]
@@ -518,6 +537,16 @@ rm_r <- function(x, envir = parent.frame()) {
   })
 }
 
+#' Summarize objects in scope
+#'
+#' Get type, size (bytes) and dimensions of objects in scope
+#' @param pos pos
+#' @param pattern regex pattern to match objects of interest
+#' @param order.by which column to order by
+#' @param decreasing default is \code{TRUE}
+#' @param head default is \code{FALSE} but if true, just show top \code{n}
+#' @param n number to show if limiting to \code{head}
+#' @export
 ls.objects <- function(pos = 1, pattern, order.by,
                        decreasing = FALSE, head = FALSE, n = 5) {
   napply <- function(names, fn) sapply(names, function(x)
@@ -620,6 +649,7 @@ utils::globalVariables(c(".", "%>%"))
 #' "grid", "methods", "parallel", "profile", "splines", "stats",
 #'  "stats4", "tcltk", "tools", "translations")
 #'
+#' \dontrun{
 #' base_reqs <- lapply(base, min_r_version)
 #'
 #' contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
@@ -627,8 +657,8 @@ utils::globalVariables(c(".", "%>%"))
 #'  "mgcv", "nlme", "nnet", "rpart", "spatial", "survival")
 #'
 #' contrib_reqs <- lapply(contrib, min_r_version)
-#'
-#' min_r_version("devtools")
+#' }
+#' min_r_version("icd")
 #' @export
 min_r_version <- function(pkg) {
   requireNamespace("tools")

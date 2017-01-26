@@ -2,8 +2,8 @@
 % Please edit documentation in R/util.r
 \name{allIsInteger}
 \alias{allIsInteger}
-\title{check whether vector represents all integer values, not that the same
-  as \code{is.integer}}
+\title{check whether vector represents all integer values, not that the same as
+\code{is.integer}}
 \usage{
 allIsInteger(x, tol = 1e-09, na.rm = TRUE)
 }
@@ -19,7 +19,6 @@ considered an integer.}
 logical scalar
 }
 \description{
-check whether all the items of input vector are integer
-  as.integer
+check whether all the items of input vector are integer as.integer
 }
 

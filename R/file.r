@@ -1,3 +1,20 @@
+# Copyright (C) 2014 - 2017  Jack O. Wasey
+#
+# This file is part of jwutil.
+#
+# jwutil is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# jwutil is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with jwutil If not, see <http:#www.gnu.org/licenses/>.
+
 #' unzip a single file from URL
 #'
 #' take a single file from zip located at a given URL, unzip into temporary
@@ -64,8 +81,10 @@ unzip_to_data_raw <- function(url, file_name, force = FALSE, verbose = FALSE,
   checkmate::assert_string(file_name, na.ok = FALSE)
   checkmate::assert_flag(offline)
 
-  if (!dir.exists(data_raw_path))
+  if (!dir.exists(data_raw_path)) {
+    stop("creating temp dir - must delete after test if done on CRAN")
     data_raw_path <- tempdir()
+  }
 
   file_path <- file.path(data_raw_path, make.names(file_name))
   if (verbose) {
@@ -92,8 +111,10 @@ download_to_data_raw <- function(
   checkmate::assert_string(file_name)
   checkmate::assert_flag(offline)
 
-  if (!dir.exists(data_raw_path))
+  if (!dir.exists(data_raw_path)) {
+    stop("creating temp dir - must delete after test if done on CRAN")
     data_raw_path <- tempdir()
+  }
 
   save_path <- file.path(data_raw_path, file_name)
   f_info <- list(file_path = save_path, file_name = file_name)
