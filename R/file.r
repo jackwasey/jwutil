@@ -81,10 +81,8 @@ unzip_to_data_raw <- function(url, file_name, force = FALSE, verbose = FALSE,
   checkmate::assert_string(file_name, na.ok = FALSE)
   checkmate::assert_flag(offline)
 
-  if (!dir.exists(data_raw_path)) {
-    stop("creating temp dir - must delete after test if done on CRAN")
-    data_raw_path <- tempdir()
-  }
+  if (!dir.exists(data_raw_path))
+    data_raw_path <- .tempdir()
 
   file_path <- file.path(data_raw_path, make.names(file_name))
   if (verbose) {
@@ -111,10 +109,9 @@ download_to_data_raw <- function(
   checkmate::assert_string(file_name)
   checkmate::assert_flag(offline)
 
-  if (!dir.exists(data_raw_path)) {
-    stop("creating temp dir - must delete after test if done on CRAN")
-    data_raw_path <- tempdir()
-  }
+  if (!dir.exists(data_raw_path))
+    data_raw_path <- .tempdir()
+
 
   save_path <- file.path(data_raw_path, file_name)
   f_info <- list(file_path = save_path, file_name = file_name)
@@ -155,4 +152,13 @@ save_in_data_dir <- function(var_name, suffix = "", data_path = "data") {
        compress = "xz")
   message("Now reload package to enable updated/new data: ", var_name)
   invisible(get(var_name, envir = parent.frame()))
+}
+
+# tempdir optional hard stop, to make sure CRAN doesn't get polluted and throw
+# the package out
+.tempdir <- function(...) {
+  if (length(strsplit(utils::packageDescription("jwutil")$Version, "\\.")[[1]]) > 3) {
+    stop("CRAN must not have residual temp files or directories")
+  }
+  tempdir(...)
 }

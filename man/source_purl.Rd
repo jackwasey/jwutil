@@ -4,7 +4,7 @@
 \alias{source_purl}
 \title{extract code from knitr vignette and source it}
 \usage{
-source_purl(input, output = file.path(tempdir(), paste0(basename(input),
+source_purl(input, output = file.path(.tempdir(), paste0(basename(input),
   ".R")), documentation = 1L, ...)
 }
 \arguments{

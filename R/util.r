@@ -598,7 +598,7 @@ is.Date <- function(x)
 #' @param ... further parameters passed to \code{source}
 #' @export
 source_purl <- function(input,
-                        output = file.path(tempdir(),
+                        output = file.path(.tempdir(),
                                            paste0(basename(input), ".R")),
                         documentation = 1L, ...) {
   requireNamespace("knitr")
