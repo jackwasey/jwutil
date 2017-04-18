@@ -123,7 +123,7 @@ download_to_data_raw <- function(
     return()
 
   # consider libcurl, but seems to work without now
-  if (utils::download.file(url = url, destfile = save_path, quiet = TRUE, method = "auto") != 0)
+  if (utils::download.file(url = url, destfile = save_path, quiet = TRUE) != 0)
     stop(paste(url, " not downloaded successfully."))
 
   f_info
