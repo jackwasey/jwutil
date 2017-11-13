@@ -43,4 +43,3 @@ microbenchmark::microbenchmark(
   )
 }
 }
-

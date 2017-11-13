@@ -4,7 +4,7 @@
 \name{bad_input}
 \alias{bad_input}
 \title{bad input data for tests}
-\format{An object of class \code{list} of length 42.}
+\format{An object of class \code{list} of length 43.}
 \usage{
 bad_input
 }
@@ -12,4 +12,3 @@ bad_input
 a variety of horrible data
 }
 \keyword{sysdata}
-

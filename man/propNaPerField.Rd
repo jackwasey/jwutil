@@ -16,4 +16,3 @@ numeric vector
 Return proportion of values which are \code{NA} in each field of
   the given data frame.
 }
-

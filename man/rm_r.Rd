@@ -17,4 +17,3 @@ search through environments until the variables in the list
   infinite recursion, but \code{rm} should be able to delete anything that
   \code{exists} can see.
 }
-

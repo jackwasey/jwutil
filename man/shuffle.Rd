@@ -17,4 +17,3 @@ list or vector of same length as input, (probably) in a different
 randomly shuffle the order of a vector or list. This is to
   improve quality of bad data to throw at functions when testing.
 }
-

@@ -17,4 +17,3 @@ unzip_single(url, file_name, save_path)
 take a single file from zip located at a given URL, unzip into temporary
 directory, and copy to the given \code{save_path}
 }
-

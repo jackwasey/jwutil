@@ -33,11 +33,11 @@
 #' @param value Value to be assigned to that attribute
 #' @export
 set_attr_in_place <- function(x, name, value) {
-    invisible(.Call('jwutil_setAttrInPlace', PACKAGE = 'jwutil', x, name, value))
+    invisible(.Call('_jwutil_setAttrInPlace', PACKAGE = 'jwutil', x, name, value))
 }
 
 isRowSorted <- function(x) {
-    .Call('jwutil_isRowSorted', PACKAGE = 'jwutil', x)
+    .Call('_jwutil_isRowSorted', PACKAGE = 'jwutil', x)
 }
 
 #' @name propRowSorted
@@ -49,7 +49,7 @@ isRowSorted <- function(x) {
 #' @import Rcpp
 #' @export
 propRowSorted <- function(x) {
-    .Call('jwutil_propRowSorted', PACKAGE = 'jwutil', x)
+    .Call('_jwutil_propRowSorted', PACKAGE = 'jwutil', x)
 }
 
 #' @name fastIntToString
@@ -74,15 +74,15 @@ propRowSorted <- function(x) {
 #' }
 #' @keywords internal
 fastIntToStringStd <- function(x) {
-    .Call('jwutil_fastIntToStringStd', PACKAGE = 'jwutil', x)
+    .Call('_jwutil_fastIntToStringStd', PACKAGE = 'jwutil', x)
 }
 
 #' @describeIn fastIntToString Same using Rcpp
 fastIntToStringRcpp <- function(x) {
-    .Call('jwutil_fastIntToStringRcpp', PACKAGE = 'jwutil', x)
+    .Call('_jwutil_fastIntToStringRcpp', PACKAGE = 'jwutil', x)
 }
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('jwutil_RcppExport_registerCCallable', PACKAGE = 'jwutil')
+    .Call('_jwutil_RcppExport_registerCCallable', PACKAGE = 'jwutil')
 })

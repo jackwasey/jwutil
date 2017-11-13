@@ -18,4 +18,3 @@ logical vector of length of x
 borrowed from Hmisc. See %in%. Original %in% is: match(x, table,
   nomatch = 0L) > 0L
 }
-

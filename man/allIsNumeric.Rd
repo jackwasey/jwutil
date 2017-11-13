@@ -19,4 +19,3 @@ logical scalar
 check whether all the items of input vector are numeric without throwing
 warning derived from Hmsic package
 }
-

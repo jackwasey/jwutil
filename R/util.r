@@ -649,6 +649,21 @@ min_r_version <- function(pkg) {
   max_ver
 }
 
+#' install packages where are missing
+#' @param character vector of packages to load and install if necessary
+#' @export
+reqinst <- function(pkgs, quietly = TRUE, warn.conflicts = FALSE) {
+  for (pkg in pkgs)
+    if (!require(pkg, character.only = TRUE,
+                 quietly = quietly,
+                 warn.conflicts = warn.conflicts)) {
+      install.packages(pkg, quiet = TRUE)
+      library(pkg, character.only = TRUE,
+              quietly = quietly,
+              warn.conflicts = warn.conflicts)
+    }
+}
+
 #' Pipe
 #'
 #' Use the pipe function, \code{\%>\%} to turn function composition into a

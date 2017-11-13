@@ -38,4 +38,3 @@ Be careful: this may throw funny results for exotic regex, but
   pairs of parenthesis, then the first (by default) becomes the name, and the
   second the value.
 }
-

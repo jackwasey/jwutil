@@ -16,4 +16,3 @@ fill out missing combinations of factors with NA
 Adapated from
   \url{http://www.cookbook-r.com/Manipulating_data/Summarizing_data/#using-aggregate}
 }
-

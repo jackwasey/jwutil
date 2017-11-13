@@ -18,4 +18,3 @@ formula
 build simple linear formula from variable names given by two
   character vectors. TODO: allow unquoted names.
 }
-

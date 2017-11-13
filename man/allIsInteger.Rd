@@ -21,4 +21,3 @@ logical scalar
 \description{
 check whether all the items of input vector are integer as.integer
 }
-

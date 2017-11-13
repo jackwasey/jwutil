@@ -21,4 +21,3 @@ filtered data frame
 applies an expression to a data frame, and gives information
   about the numbers of dropped rows.
 }
-

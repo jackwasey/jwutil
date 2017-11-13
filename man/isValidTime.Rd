@@ -19,4 +19,3 @@ logical vector, with NA out if NA given
 allow leading and trailing space, optional colon in middle, 2400
   is not allowed. TODO: can lubridate do this better?
 }
-

@@ -29,4 +29,3 @@ data.frame with columns of logicals
 converts a single factor into a data.frame with multiple T/F
   fields, one for each factor
 }
-

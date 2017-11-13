@@ -23,4 +23,3 @@ headers to code; 2 means add all text chunks to code as roxygen comments}
 \description{
 extract code from knitr vignette and source it
 }
-

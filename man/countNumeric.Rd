@@ -16,4 +16,3 @@ integer
 counts the number of numeric elements in a vector, without
   throwing warnings
 }
-

@@ -23,4 +23,3 @@ ls.objects(pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE,
 \description{
 Get type, size (bytes) and dimensions of objects in scope
 }
-

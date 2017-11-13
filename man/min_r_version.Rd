@@ -33,4 +33,3 @@ contrib_reqs <- lapply(contrib, min_r_version)
 }
 min_r_version("icd")
 }
-

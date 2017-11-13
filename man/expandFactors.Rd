@@ -36,4 +36,3 @@ For a two level factor, this is relatively easy, since we just
 \seealso{
 \code{PSAgraphics::cv.trans.psa}
 }
-

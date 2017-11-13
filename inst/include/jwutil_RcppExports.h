@@ -16,7 +16,7 @@ namespace jwutil {
             require("jwutil", Rcpp::Named("quietly") = true);
             typedef int(*Ptr_validate)(const char*);
             static Ptr_validate p_validate = (Ptr_validate)
-                R_GetCCallable("jwutil", "jwutil_RcppExport_validate");
+                R_GetCCallable("jwutil", "_jwutil_RcppExport_validate");
             if (!p_validate(sig)) {
                 throw Rcpp::function_not_exported(
                     "C++ function with signature '" + std::string(sig) + "' not found in jwutil");
@@ -29,12 +29,12 @@ namespace jwutil {
         static Ptr_isRowSorted p_isRowSorted = NULL;
         if (p_isRowSorted == NULL) {
             validateSignature("LogicalVector(*isRowSorted)(NumericMatrix)");
-            p_isRowSorted = (Ptr_isRowSorted)R_GetCCallable("jwutil", "jwutil_isRowSorted");
+            p_isRowSorted = (Ptr_isRowSorted)R_GetCCallable("jwutil", "_jwutil_isRowSorted");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_isRowSorted(Rcpp::wrap(x));
+            rcpp_result_gen = p_isRowSorted(Shield<SEXP>(Rcpp::wrap(x)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -48,12 +48,12 @@ namespace jwutil {
         static Ptr_propRowSorted p_propRowSorted = NULL;
         if (p_propRowSorted == NULL) {
             validateSignature("double(*propRowSorted)(NumericMatrix)");
-            p_propRowSorted = (Ptr_propRowSorted)R_GetCCallable("jwutil", "jwutil_propRowSorted");
+            p_propRowSorted = (Ptr_propRowSorted)R_GetCCallable("jwutil", "_jwutil_propRowSorted");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_propRowSorted(Rcpp::wrap(x));
+            rcpp_result_gen = p_propRowSorted(Shield<SEXP>(Rcpp::wrap(x)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -67,12 +67,12 @@ namespace jwutil {
         static Ptr_fastIntToStringStd p_fastIntToStringStd = NULL;
         if (p_fastIntToStringStd == NULL) {
             validateSignature("std::vector<std::string>(*fastIntToStringStd)(std::vector<int>)");
-            p_fastIntToStringStd = (Ptr_fastIntToStringStd)R_GetCCallable("jwutil", "jwutil_fastIntToStringStd");
+            p_fastIntToStringStd = (Ptr_fastIntToStringStd)R_GetCCallable("jwutil", "_jwutil_fastIntToStringStd");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_fastIntToStringStd(Rcpp::wrap(x));
+            rcpp_result_gen = p_fastIntToStringStd(Shield<SEXP>(Rcpp::wrap(x)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -86,12 +86,12 @@ namespace jwutil {
         static Ptr_fastIntToStringRcpp p_fastIntToStringRcpp = NULL;
         if (p_fastIntToStringRcpp == NULL) {
             validateSignature("Rcpp::CharacterVector(*fastIntToStringRcpp)(Rcpp::IntegerVector)");
-            p_fastIntToStringRcpp = (Ptr_fastIntToStringRcpp)R_GetCCallable("jwutil", "jwutil_fastIntToStringRcpp");
+            p_fastIntToStringRcpp = (Ptr_fastIntToStringRcpp)R_GetCCallable("jwutil", "_jwutil_fastIntToStringRcpp");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_fastIntToStringRcpp(Rcpp::wrap(x));
+            rcpp_result_gen = p_fastIntToStringRcpp(Shield<SEXP>(Rcpp::wrap(x)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

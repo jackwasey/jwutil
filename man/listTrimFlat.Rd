@@ -15,4 +15,3 @@ trimmed list
 \description{
 Trim \code{NULL} or empty values from a flat list.
 }
-

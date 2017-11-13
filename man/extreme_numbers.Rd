@@ -13,4 +13,3 @@ very biggest and smallest non-zero numbers the current machine
   can handle, positive and negative.
 }
 \keyword{sysdata}
-

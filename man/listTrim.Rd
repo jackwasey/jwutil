@@ -16,4 +16,3 @@ trimmed list
 delele null/empty entries in a list. Recursively looks through
   list if nested.
 }
-

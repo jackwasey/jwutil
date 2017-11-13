@@ -2,8 +2,8 @@
 % Please edit documentation in R/RcppExports.R
 \name{fastIntToString}
 \alias{fastIntToString}
-\alias{fastIntToStringRcpp}
 \alias{fastIntToStringStd}
+\alias{fastIntToStringRcpp}
 \title{Fast convert integer vector to character vector}
 \usage{
 fastIntToStringStd(x)
@@ -23,6 +23,7 @@ Fast conversion from integer vector to character vector using C++
 \itemize{
 \item \code{fastIntToStringRcpp}: Same using Rcpp
 }}
+
 \examples{
 \dontrun{
 pts <- generate_random_pts(1e7)
@@ -39,4 +40,3 @@ microbenchmark::microbenchmark(fastIntToStringStd(pts$visit_id, buffer = 8),
 }
 }
 \keyword{internal}
-

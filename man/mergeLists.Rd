@@ -19,4 +19,3 @@ merge lists by vector combining all the vector elements of the list items
 with the matching names. Unnamed vectors in the list will be dropped
 silently.
 }
-

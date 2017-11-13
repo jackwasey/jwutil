@@ -2,8 +2,8 @@
 % Please edit documentation in R/util.r
 \name{platformIsLinux}
 \alias{platformIsLinux}
-\alias{platformIsMac}
 \alias{platformIsWindows}
+\alias{platformIsMac}
 \title{Are we running on Linux, Mac or Windows?}
 \usage{
 platformIsLinux()
@@ -18,4 +18,3 @@ logical
 \description{
 Are we running on Linux, Mac or Windows?
 }
-

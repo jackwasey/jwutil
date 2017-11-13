@@ -23,4 +23,3 @@ vector of POSIXlt date-times
 Some datetime data is presented as a separate dates and times.
   This function restores the full date-time.
 }
-

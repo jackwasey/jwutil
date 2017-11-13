@@ -15,4 +15,3 @@ logical
 \description{
 copied from lubridate
 }
-

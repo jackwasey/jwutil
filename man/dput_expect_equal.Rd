@@ -22,4 +22,3 @@ output is correct, and wish to generate a test case to reflect this.
 \examples{
 dput_expect_equal("a" \%nin\% c("b", "c", "d"))
 }
-

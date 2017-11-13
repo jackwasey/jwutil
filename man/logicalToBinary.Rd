@@ -18,4 +18,3 @@ text containing TRUE and FALSE is inefficient. Convert to binary takes more R
 memory, but allows more compact output TODO: test
 }
 \keyword{manip}
-

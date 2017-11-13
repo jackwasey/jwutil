@@ -25,4 +25,3 @@ downloads zip file, and opens named file \code{filename}, or the
   with additional arguments to FUN given by \dots.
   @details TODO: update from \code{icd} package
 }
-

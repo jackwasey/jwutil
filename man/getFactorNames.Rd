@@ -21,4 +21,3 @@ vector
 \description{
 Get the names of those fields in a data frame which are factors.
 }
-

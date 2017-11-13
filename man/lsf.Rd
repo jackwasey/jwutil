@@ -15,4 +15,3 @@ character vector of functions in given package
 \description{
 List functions in a package
 }
-

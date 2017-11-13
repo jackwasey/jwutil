@@ -10,7 +10,7 @@ using namespace Rcpp;
 
 // setAttrInPlace
 void setAttrInPlace(Rcpp::RObject& x, Rcpp::String name, SEXP value);
-RcppExport SEXP jwutil_setAttrInPlace(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
+RcppExport SEXP _jwutil_setAttrInPlace(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
@@ -22,7 +22,7 @@ END_RCPP
 }
 // isRowSorted
 LogicalVector isRowSorted(NumericMatrix x);
-static SEXP jwutil_isRowSorted_try(SEXP xSEXP) {
+static SEXP _jwutil_isRowSorted_try(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
@@ -30,11 +30,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP jwutil_isRowSorted(SEXP xSEXP) {
+RcppExport SEXP _jwutil_isRowSorted(SEXP xSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(jwutil_isRowSorted_try(xSEXP));
+        rcpp_result_gen = PROTECT(_jwutil_isRowSorted_try(xSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -52,7 +52,7 @@ RcppExport SEXP jwutil_isRowSorted(SEXP xSEXP) {
 }
 // propRowSorted
 double propRowSorted(NumericMatrix x);
-static SEXP jwutil_propRowSorted_try(SEXP xSEXP) {
+static SEXP _jwutil_propRowSorted_try(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
@@ -60,11 +60,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP jwutil_propRowSorted(SEXP xSEXP) {
+RcppExport SEXP _jwutil_propRowSorted(SEXP xSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(jwutil_propRowSorted_try(xSEXP));
+        rcpp_result_gen = PROTECT(_jwutil_propRowSorted_try(xSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -82,7 +82,7 @@ RcppExport SEXP jwutil_propRowSorted(SEXP xSEXP) {
 }
 // fastIntToStringStd
 std::vector<std::string> fastIntToStringStd(std::vector<int> x);
-static SEXP jwutil_fastIntToStringStd_try(SEXP xSEXP) {
+static SEXP _jwutil_fastIntToStringStd_try(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
@@ -90,11 +90,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP jwutil_fastIntToStringStd(SEXP xSEXP) {
+RcppExport SEXP _jwutil_fastIntToStringStd(SEXP xSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(jwutil_fastIntToStringStd_try(xSEXP));
+        rcpp_result_gen = PROTECT(_jwutil_fastIntToStringStd_try(xSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -112,7 +112,7 @@ RcppExport SEXP jwutil_fastIntToStringStd(SEXP xSEXP) {
 }
 // fastIntToStringRcpp
 Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x);
-static SEXP jwutil_fastIntToStringRcpp_try(SEXP xSEXP) {
+static SEXP _jwutil_fastIntToStringRcpp_try(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type x(xSEXP);
@@ -120,11 +120,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP jwutil_fastIntToStringRcpp(SEXP xSEXP) {
+RcppExport SEXP _jwutil_fastIntToStringRcpp(SEXP xSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(jwutil_fastIntToStringRcpp_try(xSEXP));
+        rcpp_result_gen = PROTECT(_jwutil_fastIntToStringRcpp_try(xSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -142,7 +142,7 @@ RcppExport SEXP jwutil_fastIntToStringRcpp(SEXP xSEXP) {
 }
 
 // validate (ensure exported C++ functions exist before calling them)
-static int jwutil_RcppExport_validate(const char* sig) { 
+static int _jwutil_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
         signatures.insert("LogicalVector(*isRowSorted)(NumericMatrix)");
@@ -154,11 +154,26 @@ static int jwutil_RcppExport_validate(const char* sig) {
 }
 
 // registerCCallable (register entry points for exported C++ functions)
-RcppExport SEXP jwutil_RcppExport_registerCCallable() { 
-    R_RegisterCCallable("jwutil", "jwutil_isRowSorted", (DL_FUNC)jwutil_isRowSorted_try);
-    R_RegisterCCallable("jwutil", "jwutil_propRowSorted", (DL_FUNC)jwutil_propRowSorted_try);
-    R_RegisterCCallable("jwutil", "jwutil_fastIntToStringStd", (DL_FUNC)jwutil_fastIntToStringStd_try);
-    R_RegisterCCallable("jwutil", "jwutil_fastIntToStringRcpp", (DL_FUNC)jwutil_fastIntToStringRcpp_try);
-    R_RegisterCCallable("jwutil", "jwutil_RcppExport_validate", (DL_FUNC)jwutil_RcppExport_validate);
+RcppExport SEXP _jwutil_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("jwutil", "_jwutil_isRowSorted", (DL_FUNC)_jwutil_isRowSorted_try);
+    R_RegisterCCallable("jwutil", "_jwutil_propRowSorted", (DL_FUNC)_jwutil_propRowSorted_try);
+    R_RegisterCCallable("jwutil", "_jwutil_fastIntToStringStd", (DL_FUNC)_jwutil_fastIntToStringStd_try);
+    R_RegisterCCallable("jwutil", "_jwutil_fastIntToStringRcpp", (DL_FUNC)_jwutil_fastIntToStringRcpp_try);
+    R_RegisterCCallable("jwutil", "_jwutil_RcppExport_validate", (DL_FUNC)_jwutil_RcppExport_validate);
     return R_NilValue;
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_jwutil_setAttrInPlace", (DL_FUNC) &_jwutil_setAttrInPlace, 3},
+    {"_jwutil_isRowSorted", (DL_FUNC) &_jwutil_isRowSorted, 1},
+    {"_jwutil_propRowSorted", (DL_FUNC) &_jwutil_propRowSorted, 1},
+    {"_jwutil_fastIntToStringStd", (DL_FUNC) &_jwutil_fastIntToStringStd, 1},
+    {"_jwutil_fastIntToStringRcpp", (DL_FUNC) &_jwutil_fastIntToStringRcpp, 1},
+    {"_jwutil_RcppExport_registerCCallable", (DL_FUNC) &_jwutil_RcppExport_registerCCallable, 0},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_jwutil(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

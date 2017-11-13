@@ -4,6 +4,8 @@
 \name{jwutil-package}
 \alias{jwutil}
 \alias{jwutil-package}
+\alias{jwutil-package}
+\alias{jwutil}
 \title{Tools for data manipulation not found elsewhere, and testthat extensions}
 \description{
 This is a set of simple utilities for various data manipulation and testing tasks.
@@ -15,4 +17,15 @@ function calls. There are functions and data to test extreme numbers, dates,
 and bad input of various kinds which should allow testing failure and corner
 cases, which can be used for fuzzing your functions. The test suite has many examples of usage.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/jackwasey/jwutil}
+  \item Report bugs at \url{https://github.com/jackwasey/jwutil/issues}
+}
 
+}
+\author{
+\strong{Maintainer}: Jack O. Wasey \email{jack@jackwasey.com} [copyright holder]
+
+}

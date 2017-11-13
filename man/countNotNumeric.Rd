@@ -19,4 +19,3 @@ counts the number of non-numeric elements in a vector, without
 \details{
 did have \code{extras = c(".", "NA"))}
 }
-

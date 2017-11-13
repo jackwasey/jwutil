@@ -36,6 +36,7 @@ Doesn't make any allowance for factors.
 \itemize{
 \item \code{numeric_char_col_names}: Find character columns which are really numeric
 }}
+
 \examples{
 dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
                   c(1L, 2L), c(0.1, 0.2), c("9", "8"))
@@ -45,4 +46,3 @@ binary_cols(dat)
 binary_col_names(dat)
 binary_col_names(dat, invert = TRUE)
 }
-
