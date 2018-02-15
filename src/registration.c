@@ -9,7 +9,6 @@
 
 /* .Call calls */
 extern SEXP _jwutil_fastIntToStringRcpp(SEXP);
-extern SEXP _jwutil_fastIntToStringRpp(SEXP);
 extern SEXP _jwutil_fastIntToStringStd(SEXP);
 extern SEXP _jwutil_getOmpMaxThreads();
 extern SEXP _jwutil_getOmpThreads();
@@ -21,7 +20,6 @@ extern SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jwutil_fastIntToStringRcpp",          (DL_FUNC) &_jwutil_fastIntToStringRcpp,          1},
-    {"_jwutil_fastIntToStringRpp",           (DL_FUNC) &_jwutil_fastIntToStringRpp,           1},
     {"_jwutil_fastIntToStringStd",           (DL_FUNC) &_jwutil_fastIntToStringStd,           1},
     {"_jwutil_getOmpMaxThreads",             (DL_FUNC) &_jwutil_getOmpMaxThreads,             0},
     {"_jwutil_getOmpThreads",                (DL_FUNC) &_jwutil_getOmpThreads,                0},

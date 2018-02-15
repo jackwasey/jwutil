@@ -22,3 +22,5 @@
 #' @useDynLib jwutil, .registration=TRUE
 #' @docType package
 NULL
+
+## @useDynLib jwutil, .registration=TRUE
