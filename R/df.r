@@ -57,7 +57,7 @@ logicalToBinary <- function(x) {
 #' @template verbose
 #' @return data.frame with columns of logicals
 #' @export
-factorToDataframeLogical <- function(fctr,
+factor_to_df_logical <- function(fctr,
                                      prefix = deparse(substitute(fctr)),
                                      sep = "",
                                      na.rm = TRUE,
@@ -109,51 +109,9 @@ factorToDataframeLogical <- function(fctr,
   df
 }
 
-#' @title Takes factors from a data frame and converts them to true/false fields
-#'   with appropriately named fields.
-#' @description For a two level factor, this is relatively easy, since we just
-#'   replace the field with \code{x==levels(x)[1]} or something like that, and
-#'   rename the field to indicate that TRUE is level 1 of the factor. This works
-#'   well for gender. For multi-level factors there is redundancy with multiple
-#'   new fields now containing FALSE, with only one TRUE for the matching level.
-#' @param x data.frame to search for factors to convert
-#' @param consider character vector of field names in the data frame to
-#'   consider. Defaults to all fields
-#' @param sep character scalar used to separate field prefixes from factor
-#'   values in new column names
-#' @param na.rm logical scalar: if NA data and/or NA levels, then covert to NA
-#'   strings and expand these as for any other factor
-#' @template verbose
-#' @return data.frame with no factors
+#' @rdname factor_to_df_logical
 #' @export
-#' @seealso \code{PSAgraphics::cv.trans.psa}
-expandFactors <- function(x,
-                          consider = names(x),
-                          sep = "",
-                          na.rm = TRUE,
-                          verbose = FALSE) {
-  if (verbose)
-    message("converting factors in data frame into logical vectors")
-
-  # identify which of the last of fields is actually a factor
-  factor_names <- getFactorNames(x, consider)
-
-  if (length(factor_names) > 0) {
-    if (verbose) message("there are factors to be converted into values: ",
-                         paste(factor_names, collapse = ", "))
-    for (fn in factor_names) {
-      if (verbose) message(sprintf("working on factor: %s", fn))
-      dfpart <- factorToDataframeLogical(
-        fctr = x[[fn]], prefix = fn, sep = sep,
-        na.rm = na.rm, verbose = verbose)
-      x[fn] <- NULL
-      x <- cbind(x, dfpart)
-    }
-  } else {
-    if (verbose) message("no factors found to convert in exFactor")
-  }
-  x
-}
+factorToDataframeLogical <- factor_to_df_logical
 
 #' @title get names of the factor fields in a data frame
 #' @description Get the names of those fields in a data frame which are factors.

@@ -58,45 +58,6 @@ test_that("getFactorNames", {
                c("f2", "f1", "f1", "f2"))
 })
 
-test_that("expandFactors", {
-  expect_equal(expandFactors(dframe, consider = c("f1", "f2")),
-               expandFactors(dframe))
-
-  expect_warning(out <- expandFactors(dframe, consider = NULL), NA)
-  expect_identical(dframe, out)
-
-  out <- expandFactors(
-    dframe,
-    consider = c("f1", "f2"),
-    sep = ".",
-    verbose = FALSE
-  )
-  expect_equal(dim(out), c(9, 6))
-  expect_equal(class(out[[1]]), "logical")
-  expect_equal(names(out),
-               c("f1.1", "f1.2", "f1.3", "f2.10", "f2.20", "f2.30"))
-
-  out <- expandFactors(dframe, consider = c("f1"), sep = ".")
-  expect_equal(dim(out), c(9, 4))
-  expect_equal(class(out[["f1.1"]]), "logical")
-  expect_equal(names(out), c("f2", "f1.1", "f1.2", "f1.3"))
-
-  out <- expandFactors(mixed.df, consider = c("v1", "f1"), sep = ".")
-  expect_equal(dim(out), c(9, 5))
-  expect_equal(class(out[["f1.1"]]), "logical")
-  expect_equal(names(out), c("f2", "v1", "f1.1", "f1.2", "f1.3"))
-})
-
-test_that("factorToDataframeLogical bad input fails", {
-  expect_error(factorToDataframeLogical(dframe))
-  expect_error(factorToDataframeLogical(bad_input))
-  expect_error(factorToDataframeLogical(c("some", "string of characters")))
-
-  expect_error(factorToDataframeLogical(f1, prefix = c("1", "2")))
-  expect_error(factorToDataframeLogical(f1, prefix = 1))
-
-})
-
 test_that("factorToDataframeLogical works", {
   expect_equal(dim(factorToDataframeLogical(
     f1, prefix = "f1", verbose = FALSE

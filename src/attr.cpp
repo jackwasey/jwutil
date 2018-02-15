@@ -1,5 +1,7 @@
 #include <Rcpp.h>
 
+// [[Rcpp::interfaces(r, cpp)]]
+
 //' Set attribute on any SEXP in place
 //'
 //' @examples
@@ -31,7 +33,7 @@
 //' @param name The name of the attribute, as length one character vector
 //' @param value Value to be assigned to that attribute
 //' @export
-// [[Rcpp::export(set_attr_in_place)]]
-void setAttrInPlace(Rcpp::RObject& x, Rcpp::String name, SEXP value) {
+// [[Rcpp::export]]
+void set_attr_in_place(Rcpp::RObject& x, Rcpp::String name, SEXP value) {
   x.attr(name) = value;
 }

@@ -1,13 +1,10 @@
-#ifdef HAVE_TESTTHAT_H
+//#ifdef TESTTHAT_ENABLED
 #include <testthat.h>
 #include <Rcpp.h>
+#include "util.h"
 
-context("C++ Catch") {
-  test_that("two plus two is four") {
-    int result = 2 + 2;
-    expect_true(result == 4);
-  }
-}
+#ifdef _OPENMP
+#include <omp.h>
 
 context("get OMP max threads") {
   test_that("max threads give a semi-sensible number") {
@@ -25,6 +22,37 @@ context("get OMP current threads") {
   }
 }
 
+#endif // openmp
+
+/*
+// [[Rcpp::export]]
+int valgrindCallgrindStart(bool zerostats = false) {
+#ifdef ICD_VALGRIND
+#ifdef ICD_DEBUG
+  Rcpp::Rcout << "Starting callgrind instrumentation...\n";
+#endif
+  CALLGRIND_START_INSTRUMENTATION;
+  if (zerostats) {
+    Rcpp::Rcout << "Zeroing callgrind stats.\n";
+    CALLGRIND_ZERO_STATS;
+  }
+#endif
+  return 0;
+}
+
+
+// [[Rcpp::export]]
+int valgrindCallgrindStop() {
+#ifdef ICD_VALGRIND
+#ifdef ICD_DEBUG
+  Rcpp::Rcout << "Stopping callgrind instrumentation...\n";
+#endif
+  CALLGRIND_STOP_INSTRUMENTATION;
+#endif
+  return 0;
+}
+
+
 context("valgrind hooks") {
   test_that("start callgrind") {
     int i = valgrindCallgrindStart(false);
@@ -36,6 +64,7 @@ context("valgrind hooks") {
     expect_true(i == 0);
   }
 }
+*/
 
 context("fast int to string") {
   test_that("Rcpp version works") {
@@ -87,4 +116,4 @@ context("fast int to string") {
 }
 
 // endif have testthat
-#endif
+//#endif

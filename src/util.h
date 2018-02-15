@@ -21,6 +21,6 @@ typedef VecVecInt::size_type VecVecIntSz;
 typedef Rcpp::CharacterVector CV;
 
 std::vector<std::string> fastIntToStringStd(std::vector<int> x);
-CV fastIntToStringRcpp(Rcpp::IntegerVector x);
+Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x);
 
 #endif

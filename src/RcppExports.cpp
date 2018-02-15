@@ -8,17 +8,94 @@
 
 using namespace Rcpp;
 
-// setAttrInPlace
-void setAttrInPlace(Rcpp::RObject& x, Rcpp::String name, SEXP value);
-RcppExport SEXP _jwutil_setAttrInPlace(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
+// set_attr_in_place
+void set_attr_in_place(Rcpp::RObject& x, Rcpp::String name, SEXP value);
+static SEXP _jwutil_set_attr_in_place_try(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
 BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
     Rcpp::traits::input_parameter< Rcpp::String >::type name(nameSEXP);
     Rcpp::traits::input_parameter< SEXP >::type value(valueSEXP);
-    setAttrInPlace(x, name, value);
+    set_attr_in_place(x, name, value);
     return R_NilValue;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _jwutil_set_attr_in_place(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_jwutil_set_attr_in_place_try(xSEXP, nameSEXP, valueSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// getOmpMaxThreads
+int getOmpMaxThreads();
+static SEXP _jwutil_getOmpMaxThreads_try() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    rcpp_result_gen = Rcpp::wrap(getOmpMaxThreads());
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _jwutil_getOmpMaxThreads() {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_jwutil_getOmpMaxThreads_try());
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// getOmpThreads
+int getOmpThreads();
+static SEXP _jwutil_getOmpThreads_try() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    rcpp_result_gen = Rcpp::wrap(getOmpThreads());
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _jwutil_getOmpThreads() {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_jwutil_getOmpThreads_try());
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
 }
 // isRowSorted
 LogicalVector isRowSorted(NumericMatrix x);
@@ -145,6 +222,9 @@ RcppExport SEXP _jwutil_fastIntToStringRcpp(SEXP xSEXP) {
 static int _jwutil_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
+        signatures.insert("void(*set_attr_in_place)(Rcpp::RObject&,Rcpp::String,SEXP)");
+        signatures.insert("int(*getOmpMaxThreads)()");
+        signatures.insert("int(*getOmpThreads)()");
         signatures.insert("LogicalVector(*isRowSorted)(NumericMatrix)");
         signatures.insert("double(*propRowSorted)(NumericMatrix)");
         signatures.insert("std::vector<std::string>(*fastIntToStringStd)(std::vector<int>)");
@@ -155,25 +235,13 @@ static int _jwutil_RcppExport_validate(const char* sig) {
 
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _jwutil_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("jwutil", "_jwutil_set_attr_in_place", (DL_FUNC)_jwutil_set_attr_in_place_try);
+    R_RegisterCCallable("jwutil", "_jwutil_getOmpMaxThreads", (DL_FUNC)_jwutil_getOmpMaxThreads_try);
+    R_RegisterCCallable("jwutil", "_jwutil_getOmpThreads", (DL_FUNC)_jwutil_getOmpThreads_try);
     R_RegisterCCallable("jwutil", "_jwutil_isRowSorted", (DL_FUNC)_jwutil_isRowSorted_try);
     R_RegisterCCallable("jwutil", "_jwutil_propRowSorted", (DL_FUNC)_jwutil_propRowSorted_try);
     R_RegisterCCallable("jwutil", "_jwutil_fastIntToStringStd", (DL_FUNC)_jwutil_fastIntToStringStd_try);
     R_RegisterCCallable("jwutil", "_jwutil_fastIntToStringRcpp", (DL_FUNC)_jwutil_fastIntToStringRcpp_try);
     R_RegisterCCallable("jwutil", "_jwutil_RcppExport_validate", (DL_FUNC)_jwutil_RcppExport_validate);
     return R_NilValue;
-}
-
-static const R_CallMethodDef CallEntries[] = {
-    {"_jwutil_setAttrInPlace", (DL_FUNC) &_jwutil_setAttrInPlace, 3},
-    {"_jwutil_isRowSorted", (DL_FUNC) &_jwutil_isRowSorted, 1},
-    {"_jwutil_propRowSorted", (DL_FUNC) &_jwutil_propRowSorted, 1},
-    {"_jwutil_fastIntToStringStd", (DL_FUNC) &_jwutil_fastIntToStringStd, 1},
-    {"_jwutil_fastIntToStringRcpp", (DL_FUNC) &_jwutil_fastIntToStringRcpp, 1},
-    {"_jwutil_RcppExport_registerCCallable", (DL_FUNC) &_jwutil_RcppExport_registerCCallable, 0},
-    {NULL, NULL, 0}
-};
-
-RcppExport void R_init_jwutil(DllInfo *dll) {
-    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
 }

@@ -33,11 +33,19 @@
 #' @param value Value to be assigned to that attribute
 #' @export
 set_attr_in_place <- function(x, name, value) {
-    invisible(.Call('_jwutil_setAttrInPlace', PACKAGE = 'jwutil', x, name, value))
+    invisible(.Call(`_jwutil_set_attr_in_place`, x, name, value))
+}
+
+getOmpMaxThreads <- function() {
+    .Call(`_jwutil_getOmpMaxThreads`)
+}
+
+getOmpThreads <- function() {
+    .Call(`_jwutil_getOmpThreads`)
 }
 
 isRowSorted <- function(x) {
-    .Call('_jwutil_isRowSorted', PACKAGE = 'jwutil', x)
+    .Call(`_jwutil_isRowSorted`, x)
 }
 
 #' @name propRowSorted
@@ -49,7 +57,7 @@ isRowSorted <- function(x) {
 #' @import Rcpp
 #' @export
 propRowSorted <- function(x) {
-    .Call('_jwutil_propRowSorted', PACKAGE = 'jwutil', x)
+    .Call(`_jwutil_propRowSorted`, x)
 }
 
 #' @name fastIntToString
@@ -74,12 +82,12 @@ propRowSorted <- function(x) {
 #' }
 #' @keywords internal
 fastIntToStringStd <- function(x) {
-    .Call('_jwutil_fastIntToStringStd', PACKAGE = 'jwutil', x)
+    .Call(`_jwutil_fastIntToStringStd`, x)
 }
 
 #' @describeIn fastIntToString Same using Rcpp
 fastIntToStringRcpp <- function(x) {
-    .Call('_jwutil_fastIntToStringRcpp', PACKAGE = 'jwutil', x)
+    .Call(`_jwutil_fastIntToStringRcpp`, x)
 }
 
 # Register entry points for exported C++ functions

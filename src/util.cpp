@@ -49,3 +49,5 @@ Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x) {
   }
   return out;
 }
+
+// don't forget to do this! tools::package_native_routine_registration_skeleton(".", "src/registration.c")

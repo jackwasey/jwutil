@@ -24,6 +24,62 @@ namespace jwutil {
         }
     }
 
+    inline void set_attr_in_place(Rcpp::RObject& x, Rcpp::String name, SEXP value) {
+        typedef SEXP(*Ptr_set_attr_in_place)(SEXP,SEXP,SEXP);
+        static Ptr_set_attr_in_place p_set_attr_in_place = NULL;
+        if (p_set_attr_in_place == NULL) {
+            validateSignature("void(*set_attr_in_place)(Rcpp::RObject&,Rcpp::String,SEXP)");
+            p_set_attr_in_place = (Ptr_set_attr_in_place)R_GetCCallable("jwutil", "_jwutil_set_attr_in_place");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_set_attr_in_place(Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(name)), Shield<SEXP>(Rcpp::wrap(value)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+    }
+
+    inline int getOmpMaxThreads() {
+        typedef SEXP(*Ptr_getOmpMaxThreads)();
+        static Ptr_getOmpMaxThreads p_getOmpMaxThreads = NULL;
+        if (p_getOmpMaxThreads == NULL) {
+            validateSignature("int(*getOmpMaxThreads)()");
+            p_getOmpMaxThreads = (Ptr_getOmpMaxThreads)R_GetCCallable("jwutil", "_jwutil_getOmpMaxThreads");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_getOmpMaxThreads();
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<int >(rcpp_result_gen);
+    }
+
+    inline int getOmpThreads() {
+        typedef SEXP(*Ptr_getOmpThreads)();
+        static Ptr_getOmpThreads p_getOmpThreads = NULL;
+        if (p_getOmpThreads == NULL) {
+            validateSignature("int(*getOmpThreads)()");
+            p_getOmpThreads = (Ptr_getOmpThreads)R_GetCCallable("jwutil", "_jwutil_getOmpThreads");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_getOmpThreads();
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<int >(rcpp_result_gen);
+    }
+
     inline LogicalVector isRowSorted(NumericMatrix x) {
         typedef SEXP(*Ptr_isRowSorted)(SEXP);
         static Ptr_isRowSorted p_isRowSorted = NULL;
@@ -39,7 +95,7 @@ namespace jwutil {
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
         if (rcpp_result_gen.inherits("try-error"))
-            throw Rcpp::exception(as<std::string>(rcpp_result_gen).c_str());
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<LogicalVector >(rcpp_result_gen);
     }
 
@@ -58,7 +114,7 @@ namespace jwutil {
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
         if (rcpp_result_gen.inherits("try-error"))
-            throw Rcpp::exception(as<std::string>(rcpp_result_gen).c_str());
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<double >(rcpp_result_gen);
     }
 
@@ -77,7 +133,7 @@ namespace jwutil {
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
         if (rcpp_result_gen.inherits("try-error"))
-            throw Rcpp::exception(as<std::string>(rcpp_result_gen).c_str());
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<std::vector<std::string> >(rcpp_result_gen);
     }
 
@@ -96,7 +152,7 @@ namespace jwutil {
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
         if (rcpp_result_gen.inherits("try-error"))
-            throw Rcpp::exception(as<std::string>(rcpp_result_gen).c_str());
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<Rcpp::CharacterVector >(rcpp_result_gen);
     }
 

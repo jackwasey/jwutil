@@ -1,6 +1,8 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// [[Rcpp::interfaces(r, cpp)]]
+
 //' @name isRowSorted
 //' @title is every row sorted?
 //' @description Quicky run through rows of a matrix looking for any

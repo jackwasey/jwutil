@@ -476,8 +476,16 @@ read_xlsx_linux <- function(file) {
 #' @param left character vector
 #' @param right character vector
 #' @return formula
+#' @import stats
+#' @examples
+#' print(f <- build_formula(left = "A", right = c("B", "C")))
+#' class(f)
+#'
+#' build_formula(left = "Species", right = names(iris)[1:4])
 #' @export
-buildLinearFormula <- function(left, right) {
+build_formula <- function(left, right) {
+  checkmate::assert_string(left)
+  checkmate::assert_character(right, min.chars = 1, any.missing = FALSE, min.len = 1)
   stats::as.formula(
     paste(
       paste(left, collapse = "+"),
@@ -485,6 +493,10 @@ buildLinearFormula <- function(left, right) {
       sep = "~")
   )
 }
+
+#' @rdname build_formula
+#' @export
+buildLinearFormula <- build_formula
 
 #' @title inverse which
 #' @description for a given vector of ordinals which would reference items in a

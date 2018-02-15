@@ -19,6 +19,6 @@
 "_PACKAGE"
 #' @name jwutil-package
 #' @aliases jwutil jwutil-package
-#' @useDynLib jwutil
+#' @useDynLib jwutil, .registration=TRUE
 #' @docType package
 NULL
