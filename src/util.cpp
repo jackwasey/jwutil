@@ -50,4 +50,5 @@ Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x) {
   return out;
 }
 
-// don't forget to do this! tools::package_native_routine_registration_skeleton(".", "src/registration.c")
+// don't forget to do this! # tools::package_native_routine_registration_skeleton(".", "src/registration.c", character_only = FALSE)
+// ###  the backticks screw up the tool so must do character_only FALSE! No idea why Rcpp does this, or why it seems to work on 'icd' anyway.
