@@ -7,7 +7,11 @@
 reqinst(pkgs, quietly = TRUE, warn.conflicts = FALSE)
 }
 \arguments{
-\item{character}{vector of packages to load and install if necessary}
+\item{pkgs}{vector of packages to load and install if necessary}
+
+\item{quietly}{logical value, default \code{TRUE}}
+
+\item{warn.conflicts}{logical value, default \code{FALSE}}
 }
 \description{
 install packages where are missing

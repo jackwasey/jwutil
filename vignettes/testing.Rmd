@@ -57,7 +57,7 @@ expect_that_combine_all_args(
 ```
 
 For functions where the first argument is a vector, and the order of elements in the vector should not matter, `expect_that_combine_first_arg` will permute all combinations of the first argument, and expect the same result. A large number of elements will take a very long time, factorial with the number of items.
-```{r combine_first}
+```{r combine_first, eval=FALSE}
 expect_that_combine_first_arg(sum(c(-1, 0, 1)), testthat::equals(0))
 ```
 
