@@ -4,13 +4,11 @@
 \alias{reqinst}
 \title{install packages where are missing}
 \usage{
-reqinst(pkgs, ...)
+reqinst(pkgs)
 }
 \arguments{
 \item{pkgs}{character vector of packages to load and attach, with
 installation if necessary}
-
-\item{...}{arguments passed to \code{library}}
 }
 \description{
 install packages where are missing

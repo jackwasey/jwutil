@@ -661,17 +661,16 @@ min_r_version <- function(pkg) {
 #' install packages where are missing
 #' @param pkgs character vector of packages to load and attach, with
 #'   installation if necessary
-#' @param ... arguments passed to \code{library}
 #' @importFrom utils install.packages
 #' @export
-reqinst <- function(pkgs, ...) {
+reqinst <- function(pkgs) {
   for (pkg in pkgs)
     if (!suppressPackageStartupMessages(
       require(pkg, character.only = TRUE,
                  quietly = TRUE,
                  warn.conflicts = FALSE))) {
       utils::install.packages(pkg, quiet = TRUE)
-      library(pkg, character.only = TRUE, ...)
+      library(pkg, character.only = TRUE)
     }
 }
 
