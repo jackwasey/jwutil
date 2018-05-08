@@ -4,14 +4,13 @@
 \alias{reqinst}
 \title{install packages where are missing}
 \usage{
-reqinst(pkgs, quietly = TRUE, warn.conflicts = FALSE)
+reqinst(pkgs, ...)
 }
 \arguments{
-\item{pkgs}{vector of packages to load and install if necessary}
+\item{pkgs}{character vector of packages to load and attach, with
+installation if necessary}
 
-\item{quietly}{logical value, default \code{TRUE}}
-
-\item{warn.conflicts}{logical value, default \code{FALSE}}
+\item{...}{arguments passed to \code{library}}
 }
 \description{
 install packages where are missing

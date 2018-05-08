@@ -629,6 +629,8 @@ utils::globalVariables(c(".", "%>%"))
 #' contrib_reqs <- lapply(contrib, min_r_version)
 #' }
 #' min_r_version("icd")
+#' @import tools
+#' @import utils
 #' @export
 min_r_version <- function(pkg) {
   requireNamespace("tools")
@@ -637,49 +639,43 @@ min_r_version <- function(pkg) {
   deps <- tools::package_dependencies(pkg, db = avail, recursive = TRUE)
   if (is.null(deps))
     stop("package not found")
-
   pkgs <- deps[[1]]
   repo <- getOption("repo")
   if (is.null(repo))
     repo <- "https://cloud.r-project.org"
-
   matches <- avail[, "Package"] %in% pkgs
   pkg_list <- avail[matches, "Depends"]
   vers <- grep("^R$|^R \\(.*\\)$", pkg_list, value = TRUE)
   vers <- gsub("[^0-9.]", "", vers)
   if (length(vers) == 0)
     return("Not specified")
-
   max_ver <- vers[1]
   if (length(vers) == 1)
     return(max_ver)
-
   for (v in 2:length(vers))
     if (utils::compareVersion(vers[v], max_ver) > 0)
       max_ver <- vers[v]
-
   max_ver
 }
 
 #' install packages where are missing
-#' @param pkgs vector of packages to load and install if necessary
-#' @param quietly logical value, default \code{TRUE}
-#' @param warn.conflicts logical value, default \code{FALSE}
+#' @param pkgs character vector of packages to load and attach, with
+#'   installation if necessary
+#' @param ... arguments passed to \code{library}
 #' @importFrom utils install.packages
 #' @export
-reqinst <- function(pkgs, quietly = TRUE, warn.conflicts = FALSE) {
+reqinst <- function(pkgs, ...) {
   for (pkg in pkgs)
-    if (!require(pkg, character.only = TRUE,
-                 quietly = quietly,
-                 warn.conflicts = warn.conflicts)) {
+    if (!suppressPackageStartupMessages(
+      require(pkg, character.only = TRUE,
+                 quietly = TRUE,
+                 warn.conflicts = FALSE))) {
       utils::install.packages(pkg, quiet = TRUE)
-      library(pkg, character.only = TRUE,
-              quietly = quietly,
-              warn.conflicts = warn.conflicts)
+      library(pkg, character.only = TRUE, ...)
     }
 }
 
-#' Pipe
+#' Pipe, re-exported from \pkg{magrittr}
 #'
 #' Use the pipe function, \code{\%>\%} to turn function composition into a
 #' series of imperative statements.
@@ -690,3 +686,16 @@ reqinst <- function(pkgs, quietly = TRUE, warn.conflicts = FALSE) {
 #' @keywords internal
 #' @param lhs,rhs chained functions and results
 NULL
+
+#' Update github_install packages
+#' @export
+update_github_pkgs <- function() {
+  requireNamespace("devtools")
+  pkgs <- installed.packages(fields = "RemoteType")
+  gh <- pkgs[pkgs[, "RemoteType"] %in% "github", "Package"]
+  lapply(gh, function(x) {
+    repo = packageDescription(x, fields = "GithubRepo")
+    username = packageDescription(x, fields = "GithubUsername")
+    devtools::install_github(repo = paste0(username, "/", repo))
+  })
+}

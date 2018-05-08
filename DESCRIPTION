@@ -19,10 +19,10 @@ Imports:
     checkmate,
     magrittr,
     methods,
-    Rcpp,
     stats,
     utils
 Suggests:
+    devtools,
     knitr,
     lintr,
     testthat,

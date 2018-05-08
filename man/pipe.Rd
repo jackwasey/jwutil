@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.r
 \name{\%>\%}
 \alias{\%>\%}
-\title{Pipe}
+\title{Pipe, re-exported from \pkg{magrittr}}
 \arguments{
 \item{lhs, rhs}{chained functions and results}
 }

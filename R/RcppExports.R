@@ -54,7 +54,6 @@ isRowSorted <- function(x) {
 #' then sums TRUE values and takes fraction of total
 #' @param x matrix, each row containing ordered or disordered numerics
 #' @return double, the proportion from 0 to 1
-#' @import Rcpp
 #' @export
 propRowSorted <- function(x) {
     .Call(`_jwutil_propRowSorted`, x)
