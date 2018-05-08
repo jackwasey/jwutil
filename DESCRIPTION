@@ -19,6 +19,7 @@ Imports:
     checkmate,
     magrittr,
     methods,
+    Rcpp,
     stats,
     utils
 Suggests:
