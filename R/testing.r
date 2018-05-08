@@ -1,3 +1,21 @@
+# Copyright (C) 2014 - 2017  Jack O. Wasey
+#
+# This file is part of jwutil.
+#
+# jwutil is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# jwutil is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with jwutil If not, see <http:#www.gnu.org/licenses/>.
+
+
 # increasing will (randomly) cover more test cases, but quickly slow down the
 # test suite.
 nums_in_tests <- 30
@@ -39,10 +57,10 @@ numbers_to_long_and_float <- function(..., na.rm = TRUE) {
 }
 
 #' @title zeroes
-#' @description long and float types
+#' @description long, float and complex types
 #' @keywords sysdata
 #' @export
-zeroes <- list(0L, 0.0)
+zeroes <- list(0L, 0.0, complex(length.out = 1))
 
 #' @title bad input data for tests
 #' @description a variety of horrible data
@@ -164,6 +182,8 @@ random_test_letters <- function(n = nums_in_tests, max_str_len = 257) {
 extreme_numbers <- c(
   .Machine$integer.max,
   -.Machine$integer.max,
+  1L,
+  -1L,
   .Machine$double.xmin,
   .Machine$double.xmax,
   -.Machine$double.xmin,
@@ -198,25 +218,28 @@ expect_that_combine_all_args <- function(object, condition,
 
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
+  arg_names <- names(args)
   # can only handle flat lists of arguments when permuting
   stopifnot(identical(unlist(args, recursive = TRUE),
                       unlist(args, recursive = FALSE)))
   stopifnot(length(args) >= 2)
 
-  # get the combinations of arguments
   arg_combs <- jwutil::permute(unlist(args))
+  arg_name_combs <- jwutil::permute(arg_names)
 
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
+    arg_list <- as.list(arg_combs[comb, ])
+    names(arg_list) <- arg_name_combs[comb, ]
     e <- testthat::expect_that(
-      object    = do.call(as.character(func_name), as.list(arg_combs[comb, ])),
+      object    = do.call(as.character(func_name), arg_list),
       condition = condition,
       info      = paste0(
         info, "args = ",
         paste(arg_combs[comb, ], collapse = " ", sep = ","),
         sprintf(" (test iteration %d)", comb)
       ),
-      label     = label
+      label = label
     )
   }
   invisible(e)

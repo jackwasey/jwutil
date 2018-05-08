@@ -16,7 +16,6 @@ values, defaults to '.' and 'NA'. Also allow \code{NA}.}
 logical scalar
 }
 \description{
-check whether all the items of input vector are numeric without
-  throwing warning derived from Hmsic package
+check whether all the items of input vector are numeric without throwing
+warning derived from Hmsic package
 }
-

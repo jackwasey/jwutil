@@ -16,4 +16,3 @@ double, the proportion from 0 to 1
 first performs isRowSorted to get a logical vector,
 then sums TRUE values and takes fraction of total
 }
-

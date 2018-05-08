@@ -15,4 +15,3 @@ character vector
 \description{
 slower than \code{strip}.
 }
-

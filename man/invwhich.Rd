@@ -20,4 +20,3 @@ for a given vector of ordinals which would reference items in a
   vector, list etc, \code{invwhich} returns a logical vector with TRUE for
   the cited positions. If length is not provided, the maximum index is used.
 }
-

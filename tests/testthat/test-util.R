@@ -18,31 +18,31 @@ test_that("inverse of base 'which' function", {
   expect_equal(invwhich(c(1, 2), len = 3), c(TRUE, TRUE, FALSE))
 })
 
-test_that("asCharacterNoWarn", {
-  expect_error(asCharacterNoWarn())
-  expect_equal(asCharacterNoWarn(1), "1")
-  expect_equal(asCharacterNoWarn(1L), "1")
-  expect_equal(asCharacterNoWarn(1.1), "1.1")
-  expect_equal(asCharacterNoWarn(c(1.2, 34.555)), c("1.2", "34.555"))
+test_that("as_char_no_warn", {
+  expect_error(as_char_no_warn())
+  expect_equal(as_char_no_warn(1), "1")
+  expect_equal(as_char_no_warn(1L), "1")
+  expect_equal(as_char_no_warn(1.1), "1.1")
+  expect_equal(as_char_no_warn(c(1.2, 34.555)), c("1.2", "34.555"))
 
-  expect_equal(asCharacterNoWarn(NA), NA_character_)
-  expect_equal(asCharacterNoWarn(c(1.2, NA)), c("1.2", NA_character_))
-  expect_equal(asCharacterNoWarn(c(NA, 1.2)), c(NA_character_, "1.2"))
+  expect_equal(as_char_no_warn(NA), NA_character_)
+  expect_equal(as_char_no_warn(c(1.2, NA)), c("1.2", NA_character_))
+  expect_equal(as_char_no_warn(c(NA, 1.2)), c(NA_character_, "1.2"))
 })
 
-test_that("asCharacterNoWarn factor", {
-  expect_equal(asCharacterNoWarn(factor(1)), "1")
-  expect_equal(asCharacterNoWarn(factor(1L)), "1")
-  expect_equal(asCharacterNoWarn(factor(1.1)), "1.1")
-  expect_equal(asCharacterNoWarn(factor(c(1.2, 34.555))), c("1.2", "34.555"))
+test_that("as_char_no_warn factor", {
+  expect_equal(as_char_no_warn(factor(1)), "1")
+  expect_equal(as_char_no_warn(factor(1L)), "1")
+  expect_equal(as_char_no_warn(factor(1.1)), "1.1")
+  expect_equal(as_char_no_warn(factor(c(1.2, 34.555))), c("1.2", "34.555"))
 
-  expect_equal(asCharacterNoWarn(factor(NA)), NA_character_)
-  expect_equal(asCharacterNoWarn(factor(c(1.2, NA))), c("1.2", NA_character_))
-  expect_equal(asCharacterNoWarn(factor(c(NA, 1.2))), c(NA_character_, "1.2"))
-  expect_equal(asCharacterNoWarn(factor(NA, exclude = FALSE)), NA_character_)
-  expect_equal(asCharacterNoWarn(factor(c(1.2, NA), exclude = FALSE)),
+  expect_equal(as_char_no_warn(factor(NA)), NA_character_)
+  expect_equal(as_char_no_warn(factor(c(1.2, NA))), c("1.2", NA_character_))
+  expect_equal(as_char_no_warn(factor(c(NA, 1.2))), c(NA_character_, "1.2"))
+  expect_equal(as_char_no_warn(factor(NA, exclude = FALSE)), NA_character_)
+  expect_equal(as_char_no_warn(factor(c(1.2, NA), exclude = FALSE)),
                c("1.2", NA_character_))
-  expect_equal(asCharacterNoWarn(factor(c(NA, 1.2), exclude = FALSE)),
+  expect_equal(as_char_no_warn(factor(c(NA, 1.2), exclude = FALSE)),
                c(NA_character_, "1.2"))
 })
 
@@ -290,15 +290,15 @@ test_that("good inputs don't give errors or warnings, including NA", {
         tms = jt
       )
 
-      expect_that(
+      expect_error(
         add_time_to_date(dts = jd, tms = jt),
-        testthat::not(throws_error()),
+        regex = NA,
         info = paste("classes: ", class(jd), class(jt),
                      " data: ", jd, jt, collapse = ", ", sep = ", "))
 
-      expect_that(
+      expect_warning(
         add_time_to_date(dts = jd, tms = jt),
-        testthat::not(gives_warning()),
+        regex = NA,
         info = paste("classes: ", class(jd), class(jt),
                      " data: ", jd, jt, collapse = ", ", sep = ", "))
 
@@ -460,15 +460,14 @@ test_that("areIntegers", {
 })
 
 test_that("platform", {
-  expect_that(platformIsLinux() & platformIsWindows(), testthat::not(is_true()))
+  expect_false(platformIsLinux() & platformIsWindows())
+  expect_false(platformIsLinux() & platformIsMac())
+  expect_false(platformIsWindows() & platformIsMac())
 })
 
 test_that("download zip", {
-  expect_that(
-    suppressWarnings(
-      read.zip.url("http://phs.googlecode.com/files/Download%20File%20Test.zip")
-    ), testthat::not(throws_error())
-  )
+  url <- "https://github.com/jackwasey/jwutil/archive/v1.0.2.zip"
+  read.zip.url(url, filename = "jwutil-1.0.2/NAMESPACE")
 })
 
 test_that("permute a vector", {

@@ -16,4 +16,3 @@ character vector of length x
 This excludes many symbols, so just strip all symbols leaving
   alphanumeric, and no whitespace.
 }
-

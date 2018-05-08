@@ -15,4 +15,3 @@ integer
 \description{
 count the number of NAs in a vector
 }
-

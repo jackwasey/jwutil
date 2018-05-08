@@ -17,4 +17,3 @@ vector of cumulative non-NA counts with names corresponding to the
 counts non-NA fields in first field, then progreses through
   fields, OR new field and saves running total for each field TODO: tests
 }
-

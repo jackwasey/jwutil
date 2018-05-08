@@ -2,7 +2,7 @@
 % Please edit documentation in R/df.r
 \name{logicalToBinary}
 \alias{logicalToBinary}
-\title{encode TRUE as 1, and FALSE as 0 (integers)}
+\title{Encode TRUE as 1, and FALSE as 0 (integers)}
 \usage{
 logicalToBinary(x)
 }
@@ -13,9 +13,8 @@ logicalToBinary(x)
 data frame without logical fields
 }
 \description{
-when saving data as text files for distribution, printing large
-  amounts of text containing TRUE and FALSE is inefficient. Convert to binary
-  takes more R memory, but allows more compact output TODO: test
+When saving data as text files for distribution, printing large amounts of
+text containing TRUE and FALSE is inefficient. Convert to binary takes more R
+memory, but allows more compact output TODO: test
 }
 \keyword{manip}
-

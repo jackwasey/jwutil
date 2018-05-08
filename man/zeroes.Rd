@@ -4,12 +4,11 @@
 \name{zeroes}
 \alias{zeroes}
 \title{zeroes}
-\format{An object of class \code{list} of length 2.}
+\format{An object of class \code{list} of length 3.}
 \usage{
 zeroes
 }
 \description{
-long and float types
+long, float and complex types
 }
 \keyword{sysdata}
-

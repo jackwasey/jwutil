@@ -20,4 +20,3 @@ currently relies on Linux xlsx2csv command, but could
 \seealso{
 \code{readxl} package by Hadley Wickham
 }
-

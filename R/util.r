@@ -1,22 +1,38 @@
-#' @title check whether character vector represents all numeric values
-#' @description check whether all the items of input vector are numeric without
-#'   throwing warning derived from Hmsic package
+# Copyright (C) 2014 - 2017  Jack O. Wasey
+#
+# This file is part of jwutil.
+#
+# jwutil is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# jwutil is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with jwutil If not, see <http:#www.gnu.org/licenses/>.
+
+#' check whether character vector represents all numeric values
+#'
+#' check whether all the items of input vector are numeric without throwing
+#' warning derived from Hmsic package
 #' @param x is a character vector to be tested
 #' @param extras is a vector of character strings which are counted as NA
 #'   values, defaults to '.' and 'NA'. Also allow \code{NA}.
 #' @return logical scalar
 #' @export
 allIsNumeric <- function(x, extras = c(".", "NA", NA)) {
-  old <- options(warn = -1)
-  on.exit(options(old))
   xs <- x[x %nin% c("", extras)]
-  !any(is.na(as.numeric(xs)))
+  suppressWarnings(!any(is.na(as.numeric(xs))))
 }
 
-#' @title check whether vector represents all integer values, not that the same
-#'   as \code{is.integer}
-#' @description check whether all the items of input vector are integer
-#'   as.integer
+#' check whether vector represents all integer values, not that the same as
+#' \code{is.integer}
+#'
+#' check whether all the items of input vector are integer as.integer
 #' @param x is a vector to be tested
 #' @param tol single numeric, default if less than 1e-9 from an integer then
 #'   considered an integer.
@@ -29,22 +45,9 @@ allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
     na.rm = na.rm
   )
 
-#' @title convert factor or vector to character without warnings
-#' @description correctly converts factors to vectors, and then converts to
-#'   character, which may silently introduce NAs
-#' @param x is a vector, probably of numbers of characters
-#' @return character vector, may have NA values
-#' @export
-asCharacterNoWarn <- function(x) {
-  old <- options(warn = -1)
-  on.exit(options(old))
-  if (is.factor(x)) x <- levels(x)[x]
-  as.character(x)
-}
-
-#' @title convert factor or vector to numeric without warnings
-#' @aliases asIntegerNoWarn
-#' @description correctly converts factors to vectors, and then converts to
+#' convert factor or vector to numeric without warnings
+#'
+#' correctly converts factors to vectors, and then converts to
 #'   numeric or integer, which may silently introduce NAs. Invisible rounding
 #'   errors can be a problem going from numeric to integer, so consider adding
 #'   tolerance to this conversion. \code{asIntegerNoWarn} silently
@@ -54,12 +57,11 @@ asCharacterNoWarn <- function(x) {
 #'   return a single logical.
 #' @param x is a vector, probably of numbers of characters
 #' @return numeric vector, may have NA values
+#' @aliases asIntegerNoWarn
 #' @export
 asNumericNoWarn <- function(x) {
-  old <- options(warn = -1)
-  on.exit(options(old))
   if (is.factor(x)) x <- levels(x)[x]
-  as.numeric(x)
+  suppressWarnings(as.numeric(x))
 }
 
 #' @rdname asNumericNoWarn
@@ -144,7 +146,7 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
   on.exit(unlink(zipfile, recursive = TRUE), add = TRUE)
   dir.create(zipdir)
   utils::unzip(zipfile, exdir = zipdir)  # files="" so extract all
-  files <- list.files(zipdir)
+  files <- list.files(zipdir, recursive = TRUE)
   if (is.null(filename)) {
     if (length(files) == 1) {
       filename <- files
@@ -166,7 +168,7 @@ read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
 #' @param x is usually a charcter vector
 #' @return integer
 #' @export
-countNotNumeric <- function (x)
+countNotNumeric <- function(x)
   countIsNa(asNumericNoWarn(x))
 
 #' @title count numeric elements
@@ -368,7 +370,9 @@ permuteWithRepeats <- function(x) {
 #' @return data frame, each row being one permutation
 #' @export
 permute <- function(x) {
-  stopifnot(length(x) < 13)  # factorial
+  if (is.null(x)) return()
+
+  stopifnot(length(x) < 13)  # factorial size, so limit for sanity
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
 
@@ -430,7 +434,7 @@ opt_binary_fun <- function(x, n) {
   sum(colSums(x[n])) / length(n)
 }
 
-#' Are we running on Linux or Windows?
+#' Are we running on Linux, Mac or Windows?
 #'
 #' @return logical
 #' @export
@@ -441,6 +445,11 @@ platformIsLinux <- function()
 #' @export
 platformIsWindows <- function()
   Sys.info()[["sysname"]] == "Windows"
+
+#' @rdname platformIsLinux
+#' @export
+platformIsMac <- function()
+  Sys.info()[["sysname"]] == "Darwin"
 
 #' @title read \code{.xlsx} file, interpret as CSV, and return a data frame
 #' @description currently relies on Linux xlsx2csv command, but could
@@ -467,8 +476,16 @@ read_xlsx_linux <- function(file) {
 #' @param left character vector
 #' @param right character vector
 #' @return formula
+#' @import stats
+#' @examples
+#' print(f <- build_formula(left = "A", right = c("B", "C")))
+#' class(f)
+#'
+#' build_formula(left = "Species", right = names(iris)[1:4])
 #' @export
-buildLinearFormula <- function(left, right) {
+build_formula <- function(left, right) {
+  checkmate::assert_string(left)
+  checkmate::assert_character(right, min.chars = 1, any.missing = FALSE, min.len = 1)
   stats::as.formula(
     paste(
       paste(left, collapse = "+"),
@@ -476,6 +493,10 @@ buildLinearFormula <- function(left, right) {
       sep = "~")
   )
 }
+
+#' @rdname build_formula
+#' @export
+buildLinearFormula <- build_formula
 
 #' @title inverse which
 #' @description for a given vector of ordinals which would reference items in a
@@ -511,6 +532,16 @@ rm_r <- function(x, envir = parent.frame()) {
   })
 }
 
+#' Summarize objects in scope
+#'
+#' Get type, size (bytes) and dimensions of objects in scope
+#' @param pos pos
+#' @param pattern regex pattern to match objects of interest
+#' @param order.by which column to order by
+#' @param decreasing default is \code{TRUE}
+#' @param head default is \code{FALSE} but if true, just show top \code{n}
+#' @param n number to show if limiting to \code{head}
+#' @export
 ls.objects <- function(pos = 1, pattern, order.by,
                        decreasing = FALSE, head = FALSE, n = 5) {
   napply <- function(names, fn) sapply(names, function(x)
@@ -562,7 +593,7 @@ is.Date <- function(x)
 #' @param ... further parameters passed to \code{source}
 #' @export
 source_purl <- function(input,
-                        output = file.path(tempdir(),
+                        output = file.path(.tempdir(),
                                            paste0(basename(input), ".R")),
                         documentation = 1L, ...) {
   requireNamespace("knitr")
@@ -573,23 +604,98 @@ source_purl <- function(input,
   source(output, ...)
 }
 
-#' Save given variable in package data directory
+utils::globalVariables(c(".", "%>%"))
+
+#' Find minimum R version required for package
 #'
-#' File is named varname.RData with an optional suffix before .RData
+#' Recursively search dependencies for R version, and find the highest stated R
+#' version requirement.
+#' @source Based on ideas from
+#'   http://stackoverflow.com/questions/38686427/determine-minimum-r-version-for-all-package-dependencies
 #'
-#' @param var_name character or symbol, e.g. "myvar" or \code{myvar}, either of
-#'   which would find \code{myvar} in the parent environment, and save it as
-#'   \code{myvar.RData} in \code{package_root/data}.
-#' @param suffix character scalar
+#' @param pkg string with name of package to check
+#' @examples
+#' base <- c("base", "compiler", "datasets", "grDevices", "graphics",
+#' "grid", "methods", "parallel", "profile", "splines", "stats",
+#'  "stats4", "tcltk", "tools", "translations")
+#'
+#' \dontrun{
+#' base_reqs <- lapply(base, min_r_version)
+#'
+#' contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
+#' "class", "cluster", "codetools", "foreign", "lattice",
+#'  "mgcv", "nlme", "nnet", "rpart", "spatial", "survival")
+#'
+#' contrib_reqs <- lapply(contrib, min_r_version)
+#' }
+#' min_r_version("icd")
+#' @import tools
+#' @import utils
+#' @export
+min_r_version <- function(pkg) {
+  requireNamespace("tools")
+  requireNamespace("utils")
+  avail <- utils::available.packages(utils::contrib.url("https://cloud.r-project.org"))
+  deps <- tools::package_dependencies(pkg, db = avail, recursive = TRUE)
+  if (is.null(deps))
+    stop("package not found")
+  pkgs <- deps[[1]]
+  repo <- getOption("repo")
+  if (is.null(repo))
+    repo <- "https://cloud.r-project.org"
+  matches <- avail[, "Package"] %in% pkgs
+  pkg_list <- avail[matches, "Depends"]
+  vers <- grep("^R$|^R \\(.*\\)$", pkg_list, value = TRUE)
+  vers <- gsub("[^0-9.]", "", vers)
+  if (length(vers) == 0)
+    return("Not specified")
+  max_ver <- vers[1]
+  if (length(vers) == 1)
+    return(max_ver)
+  for (v in 2:length(vers))
+    if (utils::compareVersion(vers[v], max_ver) > 0)
+      max_ver <- vers[v]
+  max_ver
+}
+
+#' install packages where are missing
+#' @param pkgs character vector of packages to load and attach, with
+#'   installation if necessary
+#' @param ... arguments passed to \code{library}
+#' @importFrom utils install.packages
+#' @export
+reqinst <- function(pkgs, ...) {
+  for (pkg in pkgs)
+    if (!suppressPackageStartupMessages(
+      require(pkg, character.only = TRUE,
+                 quietly = TRUE,
+                 warn.conflicts = FALSE))) {
+      utils::install.packages(pkg, quiet = TRUE)
+      library(pkg, character.only = TRUE, ...)
+    }
+}
+
+#' Pipe, re-exported from \pkg{magrittr}
+#'
+#' Use the pipe function, \code{\%>\%} to turn function composition into a
+#' series of imperative statements.
+#'
+#' @importFrom magrittr "%>%" "%<>%" set_names extract2
+#' @name %>%
+#' @rdname pipe
 #' @keywords internal
-save_in_data_dir <- function(var_name, suffix = "") {
-  checkmate::assertString(suffix)
-  var_name <- as.character(substitute(var_name))
-  checkmate::assertString(var_name)
-  stopifnot(exists(var_name, envir = parent.frame()))
-  save(list = var_name,
-       envir = parent.frame(),
-       file = file.path("data", strip(paste0(var_name, suffix, ".RData"))),
-       compress = "xz")
-  message("Now reload package to enable updated/new data: ", var_name)
+#' @param lhs,rhs chained functions and results
+NULL
+
+#' Update github_install packages
+#' @export
+update_github_pkgs <- function() {
+  requireNamespace("devtools")
+  pkgs <- installed.packages(fields = "RemoteType")
+  gh <- pkgs[pkgs[, "RemoteType"] %in% "github", "Package"]
+  lapply(gh, function(x) {
+    repo = packageDescription(x, fields = "GithubRepo")
+    username = packageDescription(x, fields = "GithubUsername")
+    devtools::install_github(repo = paste0(username, "/", repo))
+  })
 }

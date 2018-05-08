@@ -19,4 +19,3 @@ character vector of package contents
 \description{
 default to including (?private) functions beginning with '.'
 }
-

@@ -1,0 +1,70 @@
+---
+title: "Stress-testing function calls"
+author: "Jack O. Wasey"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Stress-testing function calls}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+```{r setup, echo = FALSE}
+suppressPackageStartupMessages(library(jwutil, warn.conflicts = FALSE))
+suppressPackageStartupMessages(library(testthat, warn.conflicts = FALSE))
+```
+
+```{r desc, echo = FALSE, results='asis'}
+cat(packageDescription("jwutil")$Description)
+```
+
+# Stress and Fuzz testing
+
+`jwutil` has some minimal features to allow fuzz and stress testing functions. This is a complicated topic, but at a minimum, the following functions allow you to to give enexpected input to a function, with the expectation it should still work. The packge \code{fuzzr} does more, but does different things.
+
+## Extreme integers
+Maximum magnitude positive and negative doubles and integers
+```{r extreme}
+extreme_numbers
+```
+There are several types of zero in R (excluding string representations):
+```{r zero}
+zeroes
+sapply(zeroes, class)
+```
+
+## Permuting
+
+If the order of arguments in a function should not matter, the result should be the same each time. `expect_that_comabine_all_args` tests this.
+
+```{r combine}
+expect_that_combine_all_args(sum(1, 2), testthat::equals(3))
+```
+
+is equivalent to
+```{r combine_alt}
+expect_that(sum(1, 2), testthat::equals(3))
+expect_that(sum(2, 1), testthat::equals(3))
+```
+
+This becomes more interesting with named arguments, where the order also should not matter. Beware of testing features of R, rather than your code: R has a complicated but standard way of matching arguments, described in [Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html). If your function does complicated argument manipulation, and maybe uses `...`, this function could verify that named argument order doesn't matter.
+
+```{r combine_named, eval = FALSE}
+res <- gsub(pattern = "the", replacement = "le", x = "Pierre the chat")
+expect_that_combine_all_args(
+  gsub(pattern = "the", replacement = "le", x = "Pierre the chat"),
+  testthat::equals(res)
+  )
+```
+
+For functions where the first argument is a vector, and the order of elements in the vector should not matter, `expect_that_combine_first_arg` will permute all combinations of the first argument, and expect the same result. A large number of elements will take a very long time, factorial with the number of items.
+```{r combine_first, eval=FALSE}
+expect_that_combine_first_arg(sum(c(-1, 0, 1)), testthat::equals(0))
+```
+
+## Other
+
+`lsf` lists all the functions in a package, which may be useful to start an attack on all functions with a range of absurd data, looking perhaps for crashes in C/C++ code rather than R errors.
+```{r lsf}
+lsf("jwutil")[1:10]
+```
+

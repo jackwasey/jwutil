@@ -4,7 +4,7 @@
 \alias{source_purl}
 \title{extract code from knitr vignette and source it}
 \usage{
-source_purl(input, output = file.path(tempdir(), paste0(basename(input),
+source_purl(input, output = file.path(.tempdir(), paste0(basename(input),
   ".R")), documentation = 1L, ...)
 }
 \arguments{
@@ -23,4 +23,3 @@ headers to code; 2 means add all text chunks to code as roxygen comments}
 \description{
 extract code from knitr vignette and source it
 }
-

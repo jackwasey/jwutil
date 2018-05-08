@@ -16,4 +16,3 @@ https://gist.github.com/1187166.git Taken from
   http://stackoverflow.com/questions/1358003/\
   tricks-to-manage-the-available-memory-in-an-r-session
 }
-

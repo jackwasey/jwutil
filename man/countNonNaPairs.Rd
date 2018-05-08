@@ -18,4 +18,3 @@ cycles through the given data frame twice, and applies logical
   OR to all elements of each column it then counts how many of these pairs
   are not-na, i.e. have at least one non-NA value TODO: tests
 }
-

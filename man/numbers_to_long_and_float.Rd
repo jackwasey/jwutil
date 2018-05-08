@@ -18,4 +18,3 @@ list of long and double versions of convertable values from the input
 \description{
 intended for generating values for stress testing functions
 }
-

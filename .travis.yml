@@ -2,7 +2,7 @@ language: r
 sudo: false
 cache: packages
 r:
-  - oldrel # when oldrel = 3.1, there are S3 method problems I can't debug
+  - oldrel
   - release
   - devel
 
@@ -10,12 +10,41 @@ os:
   - linux
   - osx
 
+matrix:
+  fast_finish: true
+  allow_failures:
+  - r: oldrel
+  - os: osx
+  include:
+  - env: LINTR_COMMENT_BOT=true
+
+env:
+  global:
+    - R_CHECK_CRAN_INCOMING_=FALSE _R_CHECK_FORCE_SUGGESTS_=FALSE
+    - LINTR_COMMENT_BOT=false
+  matrix:
+    - CFLAGS="-Og -Werror -Wall -Wextra -pedantic" CXXFLAGS="-Og -Werror -Wall -Wextra -pedantic"
+    - CFLAGS="-O3 -march=native" CXXFLAGS="-O3 -march=native"
+
 warnings_are_errors: true
 
+r_binary_install:
+ - testthat
+ - Rcpp
+ - knitr
+
+r_install:
+ - magrittr
+ - lintr
+ - testthat
+
+install_github:
+ - jimhester/covr
+# - jimhester/lintr
+
 after_success:
- - Rscript -e 'devtools::install()'
- - Rscript -e 'devtools::session_info()'
- - Rscript -e 'library(covr); coveralls(quiet = FALSE)'
+ - Rscript -e 'covr::coveralls()'
+ - Rscript -e 'lintr::lint_package()'
 
 notifications:
   email:

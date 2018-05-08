@@ -20,4 +20,3 @@ Zero NA values in a data.frame, including \code{cols} and
   exluding \code{ignore}. Also does not replace \code{Date} or \code{POSIXt}
   fields.
 }
-

@@ -23,4 +23,3 @@ list without nested lists, objects with preserved data types
 unlike unlist, this function returns a list of objects of
   different data types, but removes any depth
 }
-

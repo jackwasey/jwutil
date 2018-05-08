@@ -15,4 +15,3 @@ single logical
 \description{
 Returns TRUE if the given list is not nested.
 }
-

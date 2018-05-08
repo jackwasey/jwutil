@@ -20,4 +20,3 @@ compares all data in each field to every other field, and drops
   the latter match. Will find multiple matches. Doesn't do any type
   conversions yet. This is purely by content, not by field name.
 }
-

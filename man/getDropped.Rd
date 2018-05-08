@@ -19,4 +19,3 @@ converts both vectors to numeric. This simulates merging when
   one key is character (but contains integer numbers), and another key is
   stored as integer.
 }
-

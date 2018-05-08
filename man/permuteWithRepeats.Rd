@@ -15,4 +15,3 @@ data frame, each row being one permutation
 \description{
 systematically permute the input vector or list
 }
-

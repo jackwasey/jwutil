@@ -42,4 +42,3 @@ microbenchmark::microbenchmark(setDecimalCodeInPlace(q), setDecimalCode(q), time
 
 }
 }
-

@@ -1,7 +1,25 @@
-#' @title encode TRUE as 1, and FALSE as 0 (integers)
-#' @description when saving data as text files for distribution, printing large
-#'   amounts of text containing TRUE and FALSE is inefficient. Convert to binary
-#'   takes more R memory, but allows more compact output TODO: test
+# Copyright (C) 2014 - 2017  Jack O. Wasey
+#
+# This file is part of jwutil.
+#
+# jwutil is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# jwutil is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with jwutil If not, see <http:#www.gnu.org/licenses/>.
+
+#' Encode TRUE as 1, and FALSE as 0 (integers)
+#'
+#' When saving data as text files for distribution, printing large amounts of
+#' text containing TRUE and FALSE is inefficient. Convert to binary takes more R
+#' memory, but allows more compact output TODO: test
 #' @param x dataframe which may contain logical fields
 #' @return data frame without logical fields
 #' @keywords manip
@@ -39,7 +57,7 @@ logicalToBinary <- function(x) {
 #' @template verbose
 #' @return data.frame with columns of logicals
 #' @export
-factorToDataframeLogical <- function(fctr,
+factor_to_df_logical <- function(fctr,
                                      prefix = deparse(substitute(fctr)),
                                      sep = "",
                                      na.rm = TRUE,
@@ -91,51 +109,9 @@ factorToDataframeLogical <- function(fctr,
   df
 }
 
-#' @title Takes factors from a data frame and converts them to true/false fields
-#'   with appropriately named fields.
-#' @description For a two level factor, this is relatively easy, since we just
-#'   replace the field with \code{x==levels(x)[1]} or something like that, and
-#'   rename the field to indicate that TRUE is level 1 of the factor. This works
-#'   well for gender. For multi-level factors there is redundancy with multiple
-#'   new fields now containing FALSE, with only one TRUE for the matching level.
-#' @param x data.frame to search for factors to convert
-#' @param consider character vector of field names in the data frame to
-#'   consider. Defaults to all fields
-#' @param sep character scalar used to separate field prefixes from factor
-#'   values in new column names
-#' @param na.rm logical scalar: if NA data and/or NA levels, then covert to NA
-#'   strings and expand these as for any other factor
-#' @template verbose
-#' @return data.frame with no factors
+#' @rdname factor_to_df_logical
 #' @export
-#' @seealso \code{\link[PSAgraphics]{cv.trans.psa}}
-expandFactors <- function(x,
-                          consider = names(x),
-                          sep = "",
-                          na.rm = TRUE,
-                          verbose = FALSE) {
-  if (verbose)
-    message("converting factors in data frame into logical vectors")
-
-  # identify which of the last of fields is actually a factor
-  factor_names <- getFactorNames(x, consider)
-
-  if (length(factor_names) > 0) {
-    if (verbose) message("there are factors to be converted into values: ",
-                         paste(factor_names, collapse = ", "))
-    for (fn in factor_names) {
-      if (verbose) message(sprintf("working on factor: %s", fn))
-      dfpart <- factorToDataframeLogical(
-        fctr = x[[fn]], prefix = fn, sep = sep,
-        na.rm = na.rm, verbose = verbose)
-      x[fn] <- NULL
-      x <- cbind(x, dfpart)
-    }
-  } else {
-    if (verbose) message("no factors found to convert in exFactor")
-  }
-  x
-}
+factorToDataframeLogical <- factor_to_df_logical
 
 #' @title get names of the factor fields in a data frame
 #' @description Get the names of those fields in a data frame which are factors.
@@ -145,17 +121,11 @@ expandFactors <- function(x,
 #' @return vector
 #' @export
 getFactorNames <- function(x, consider = names(x)) {
-  if (length(names(x)) <= 0) {
-    warning("getFactorNames: empty data frame passed in.")
+  if (length(names(x)) <= 0 || length(consider) <= 0)
     return()
-  }
-  if (length(consider) <= 0) {
-    warning("getFactorNames: empty consider.")
-    return()
-  }
 
   consider[sapply(x[1, consider], is.factor)]
-  #if (anyDuplicated) #TODO
+  # TODO if any duplicated
 }
 
 #' @rdname getFactorNames
@@ -237,6 +207,10 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
 #' @param verbose logical or numbers 0, 1 or 2. 1 or TRUE will give moderate
 #'   verbosity, 2 will give full verbosity. 0 or FALSE turns off all messages.
 #' @return merged data frame
+#' @examples
+#' df <- data.frame(a= c("1","2"), b = 1:2, stringsAsFactors = FALSE)
+#' eg <- data.frame(a= c("1","3"), b = 3:4, stringsAsFactors = FALSE)
+#' mergeBetter(x = df, y = eg, by.x = "a", by.y = "a", verbose = TRUE)
 #' @export
 mergeBetter <- function(x, y, by.x, by.y,
                         all.x = FALSE, all.y = FALSE,
@@ -246,10 +220,10 @@ mergeBetter <- function(x, y, by.x, by.y,
                         convert_factors = TRUE,
                         verbose = FALSE) {
 
-  checkmate::assertDataFrame(x, )
+  checkmate::assertDataFrame(x)
   checkmate::assertDataFrame(y)
-  checkmate::assertString(by.x)
-  checkmate::assertString(by.y)
+  checkmate::assertCharacter(by.x, min.len = 1, min.chars = 1)
+  checkmate::assertCharacter(by.y, min.len = 1, min.chars = 1)
   checkmate::assertFlag(all.x)
   checkmate::assertFlag(all.y)
   renameConflict <- match.arg(renameConflict)
@@ -264,51 +238,54 @@ mergeBetter <- function(x, y, by.x, by.y,
   stopifnot(all(!duplicated(tolower(names(x)))))
   stopifnot(all(!duplicated(tolower(names(y)))))
 
-  # guess a good affix. If y is not just a variable name, use 'y'
-  if (is.null(affix)) {
-    affix <- deparse(substitute(y))
-    if (length(substitute(y)) > 1) affix <- "y"
-  }
+  x_name <- deparse(substitute(x))
+  y_name <- deparse(substitute(y))
+
+  # guess a good affix: `y` might be an expression and not suitable
+  if (is.null(affix))
+    affix <- make.names(y_name)
 
   # convert factors of keys only # TODO: as.integer may be appropriate
-  # sometimes/often. TODO: tests for this
+  # sometimes/often. TODO: tests for this. Ultimately may be better to
+  # use data.table, and just index these columns properly.
   if (convert_factors) {
-    if (is.factor(x[[by.x]]))
-      x[[by.x]] <- asCharacterNoWarn(x[[by.x]])
-
-    if (is.factor(y[[by.y]]))
-      y[[by.y]] <- asCharacterNoWarn(y[[by.y]])
+    for (by_col in c(by.x, by.y)) {
+      if (is.factor(x[[by_col]]))
+        x[[by_col]] <- as_char_no_warn(x[[by_col]])
+    }
   }
 
   if (verbose) {
-    # this informational step could itself be slow in a big merge
-    left_missing <- sum(x[[by.x]] %nin% y[[by.y]])
-    right_missing  <- sum(y[[by.y]] %nin% x[[by.x]])
+    # this would be more efficient with data table or sql type query
+    comb_key_x <- apply(x[by.x], 1, paste, collapse = "j")
+    comb_key_y <- apply(y[by.y], 1, paste, collapse = "j")
+    left_missing <- sum(comb_key_x %nin% comb_key_y)
+    right_missing  <- sum(comb_key_y %nin% comb_key_x)
     if (right_missing + left_missing > 0) {
       message(sprintf(ifelse(all.y,
-                             "keeping %d out of %d unmatched from y",
-                             "dropping %d out of %d from y"
-      ), right_missing, nrow(y)))
+                             "keeping %d out of %d unmatched from %s",
+                             "dropping %d out of %d from %s"
+      ), right_missing, nrow(y), y_name, y_name))
       message(sprintf(ifelse(all.x,
-                             "keeping %d out of %d unmatched from x",
-                             "dropping %d out of %d from x"
-      ), left_missing, nrow(x)))
+                             "keeping %d out of %d unmatched from %s",
+                             "dropping %d out of %d from %s"
+      ), left_missing, nrow(x), x_name, x_name))
     } else
       message("Keys match exactly, so dropping no rows.")
   }
 
   # find duplicate field names, ignoring the field we are merging on.
   dupes_x <- names(x)[tolower(names(x)) %in% tolower(names(y)) &
-                        tolower(names(x)) != tolower(by.x) &
-                        tolower(names(x)) != tolower(by.y)]
+                        tolower(names(x)) %nin% tolower(by.x) &
+                        tolower(names(x)) %nin% tolower(by.y)]
   # drop identical fields unless an explicit rename has been requested.
   if (length(dupes_x) > 0 && renameAll == "no") {
     if (verbose)
-      message("x field names duplicated in y: ",
-              paste(dupes_x, collapse = ", "))
+      message(sprintf("%s field names duplicated in %s: %s", x_name, y_name,
+              paste(dupes_x, collapse = ", ")))
 
     if (verbose > 1)
-      message(sprintf("Adding %s to rename conflicts in y: ",
+      message(sprintf("Adding %s to rename conflicts in %s: %s", y_name,
                       renameConflict))
     dropFields <- c()
     for (xdup in dupes_x) {
@@ -339,7 +316,7 @@ mergeBetter <- function(x, y, by.x, by.y,
                             affix = affix, renameHow = renameAll)
   }
 
-  if (verbose) message(sprintf("merging using id: %s, and new id: %s",
+  if (verbose) message(sprintf("merging using id: %s, and new id: %s\n",
                                by.x, by.y))
 
   m <- merge(x = x, by.x = by.x, all.x = all.x,
@@ -461,7 +438,7 @@ filterBetter <- function(x, expr, verbose = TRUE) {
 binary_col_names <- function(x, invert = FALSE) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  names(x)[sapply(x, function(y) all(y %in% c(0, 1))) & !invert]
+  names(x)[xor(sapply(x, function(y) all(y %in% c(0, 1))), invert)]
 }
 
 #' @rdname binary_col_names
@@ -472,12 +449,34 @@ binary_cols <- function(x, invert = FALSE) {
   x[binary_col_names(x = x, invert = invert)]
 }
 
+#' @describeIn binary_col_names Find character columns which are really numeric
+#' @param attrition If less than this proportion of rows become \code{NA} on
+#'   conversion to numeric, then accept this is a numeric column after all.
+#' @export
+numeric_char_col_names <- function(x, invert = FALSE, attrition = 0.05) {
+  checkmate::assertDataFrame(x)
+  checkmate::assertFlag(invert)
+
+  char_cols <- sapply(x, is.character)
+  was_na <- colSums(is.na(x[char_cols]))
+  numberish <- colSums(is.na(asNumericNoWarn(x[char_cols])))
+  new_na_ratio <- (numberish - was_na) / (nrow(x) - was_na)
+  new_na_ratio
+}
+
 #' @rdname binary_col_names
 #' @export
 numeric_col_names <- function(x, invert = FALSE) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  names(x)[sapply(x, function(y) is.numeric(y)) & !invert]
+
+  names(x)[sapply(x, function(y) {
+    z <- is.numeric(y)
+    if (invert)
+      !z
+    else
+      z
+  })]
 }
 
 #' @rdname binary_col_names
@@ -526,4 +525,51 @@ zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE)
       message(sprintf("skipping factor or Date: %s", n))
   }
   df
+}
+
+#' minimal basic pre-processing metrics
+#' @param x data.frame input
+#' @param df_list list of data frames
+#' @export
+jw_df_basics <- function(x, df_list) {
+  stopifnot(xor(missing(x), missing(df_list)))
+  if (!missing(x))
+    df_list <- list(x)
+
+  checkmate::assertList(df_list, types = "data.frame", min.len = 1)
+
+  out <- lapply(df_list, .jw_df_basics_impl)
+  if (length(out) > 1)
+    out
+  else
+    out[[1]]
+
+}
+
+.jw_df_basics_impl <- function(x) {
+  checkmate::assertDataFrame(x)
+
+  n <- nrow(x)
+  cl <- lapply(x, class)
+  f <- vapply(x, is.factor, logical(1))
+  u <- sapply(x, function(y) length(unique(y)))
+  n_na <- colSums(is.na(x))
+  suppressWarnings({
+    n_neg <- colSums(x < 0)
+    n_zero <- colSums(x == 0)
+  })
+
+  n_neg[f] <- NA
+  n_zero[f] <- NA
+
+  cbind(
+    name = names(x),
+    class = cl,
+    typeof = lapply(x, typeof),
+    n_na, p_na = n_na / n,
+    n_neg, p_neg = n_neg / n,
+    n_zero, p_zero = n_zero / n,
+    n_uniq = u,
+    p_uniq = u / n
+  )
 }

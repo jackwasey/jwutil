@@ -15,8 +15,7 @@ mergeLists(x, y)
 list of vectors
 }
 \description{
-merge lists by vector combining all the vector elements of the
-  list items with the matching names. Unnamed vectors in the list will be
-  dropped silently.
+merge lists by vector combining all the vector elements of the list items
+with the matching names. Unnamed vectors in the list will be dropped
+silently.
 }
-
