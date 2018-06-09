@@ -3,28 +3,16 @@
 \name{binary_col_names}
 \alias{binary_col_names}
 \alias{binary_cols}
-\alias{numeric_char_col_names}
-\alias{numeric_col_names}
-\alias{numeric_cols}
 \title{names of fields which are numeric, binary or combinations thereof}
 \usage{
 binary_col_names(x, invert = FALSE)
 
 binary_cols(x, invert = FALSE)
-
-numeric_char_col_names(x, invert = FALSE, attrition = 0.05)
-
-numeric_col_names(x, invert = FALSE)
-
-numeric_cols(x, invert = FALSE)
 }
 \arguments{
 \item{x}{data frame}
 
 \item{invert}{single logical, if true, will return non-binary columns}
-
-\item{attrition}{If less than this proportion of rows become \code{NA} on
-conversion to numeric, then accept this is a numeric column after all.}
 }
 \value{
 vector of column names
@@ -32,11 +20,6 @@ vector of column names
 \description{
 Doesn't make any allowance for factors.
 }
-\section{Functions}{
-\itemize{
-\item \code{numeric_char_col_names}: Find character columns which are really numeric
-}}
-
 \examples{
 dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
                   c(1L, 2L), c(0.1, 0.2), c("9", "8"))

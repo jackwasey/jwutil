@@ -19,7 +19,6 @@ v2 <- as.numeric(f2)
 vdf <- data.frame(v1, v2)
 fdv1 <- data.frame(v2, v1)
 fdv2 <- data.frame(v2 = v1, v1 = v2)
-
 dfa <- dfb <- dfc <- data.frame(
   a = c(1, 2, 3, 4),
   b = c(11, 12, 13, 14),
@@ -86,24 +85,20 @@ test_that("extra factor levels, 1,2 level factors", {
 })
 
 test_that("factorToDataframeLogical works for NA factor levels", {
-  f <-
-    factor(c("jack", "alfie", NA), exclude = NULL)  # make NA a level
-  df <-
-    data.frame(
-      fjack = c(T, F, F),
-      falfie = c(F, T, F),
-      fNA = c(F, F, T)
-    )
+  f <- factor(c("jack", "alfie", NA), exclude = NULL)
+  df <- data.frame(
+    fjack = c(T, F, F),
+    falfie = c(F, T, F),
+    fNA = c(F, F, T)
+  )
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
-  f <-
-    factor(c("jack", "alfie", NA), exclude = NA)  # make NA not a level
-  df <-
-    data.frame(
-      fjack = c(T, F, F),
-      falfie = c(F, T, F),
-      fNA = c(F, F, T)
-    )
+  f <- factor(c("jack", "alfie", NA), exclude = NA)
+  df <- data.frame(
+    fjack = c(T, F, F),
+    falfie = c(F, T, F),
+    fNA = c(F, F, T)
+  )
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
 
   f <- factor(c("jack", NA))
@@ -113,11 +108,7 @@ test_that("factorToDataframeLogical works for NA factor levels", {
   f <- factor(c("jack", "alfie"), levels = c("jack", "alfie", NA))
   df <- data.frame(fjack = c(T, F))
   expect_equal(factorToDataframeLogical(f, prefix = "f"), df)
-
 })
-
-
-
 
 test_that("drop duplicate fields in a data frame", {
   expect_error(dropDuplicateFields(bad_input))
@@ -128,7 +119,6 @@ test_that("drop duplicate fields in a data frame", {
   expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c")]), dfa)
   expect_equal(dropDuplicateFields(dfa[c("a", "a", "b", "c", "c")]), dfa)
 })
-
 
 test_that("drop rows with NA values in given fields bad data", {
   # don't test \code{complete.cases}, just my function

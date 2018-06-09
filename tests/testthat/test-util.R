@@ -403,7 +403,7 @@ test_that("areIntegers", {
   expect_that(areIntegers(c(1, 2)), testthat::equals(c(TRUE, TRUE)))
   expect_true(areIntegers(-1))
   expect_true(all(areIntegers(zeroes)))
-  expect_that(all(areIntegers(random_test_integers())), is_true())
+  expect_true(all(areIntegers(random_test_integers())))
   expect_true(areIntegers(1.00000000005))  # inside default tolerance
   expect_that(areIntegers(NA_integer_, na.ignore = T),
               testthat::equals(NA_integer_))
@@ -411,16 +411,12 @@ test_that("areIntegers", {
               testthat::equals(NA_integer_))
   expect_that(areIntegers(NA_character_, na.ignore = T),
               testthat::equals(NA_integer_))
-  expect_that(areIntegers(NA_integer_, na.ignore = F),
-              testthat::is_false())
-  expect_that(areIntegers(NA_real_, na.ignore = F),
-              testthat::is_false())
-  expect_that(areIntegers(NA_character_, na.ignore = F),
-              testthat::is_false())
+  expect_false(areIntegers(NA_integer_, na.ignore = F))
+  expect_false(areIntegers(NA_real_, na.ignore = F))
+  expect_false(areIntegers(NA_character_, na.ignore = F))
   expect_true(areIntegers(1.005, tol = 0.01))
-
   # multi value:
-  expect_that(areIntegers(c(1, 0, -1)), testthat::equals(c(T, T, T)))
+  expect_equal(areIntegers(c(1, 0, -1)), c(T, T, T))
   expect_equal(areIntegers(zeroes), rep(TRUE, times = length(zeroes)))
   expect_equal(areIntegers(random_test_integers()),
                rep(TRUE, times = length(random_test_integers())))

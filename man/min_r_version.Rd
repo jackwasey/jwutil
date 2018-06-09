@@ -24,12 +24,10 @@ base <- c("base", "compiler", "datasets", "grDevices", "graphics",
 
 \dontrun{
 base_reqs <- lapply(base, min_r_version)
-
 contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
 "class", "cluster", "codetools", "foreign", "lattice",
  "mgcv", "nlme", "nnet", "rpart", "spatial", "survival")
-
 contrib_reqs <- lapply(contrib, min_r_version)
-}
 min_r_version("icd")
+}
 }

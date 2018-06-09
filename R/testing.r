@@ -32,7 +32,7 @@ lsf <- function(pkg) {
 
   funcs <- c()
   for (e in everything) {
-    if (is.function(get(e, envir = as.environment(env_name), inherits = F)))
+    if (is.function(get(e, envir = as.environment(env_name), inherits = FALSE)))
       funcs <- append(funcs, e)
   }
   funcs
@@ -124,7 +124,6 @@ random_test_integers <- function(n = nums_in_tests,
                                  min = -.Machine$integer.max,
                                  max = .Machine$integer.max,
                                  hole = NULL) {
-
   x <- suppressWarnings(
     unique(
       as.integer(
@@ -142,9 +141,8 @@ random_test_integers <- function(n = nums_in_tests,
 #' @export
 random_test_dates <- function(n = nums_in_tests,
                               origin = as.Date("2000-01-01"),
-                              dayspread = 365 * 150) {
+                              dayspread = 365 * 150)
   as.Date(stats::runif(n, min = -dayspread, max = dayspread), origin)
-}
 
 #' @rdname random_test_dates
 #' @export
@@ -180,14 +178,10 @@ random_test_letters <- function(n = nums_in_tests, max_str_len = 257) {
 #' @keywords sysdata
 #' @export
 extreme_numbers <- c(
-  .Machine$integer.max,
-  -.Machine$integer.max,
-  1L,
-  -1L,
-  .Machine$double.xmin,
-  .Machine$double.xmax,
-  -.Machine$double.xmin,
-  -.Machine$double.xmax)
+  .Machine$integer.max, -.Machine$integer.max,
+  1L, -1L,
+  .Machine$double.xmin,.Machine$double.xmax,
+  -.Machine$double.xmin, -.Machine$double.xmax)
 
 #' @title alternative \code{expect_that} from \code{testthat} which permutes all
 #'   the inputs to a function which should give the same result where n args >=2
@@ -212,10 +206,8 @@ extreme_numbers <- c(
 #' @export
 expect_that_combine_all_args <- function(object, condition,
                                          info = NULL, label = NULL) {
-
   cl <- substitute(object)
   # TODO: I now want to test for whether there are multiple top-level symbols
-
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
   arg_names <- names(args)
@@ -223,10 +215,8 @@ expect_that_combine_all_args <- function(object, condition,
   stopifnot(identical(unlist(args, recursive = TRUE),
                       unlist(args, recursive = FALSE)))
   stopifnot(length(args) >= 2)
-
   arg_combs <- permute(unlist(args))
   arg_name_combs <- permute(arg_names)
-
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
     arg_list <- as.list(arg_combs[comb, ])
@@ -249,10 +239,8 @@ expect_that_combine_all_args <- function(object, condition,
 #' @export
 expect_that_combine_first_arg <- function(object, condition,
                                           info = NULL, label = NULL) {
-
   cl <- substitute(object)
   # TODO: see above
-
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
   arg_one <- eval(args[[1]])  # c(1,2,3) has len 4 because not evaluated yet
