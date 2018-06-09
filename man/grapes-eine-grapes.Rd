@@ -2,12 +2,8 @@
 % Please edit documentation in R/env.r
 \name{\%eine\%}
 \alias{\%eine\%}
-\title{in/match equivalent for two \code{Environment} arguments}
+\title{%in%/match equivalent for two \code{Environment} arguments}
 \usage{
 x \%eine\% table
-}
-\description{
-\code{x} and \code{table} are identical to match. Lookup is done based on
-environment element names; contents are ignored.
 }
 \keyword{internal}

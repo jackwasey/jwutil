@@ -122,44 +122,6 @@ areNumeric <- function(x, extras = c(".", "NA", NA)) {
 "%nin%" <- function(x, table)
   match(x, table, nomatch = 0) == 0
 
-#' @title read file from zip at URL
-#' @description downloads zip file, and opens named file \code{filename}, or the
-#'   single file in zip if \code{filename} is not specified. FUN is a function,
-#'   with additional arguments to FUN given by \dots.
-#'   @details TODO: update from \code{icd} package
-#' @param url character vector of length one containing URL of zip file.
-#' @param filename character vector of length one containing name of file to
-#'   extract from zip. If not specified, and the zip contains a single file,
-#'   then this single file will be used.
-#' @param FUN function used to process the file in the zip, defaults to
-#'   readLines. The first argument to FUN will be the path of the extracted
-#'   \code{filename}
-#' @param \dots further arguments to FUN
-#' @export
-read.zip.url <- function(url, filename = NULL, FUN = readLines, ...) {
-  stopifnot(length(filename) <= 1)
-  stopifnot(is.character(url), length(url) == 1)
-  zipfile <- tempfile()
-  on.exit(unlink(zipfile), add = TRUE)
-  utils::download.file(url = url, destfile = zipfile, quiet = TRUE)
-  zipdir <- tempfile()
-  on.exit(unlink(zipfile, recursive = TRUE), add = TRUE)
-  dir.create(zipdir)
-  utils::unzip(zipfile, exdir = zipdir)  # files="" so extract all
-  files <- list.files(zipdir, recursive = TRUE)
-  if (is.null(filename)) {
-    if (length(files) == 1) {
-      filename <- files
-    } else {
-      stop("multiple files in zip, but no filename specified: ",
-           paste(files, collapse = ", "))
-    }
-  } else
-    stopifnot(filename %in% files)
-
-  do.call(FUN, args = c(list(file.path(zipdir, filename), warn = FALSE),
-                        list(...)))
-}
 
 #' @title count non-numeric elements
 #' @description counts the number of non-numeric elements in a vector, without
@@ -685,16 +647,3 @@ reqinst <- function(pkgs) {
 #' @keywords internal
 #' @param lhs,rhs chained functions and results
 NULL
-
-#' Update github_install packages
-#' @export
-update_github_pkgs <- function() {
-  requireNamespace("devtools")
-  pkgs <- installed.packages(fields = "RemoteType")
-  gh <- pkgs[pkgs[, "RemoteType"] %in% "github", "Package"]
-  lapply(gh, function(x) {
-    repo = packageDescription(x, fields = "GithubRepo")
-    username = packageDescription(x, fields = "GithubUsername")
-    devtools::install_github(repo = paste0(username, "/", repo))
-  })
-}

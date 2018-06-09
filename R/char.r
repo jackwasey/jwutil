@@ -126,23 +126,19 @@ strPairMatch <- function(pattern, text, swap = FALSE, dropEmpty = FALSE, ...) {
   stopifnot(is.character(text))
   stopifnot(is.logical(swap))
   stopifnot(is.logical(dropEmpty))
-
   res <- strMultiMatch(pattern = pattern, text = text,
                        dropEmpty = dropEmpty, ...)
-  stopifnot(all(sapply(res, function(x) length(x) == 2)))
-
+  stopifnot(all(vapply(res, function(x) length(x) == 2, integer(1))))
   outNames <- vapply(X = res,
                      FUN = "[",
                      FUN.VALUE = character(1),
                      ifelse(swap, 2, 1))
   stopifnot(all(!is.na(outNames)))
-
   out <- vapply(X = res,
                 FUN = "[",
                 FUN.VALUE = character(1),
                 ifelse(swap, 1, 2))
   stopifnot(all(!is.na(out)))
-
   names(out) <- outNames
   out
 }
