@@ -18,16 +18,16 @@ Depends:
 Imports:
     checkmate,
     magrittr,
-    methods,
-    Rcpp,
-    stats,
-    utils
+    Rcpp
 Suggests:
     devtools,
     knitr,
     lintr,
+    methods,
+    stats,
     testthat,
-    tools
+    tools,
+    utils
 License: GPL-3
 BugReports: https://github.com/jackwasey/jwutil/issues
 Encoding: UTF-8

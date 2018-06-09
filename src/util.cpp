@@ -38,6 +38,7 @@ std::vector<std::string> fastIntToStringStd(std::vector<int> x) {
 }
 
 //' @describeIn fastIntToString Same using Rcpp
+//' @export
 // [[Rcpp::export]]
 Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x) {
   size_t len = x.size();

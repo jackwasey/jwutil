@@ -4,7 +4,6 @@
 #include <omp.h>
 #endif
 
-
 // [[Rcpp::export]]
 int getOmpMaxThreads() {
   int maxthreads = 0;

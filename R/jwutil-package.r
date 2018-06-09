@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2017  Jack O. Wasey
+# Copyright (C) 2014 - 2018  Jack O. Wasey
 #
 # This file is part of jwutil.
 #
@@ -15,10 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with jwutil If not, see <http:#www.gnu.org/licenses/>.
 
-#' @title Tools for data manipulation not found elsewhere, and testthat extensions
+#' @title Tools for testing and data manipulation not found elsewhere
 "_PACKAGE"
 #' @name jwutil-package
 #' @aliases jwutil jwutil-package
 #' @useDynLib jwutil, .registration=TRUE
+#' @importFrom Rcpp evalCpp
+#' @importFrom utils download.file unzip read.delim object.size globalVariables
+#'   contrib.url compareVersion install.packages combn packageDescription
+#' @importFrom stats runif complete.cases as.formula
 #' @docType package
 NULL

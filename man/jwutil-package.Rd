@@ -6,7 +6,7 @@
 \alias{jwutil-package}
 \alias{jwutil-package}
 \alias{jwutil}
-\title{Tools for data manipulation not found elsewhere, and testthat extensions}
+\title{Tools for testing and data manipulation not found elsewhere}
 \description{
 This is a set of simple utilities for various data manipulation and testing tasks.
 The goal is to use base tools and 'tidyverse' well, without bringing in too many

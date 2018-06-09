@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2017  Jack O. Wasey
+# Copyright (C) 2014 - 2018  Jack O. Wasey
 #
 # This file is part of jwutil.
 #
@@ -224,8 +224,8 @@ expect_that_combine_all_args <- function(object, condition,
                       unlist(args, recursive = FALSE)))
   stopifnot(length(args) >= 2)
 
-  arg_combs <- jwutil::permute(unlist(args))
-  arg_name_combs <- jwutil::permute(arg_names)
+  arg_combs <- permute(unlist(args))
+  arg_name_combs <- permute(arg_names)
 
   # now loop through all permutations
   for (comb in 1:dim(arg_combs)[1]) {
@@ -263,7 +263,7 @@ expect_that_combine_first_arg <- function(object, condition,
   stopifnot(length(arg_one) >= 2)
 
   # get the combinations of arguments
-  arg_one_combs <- jwutil::permute(arg_one)
+  arg_one_combs <- permute(arg_one)
 
   # now loop through all permutations
   for (comb in 1:dim(arg_one_combs)[1]) {

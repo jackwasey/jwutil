@@ -85,6 +85,7 @@ fastIntToStringStd <- function(x) {
 }
 
 #' @describeIn fastIntToString Same using Rcpp
+#' @export
 fastIntToStringRcpp <- function(x) {
     .Call(`_jwutil_fastIntToStringRcpp`, x)
 }

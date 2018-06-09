@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2017  Jack O. Wasey
+# Copyright (C) 2014 - 2018  Jack O. Wasey
 #
 # This file is part of jwutil.
 #
@@ -460,9 +460,8 @@ platformIsMac <- function()
 #' @seealso \code{readxl} package by Hadley Wickham
 #' @export
 read_xlsx_linux <- function(file) {
-  if (jwutil::platformIsWindows())
+  if (platformIsWindows())
     stop("can only convert XLSX on linux using xlsx2csv command")
-
   csvfile <- tempfile()
   on.exit(unlink(csvfile), add = TRUE)
   system(paste0("xlsx2csv --delimiter=tab --dateformat=%m-%d-%y \"",
