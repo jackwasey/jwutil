@@ -1,16 +1,11 @@
-## Update
-Since last (failed) submission, 'testthat' quoted correctly in DESCRIPTION Description. Many thanks.
+Adds C++ registration.
 
-## Test environments
-* Ubuntu 16.04 R 3.3.1, clang 3.9 trunk and gcc 5.3.1
-* Ubuntu 12.04 (on travis-ci) R 3.3.0 patched, gcc 4.6.3
-* OSX 10.11, clang 3.9
+# Test environments
+* Ubuntu 18.04 R 3.5.0, GCC 7.3, clang 6
+* Ubuntu 14.04 (Travis) R-devel, gcc
+* Windows Server 2012 R2 x64 (Appveyor), R devel 32 and 64 bit
+* OSX High Sierra, clang 6
 
-## R CMD check
+# R CMD check
 
-CRAN repository db overrides:
-  X-CRAN-Comment: Removed from CRAN on 2015-03-02 for policy violation.
-
-This is now resolved by cleaning up temporary files during package tests.
-
-There are no errors or warnings.
+There are no notes, errors or warnings.
