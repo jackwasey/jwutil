@@ -72,7 +72,7 @@ getDropped <- function(x, y)
 binary_col_names <- function(x, invert = FALSE) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  names(x)[xor(sapply(x, function(y) all(y %in% c(0, 1))), invert)]
+  names(x)[xor(vapply(x, function(y) all(y %in% c(0, 1)), logical(1)), invert)]
 }
 
 #' @rdname binary_col_names
@@ -116,7 +116,7 @@ jw_df_basics <- function(x, df_list) {
   n <- nrow(x)
   cl <- lapply(x, class)
   f <- vapply(x, is.factor, logical(1))
-  u <- sapply(x, function(y) length(unique(y)))
+  u <- vapply(x, function(y) length(unique(y)), integer(1))
   n_na <- colSums(is.na(x))
   suppressWarnings({
     n_neg <- colSums(x < 0)

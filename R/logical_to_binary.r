@@ -14,7 +14,7 @@ logical_to_binary <- function(x) {
          dim(x)[1], dim(x)[2])
 
   # can condense this code into a one-liner, but this is clearer:
-  logical_fields <- names(x)[sapply(x, is.logical)]
+  logical_fields <- names(x)[vapply(x, is.logical, logical(1))]
   if (is.na(logical_fields) || length(logical_fields) == 0) return(x)
 
   #update just the logical fields with integers

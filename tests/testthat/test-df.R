@@ -63,9 +63,10 @@ test_that("factorToDataframeLogical works", {
   )),
   c(9, 3))
   expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
-  expect_true(all(sapply(
+  expect_true(all(vapply(
     factorToDataframeLogical(f1, prefix = "f1"),
-    is.logical
+    is.logical,
+    FUN.VALUE = logical(1)
   )))
 
 })

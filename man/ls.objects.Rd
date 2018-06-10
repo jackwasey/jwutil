@@ -2,13 +2,13 @@
 % Please edit documentation in R/util.r
 \name{ls.objects}
 \alias{ls.objects}
-\title{Summarize objects in scope}
+\title{Summarize objects}
 \usage{
-ls.objects(pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE,
-  n = 5)
+ls.objects(env = parent.frame(), pattern, order.by, decreasing = FALSE,
+  head = FALSE, n = 5)
 }
 \arguments{
-\item{pos}{pos}
+\item{env}{Environment to search, default is the parent frame}
 
 \item{pattern}{regex pattern to match objects of interest}
 
@@ -21,5 +21,5 @@ ls.objects(pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE,
 \item{n}{number to show if limiting to \code{head}}
 }
 \description{
-Get type, size (bytes) and dimensions of objects in scope
+Get type, size (bytes) and dimensions of objects
 }

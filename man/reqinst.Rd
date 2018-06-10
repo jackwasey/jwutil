@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.r
 \name{reqinst}
 \alias{reqinst}
-\title{install packages where are missing}
+\title{Load packages with \code{library}, installing any which are missing}
 \usage{
 reqinst(pkgs)
 }
@@ -11,5 +11,5 @@ reqinst(pkgs)
 installation if necessary}
 }
 \description{
-install packages where are missing
+Load packages with \code{library}, installing any which are missing
 }

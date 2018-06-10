@@ -11,7 +11,7 @@
 get_numeric_char_field_names <- function(x, invert = FALSE, attrition = 0.05) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  char_cols <- sapply(x, is.character)
+  char_cols <- vapply(x, is.character, character(1))
   was_na <- colSums(is.na(x[char_cols]))
   numberish <- colSums(is.na(asNumericNoWarn(x[char_cols])))
   new_na_ratio <- (numberish - was_na) / (nrow(x) - was_na)
@@ -23,13 +23,8 @@ get_numeric_char_field_names <- function(x, invert = FALSE, attrition = 0.05) {
 get_numeric_field_names <- function(x, invert = FALSE) {
   checkmate::assertDataFrame(x)
   checkmate::assertFlag(invert)
-  names(x)[sapply(x, function(y) {
-    z <- is.numeric(y)
-    if (invert)
-      !z
-    else
-      z
-  })]
+  names(x)[vapply(x, FUN.VALUE = logical(1),
+                  function(y) xor(is.numeric(y), invert))]
 }
 
 #' @rdname get_numeric_char_field_names

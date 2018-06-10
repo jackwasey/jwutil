@@ -493,30 +493,48 @@ rm_r <- function(x, envir = parent.frame()) {
   })
 }
 
-#' Summarize objects in scope
+#' Summarize objects
 #'
-#' Get type, size (bytes) and dimensions of objects in scope
-#' @param pos pos
+#' Get type, size (bytes) and dimensions of objects
+#' @param env Environment to search, default is the parent frame
 #' @param pattern regex pattern to match objects of interest
 #' @param order.by which column to order by
 #' @param decreasing default is \code{TRUE}
 #' @param head default is \code{FALSE} but if true, just show top \code{n}
 #' @param n number to show if limiting to \code{head}
+#' @importFrom utils object.size
+#' @md
 #' @export
-ls.objects <- function(pos = 1, pattern, order.by,
+ls.objects <- function(env = parent.frame(), pattern, order.by,
                        decreasing = FALSE, head = FALSE, n = 5) {
-  napply <- function(names, fn) sapply(names, function(x)
-    fn(get(x, pos = pos)))
-  names <- ls(pos = pos, pattern = pattern)
-  obj.class <- napply(names, function(x) as.character(class(x))[1])
-  obj.mode <- napply(names, mode)
+  nms <- ls(envir = env, pattern = pattern)
+  if (!length(names)) {
+    message("No objects found.")
+    return()
+  }
+  obj.class <- vapply(mget(nms, envir = env), class, character(1))
+  obj.mode <- vapply(mget(nms, envir = env), mode, character(1))
   obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
-  obj.size <- napply(names, utils::object.size)
-  obj.dim <- t(napply(names, function(x) as.numeric(dim(x))[1:2]))
-  vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
-  obj.dim[vec, 1] <- napply(names, length)[vec]
-  out <- data.frame(obj.type, obj.size, obj.dim)
-  names(out) <- c("Type", "Size", "Rows", "Columns")
+  obj.size <- vapply(mget(nms, envir = env), utils::object.size, double(1))
+  obj.rows <- rep(NA_integer_, length(nms))
+  obj.cols <- rep(NA_integer_, length(nms))
+  for (n in seq_along(nms)) {
+    w <- get(nms[n], envir = env)
+    d <- dim(w)
+    if (!is.null(d) && !is.na(d)) {
+      obj.rows[n] <- d[1]
+      obj.cols[n] <- d[2]
+    } else if (is.vector(w)) {
+      obj.rows[n] <- length(w)
+      obj.cols[n] <- NA
+    }
+    else {
+      obj.rows[n] <- NA
+      obj.cols[n] <- NA
+    }
+  }
+  out <- data.frame(obj.type, obj.size, obj.rows, obj.cols)
+  names(out) <- c("Type", "Size", "Len/Rows", "Columns")
   if (!missing(order.by))
     out <- out[order(out[[order.by]], decreasing = decreasing), ]
   if (head)
@@ -617,30 +635,19 @@ min_r_version <- function(pkg) {
   max_ver
 }
 
-#' install packages where are missing
+#' Load packages with `library`, installing any which are missing
 #' @param pkgs character vector of packages to load and attach, with
 #'   installation if necessary
 #' @importFrom utils install.packages
+#' @md
 #' @export
 reqinst <- function(pkgs) {
-  for (pkg in pkgs)
-    if (!suppressPackageStartupMessages(
-      require(pkg, character.only = TRUE,
-                 quietly = TRUE,
-                 warn.conflicts = FALSE))) {
+  for (pkg in pkgs) {
+    if (suppressPackageStartupMessages(
+      !require(pkg, character.only = TRUE,
+               quietly = TRUE,
+               warn.conflicts = FALSE)))
       utils::install.packages(pkg, quiet = TRUE)
-      library(pkg, character.only = TRUE)
-    }
+    library(pkg, character.only = TRUE)
+  }
 }
-
-#' Pipe, re-exported from \pkg{magrittr}
-#'
-#' Use the pipe function, \code{\%>\%} to turn function composition into a
-#' series of imperative statements.
-#'
-#' @importFrom magrittr "%>%" "%<>%" set_names extract2
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @param lhs,rhs chained functions and results
-NULL

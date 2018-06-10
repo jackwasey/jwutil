@@ -3,16 +3,20 @@
 #' create an environment by inserting the value \code{val} with names taken from
 #' \code{x}
 #' @keywords internal
-vec_to_env_true <- function(x, val = TRUE, env = new.env(hash = TRUE, parent = baseenv())) {
-  lapply(x, function(y) env[[y]] <- val)
-  env
-}
+vec_to_env_true <-
+  function(x, val = TRUE, env = new.env(hash = TRUE, parent = baseenv())) {
+    stopifnot(is.environment(env))
+    lapply(x, function(y) env[[y]] <- val)
+    env
+  }
 
-vec_to_env_count <- function(x, env = new.env(hash = TRUE, parent = baseenv())) {
-  for (i in seq_along(x))
-    env[[x[i]]] <- i
-  env
-}
+vec_to_env_count <-
+  function(x, env = new.env(hash = TRUE, parent = baseenv())) {
+    stopifnot(is.environment(env))
+    for (i in seq_along(x))
+      env[[x[i]]] <- i
+    env
+  }
 
 #' return a new environment with names and values swapped
 #'
@@ -27,12 +31,13 @@ env_to_vec_flip <- function(env) {
   invisible(out)
 }
 
-vec_to_lookup_pair <- function(x,
-                               env = new.env(hash = TRUE, parent = baseenv())) {
-  for (i in seq_along(x))
-    env[[x[i]]] <- i
-  list(env = env, vec = x)
-}
+vec_to_lookup_pair <-
+  function(x, env = new.env(hash = TRUE, parent = baseenv())) {
+    stopifnot(is.environment(env))
+    for (i in seq_along(x))
+      env[[x[i]]] <- i
+    list(env = env, vec = x)
+  }
 
 #' @title \%in\%/match equivalent for two \code{environment} arguments
 #' @description \code{x} and \code{table} use the same as with

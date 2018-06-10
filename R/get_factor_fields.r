@@ -9,7 +9,7 @@ get_factor_fields <- function(x, consider = names(x)) {
   if (length(names(x)) <= 0 || length(consider) <= 0)
     return()
 
-  consider[sapply(x[1, consider], is.factor)]
+  consider[vapply(x[1, consider], is.factor, logical(1))]
   # TODO if any duplicated
 }
 

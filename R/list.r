@@ -42,8 +42,10 @@ mergeLists <- function(x, y) {
 #' @return trimmed list
 #' @export
 listTrim  <-  function(x){
-  if (isFlat(x)) return(listTrimFlat(x))
-  lapply(x, listTrim)
+  if (isFlat(x))
+    listTrimFlat(x)
+  else
+    lapply(x, listTrim)
 }
 
 #' @title trim null or empty values from a list
@@ -55,9 +57,9 @@ listTrimFlat  <-  function(x) {
   # inefficient to do this twice if called from listTrim, but hey ho.
   stopifnot(isFlat(x))
   suppressWarnings(
-    x[sapply(x, length) != 0 &
-        !sapply(x, function(y) all(is.null(y))) &
-        !sapply(x, function(y) all(is.na(y)))
+    x[vapply(x, length, integer(1)) != 0 &
+        !vapply(x, function(y) all(is.null(y)), logical(1)) &
+        !vapply(x, function(y) all(is.na(y)), logical(1))
       ]
   )
 }

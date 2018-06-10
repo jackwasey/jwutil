@@ -8,7 +8,7 @@
 #' @export
 getNAFields <- function(dframe) {
   stopifnot(is.data.frame(dframe))
-  naFields <- names(dframe)[sapply(dframe, countIsNa) > 0]
+  naFields <- names(dframe)[vapply(dframe, countIsNa, integer(1)) > 0]
   if (length(naFields) == 0)
     character()
   else
@@ -27,9 +27,9 @@ getNonNAFields <- function(dframe)
 #' @return numeric vector
 #' @export
 propNaPerField <- function(dframe)
-  sapply(dframe, function(v) {
+  vapply(dframe, function(v) {
     countIsNa(v) / length(v)
-  })
+  }, numeric(1))
 
 #' @title drops rows with NA values in specified fields
 #' @description employs \code{stats::complete.cases} which is fast internal C
