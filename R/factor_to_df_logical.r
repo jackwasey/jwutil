@@ -11,16 +11,13 @@
 #' @template verbose
 #' @return data.frame with columns of logicals
 #' @export
-factor_to_df_logical <- function(fctr,
-                                 prefix = deparse(substitute(fctr)),
-                                 sep = "",
-                                 na.rm = TRUE,
-                                 verbose = FALSE) {
-  checkmate::assertFactor(fctr)
-  checkmate::assertString(prefix)
-  checkmate::assertString(sep)
-  checkmate::assertFlag(na.rm)
-  checkmate::assertFlag(verbose)
+factor_to_df_logical <- function(fctr, prefix = deparse(substitute(fctr)),
+                                 sep = "", na.rm = TRUE, verbose = FALSE) {
+  stopifnot(is.factor(fctr))
+  stopifnot(is.character(prefix) && length(prefix) == 1L)
+  stopifnot(is.character(sep) && length(sep) == 1L)
+  stopifnot(is.logical(na.rm) && length(na.rm) == 1)
+  stopifnot(is.logical(verbose) && length(verbose) == 1)
   if (verbose && sum(is.na(fctr)) > 0)
     warning("factorToCols: factor passed to factorCols contains NA")
   #remove unused factor levels

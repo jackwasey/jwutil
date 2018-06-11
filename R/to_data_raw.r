@@ -19,21 +19,17 @@
 #' @export
 unzip_to_data_raw <- function(url, file_name, force = FALSE, verbose = FALSE,
                               offline = TRUE, data_raw_path = "data-raw") {
-  checkmate::assert_string(url, na.ok = FALSE)
-  checkmate::assert_string(file_name, na.ok = FALSE)
-  checkmate::assert_flag(offline)
-
-  if (!dir.exists(data_raw_path))
-    data_raw_path <- .tempdir()
-
+  stopifnot(is.character(url) && length(url) == 1L)
+  stopifnot(is.character(file_name) && length(file_name) == 1L)
+  stopifnot(is.logical(offline) && length(offline) == 1L)
+  if (!dir.exists(data_raw_path)) data_raw_path <- .tempdir()
   file_path <- file.path(data_raw_path, make.names(file_name))
   if (verbose) {
     message("file path = ", file_path)
     message("file name = ", file_name)
   }
   if (force || !file.exists(file_path)) {
-    if (offline)
-      return()
+    if (offline) return()
     stopifnot(
       unzip_single(url = url, file_name = file_name, save_path = file_path)
     )
@@ -47,27 +43,15 @@ download_to_data_raw <- function(
   url,
   file_name = regmatches(url, regexpr("[^/]*$", url)),
   offline = TRUE, data_raw_path = "data-raw") {
-  checkmate::assert_string(url)
-  checkmate::assert_string(file_name)
-  checkmate::assert_flag(offline)
-
-  if (!dir.exists(data_raw_path))
-    data_raw_path <- .tempdir()
-
-
+  stopifnot(is.character(url) && length(url) == 1L)
+  stopifnot(is.character(file_name) && length(file_name) == 1L)
+  stopifnot(is.logical(offline) && length(offline) == 1L)
+  if (!dir.exists(data_raw_path)) data_raw_path <- .tempdir()
   save_path <- file.path(data_raw_path, file_name)
   f_info <- list(file_path = save_path, file_name = file_name)
-
-  if (file.exists(save_path))
-    return(f_info)
-
-  if (offline)
-    return()
-
-  # consider libcurl, but seems to work without now
+  if (file.exists(save_path)) return(f_info)
+  if (offline) return()
   if (utils::download.file(url = url, destfile = save_path, quiet = TRUE) != 0)
     stop(paste(url, " not downloaded successfully."))
-
   f_info
-
 }

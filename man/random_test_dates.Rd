@@ -5,11 +5,11 @@
 \alias{random_test_posixlt_datetimes}
 \title{generate random Dates or POSIXlt test datetimes}
 \usage{
-random_test_dates(n = nums_in_tests, origin = as.Date("2000-01-01"),
+random_test_dates(n = n_rnd, origin = as.Date("2000-01-01"),
   dayspread = 365 * 150)
 
-random_test_posixlt_datetimes(n = nums_in_tests,
-  origin = as.Date("2000-01-01"), dayspread = 365 * 150)
+random_test_posixlt_datetimes(n = n_rnd, origin = as.Date("2000-01-01"),
+  dayspread = 365 * 150)
 }
 \arguments{
 \item{n}{integer number to generate}

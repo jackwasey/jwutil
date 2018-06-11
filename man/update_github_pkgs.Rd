@@ -4,11 +4,13 @@
 \alias{update_github_pkgs}
 \title{Update github_install packages}
 \usage{
-update_github_pkgs(no_action = FALSE)
+update_github_pkgs()
 }
-\arguments{
-\item{no_action}{Logical, if \code{TRUE}, no action will be taken, just a report
-of what would have been done.}
+\value{
+Returns invisibly the names of packages which need updating. THe
+function outputs the commands to run to actually update them (by
+reinstalling from github). Doesn't do this automatically because it would
+mean bringing in a lot of dependencies.
 }
 \description{
 Update github_install packages

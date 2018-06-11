@@ -156,11 +156,7 @@ countIsNa <- function(x)
 #' @return numeric proportion of NAs in the supplied vector
 #' @export
 propIsNa <- function(x)
-  if (length(x)) {
-    countIsNa(x) / length(x)
-  } else {
-    0
-  }
+  if (length(x)) countIsNa(x) / length(x) else 0L
 
 #' @title count which combinations of fields have at least one non-NA
 #' @description cycles through the given data frame twice, and applies logical
@@ -192,7 +188,6 @@ countNonNaPairs <- function(d) {
 #' @export
 countNonNaCumulative <- function(d) {
   running <- rep(FALSE, dim(d)[1])
-
   apply(!is.na(d),
         MARGIN = 2,
         FUN = function(x, envir) {
@@ -231,52 +226,39 @@ lsp <- function(package, all.names = TRUE, pattern) {
 #' @return vector of POSIXlt date-times
 #' @export
 add_time_to_date <- function(tms, dts, verbose = FALSE) {
-
   if (length(dts) != length(tms))
     stop("must have matching lengths of date and time vectors.
          I got: %d and %d", length(dts), length(tms))
-
   if (class(dts) %nin% c("Date", "character") && !is.na(dts))
     stop(paste("date must be of class Date, character, but received: %s",
                class(dts)))
-
   # if a time part is given in the date field, this is an error
   if (is.character(dts) && any(grepl(pattern = "\\S\\s\\S", dts)))
     stop("suspect time is already given with date argument, \
          which invalidates this entire function. e.g. %s",
          dts[grepl(pattern = "\\S\\s\\S", dts)][1])
-
   # convert to Date (may already be Date, but that's fine) any conversion error
   # in any item will result in an error. an alternative strategy would be to
   # individually tryCatch converting each Date, returning warnings, NA, or
   # detailed error message. TODO
   dts <- as.Date(dts)
-
   # a single NA value could appear as type logical
   if (class(tms) %nin% c("numeric", "integer", "character") && !is.na(tms))
     stop("time must be numeric or character, but got class for times of '%s'.",
          class(tms))
-
   # this is a data error, not a programming error, stop
-  if (any(dts < as.Date("1850-01-01"), na.rm = TRUE)) {
+  if (any(dts < as.Date("1850-01-01"), na.rm = TRUE))
     stop("some dates are before 1850: ", dts[dts < as.Date("1850-01-01")])
-    # could alternatively set NA, warn and continue:
-  }
-
-  # let NA be valid:
+    # could alternatively set NA, warn and continue.
+  # Let NA be valid:
   if (!all(isValidTime(tms, na.rm = TRUE))) {
     warning(sprintf("%d invalid time(s) received, replacing with NA",
                     sum(isValidTime(tms, na.rm = TRUE))))
     tms[!isValidTime(tms)] <- NA
   }
-
-  # drop colons, if any
-  if (is.character(tms))  tms <- gsub(":", "", tms, fixed = TRUE)
-
+  if (is.character(tms)) tms <- gsub(":", "", tms, fixed = TRUE)
   if (verbose) message(paste("working with times:", tms,
-                             collapse = ", ", sep = ", "),
-                       capture = TRUE)
-
+                             collapse = ", ", sep = ", "), capture = TRUE)
   # convert to integer, then back to string later. THis is horrible.
   tms <- asIntegerNoWarn(tms)
   bad_range <- any(tms < 0 || tms > 2359)
@@ -284,7 +266,6 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
     warning("invalid times found. Setting to NA:", tms, capture = TRUE)
     tms[bad_range] <- NA
   }
-
   timesfourzeros <- formatC(tms, width = 4, format = "d", flag = "0")
   strptime(paste(dts, timesfourzeros, sep = " "), "%Y-%m-%d %H%M")
 }
@@ -333,13 +314,10 @@ permuteWithRepeats <- function(x) {
 #' @export
 permute <- function(x) {
   if (is.null(x)) return()
-
   stopifnot(length(x) < 13)  # factorial size, so limit for sanity
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
-
   res <- c()
-
   #take each one and place it first, then recurse the rest:
   for (element in 1:length(x)) {
     sub_combs <- Recall(x[ -element])  # recurse
@@ -352,11 +330,12 @@ permute <- function(x) {
 #' @title all unique combinations of a vector and all its non-zero subsets
 #' @description all unique combinations of a vector and all its non-zero subsets
 #' @param x vector to be subsetted and combined
+#' @importFrom  utils combn
 #' @return list of vectors with all combinations of x and its subsets
 #' @export
 combn_subset <- function(x) {
   res <- list()
-  for (n in 1:length(x)) {
+  for (n in seq_along(x)) {
     r <- utils::combn(x, n, simplify = FALSE)
     r2 <- lapply(t(r), FUN = function(y) unlist(y))
     res <- c(res, r2)
@@ -371,7 +350,6 @@ combn_subset <- function(x) {
 #' @template verbose
 #' @export
 opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = TRUE) {
-
   n <- names(x)
   all_cmbs <- combn_subset(n)
   best_min <- 1e9
@@ -420,6 +398,7 @@ platformIsMac <- function()
 #' @param file is the path to the \code{.xlsx} file
 #' @return data frame
 #' @seealso \code{readxl} package by Hadley Wickham
+#' @importFrom utils read.delim
 #' @export
 read_xlsx_linux <- function(file) {
   if (platformIsWindows())
@@ -437,7 +416,7 @@ read_xlsx_linux <- function(file) {
 #' @param left character vector
 #' @param right character vector
 #' @return formula
-#' @import stats
+#' @importFrom stats as.formula
 #' @examples
 #' print(f <- build_formula(left = "A", right = c("B", "C")))
 #' class(f)
@@ -445,8 +424,8 @@ read_xlsx_linux <- function(file) {
 #' build_formula(left = "Species", right = names(iris)[1:4])
 #' @export
 build_formula <- function(left, right) {
-  checkmate::assert_string(left)
-  checkmate::assert_character(right, min.chars = 1, any.missing = FALSE, min.len = 1)
+  stopifnot(is.character(left) && length(left) == 1)
+  stopifnot(is.character(right) && length(right) > 0)
   stats::as.formula(
     paste(
       paste(left, collapse = "+"),
@@ -560,8 +539,11 @@ lsos <- function(..., n = 10)
 is.Date <- function(x)
   methods::is(x, "Date")
 
-#' @title extract code from knitr vignette and source it
-#' @description extract code from knitr vignette and source it
+#' Extract code from knitr vignette and source it
+#'
+#' Extract code from knitr vignette and source it. This has the advantage in
+#' that it runs with code in \R session, whereas running vignettes normally
+#' requires the package to be installed.
 #' @param input path to file as single character string
 #' @param output output file path, defaults to a file in a temporary name based
 #'   on \code{input}
@@ -575,15 +557,10 @@ source_purl <- function(input,
                         output = file.path(.tempdir(),
                                            paste0(basename(input), ".R")),
                         documentation = 1L, ...) {
-  requireNamespace("knitr")
-  checkmate::assertFile(input)
-  checkmate::assertPathForOutput(output, overwrite = TRUE)
-  checkmate::assertInt(documentation)
+  stopifnot(is.integer(documentation) && length(documentation) == 1L)
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
   source(output, ...)
 }
-
-utils::globalVariables(c(".", "%>%"))
 
 #' Find minimum R version required for package
 #'
@@ -606,32 +583,26 @@ utils::globalVariables(c(".", "%>%"))
 #' contrib_reqs <- lapply(contrib, min_r_version)
 #' min_r_version("icd")
 #' }
-#' @import tools
-#' @import utils
+#' @importFrom tools package_dependencies
+#' @importFrom utils available.packages contrib.url compareVersion
 #' @export
 min_r_version <- function(pkg) {
-  requireNamespace("tools")
-  requireNamespace("utils")
-  avail <- utils::available.packages(utils::contrib.url("https://cloud.r-project.org"))
+  avail <- utils::available.packages(
+    utils::contrib.url("https://cloud.r-project.org"))
   deps <- tools::package_dependencies(pkg, db = avail, recursive = TRUE)
-  if (is.null(deps))
-    stop("package not found")
+  if (is.null(deps)) stop("package not found")
   pkgs <- deps[[1]]
   repo <- getOption("repo")
-  if (is.null(repo))
-    repo <- "https://cloud.r-project.org"
+  if (is.null(repo)) repo <- "https://cloud.r-project.org"
   matches <- avail[, "Package"] %in% pkgs
   pkg_list <- avail[matches, "Depends"]
   vers <- grep("^R$|^R \\(.*\\)$", pkg_list, value = TRUE)
   vers <- gsub("[^0-9.]", "", vers)
-  if (length(vers) == 0)
-    return("Not specified")
+  if (length(vers) == 0) return("Not specified")
   max_ver <- vers[1]
-  if (length(vers) == 1)
-    return(max_ver)
+  if (length(vers) == 1) return(max_ver)
   for (v in 2:length(vers))
-    if (utils::compareVersion(vers[v], max_ver) > 0)
-      max_ver <- vers[v]
+    if (utils::compareVersion(vers[v], max_ver) > 0) max_ver <- vers[v]
   max_ver
 }
 

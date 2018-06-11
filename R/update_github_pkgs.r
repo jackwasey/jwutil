@@ -1,23 +1,20 @@
 #' Update github_install packages
-#' @param no_action Logical, if `TRUE`, no action will be taken, just a report
-#'   of what would have been done.
-#' @import utils
+#'
+#' @return Returns invisibly the names of packages which need updating. THe
+#'   function outputs the commands to run to actually update them (by
+#'   reinstalling from github). Doesn't do this automatically because it would
+#'   mean bringing in a lot of dependencies.
+#' @importFrom utils packageDescription installed.packages
 #' @md
 #' @export
-update_github_pkgs <- function(no_action = FALSE) {
-  checkmate::assert_flag(no_action)
-  requireNamespace("devtools")
-  requireNamespace("utils")
-  pkgs <- installed.packages(fields = "RemoteType")
+update_github_pkgs <- function() {
+  pkgs <- utils::installed.packages(fields = "RemoteType")
   gh <- pkgs[pkgs[, "RemoteType"] %in% "github", "Package"]
   out <- lapply(gh, function(x) {
     repo <- utils::packageDescription(x, fields = "GithubRepo")
     username <- utils::packageDescription(x, fields = "GithubUsername")
     m <- paste0(username, "/", repo)
-    if (no_action)
-      message("Would update ", m)
-    else
-      devtools::install_github(repo = m)
+    sprintf("devtools::install_github(repo = %s)", m)
   })
   invisible(names(out))
 }

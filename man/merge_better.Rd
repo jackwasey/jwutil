@@ -3,7 +3,7 @@
 \name{merge_better}
 \alias{merge_better}
 \alias{mergeBetter}
-\title{merge better}
+\title{Merge better}
 \usage{
 merge_better(x, y, by.x, by.y, all.x = FALSE, all.y = FALSE, affix = NULL,
   renameConflict = c("suffix", "prefix"), renameAll = c("no", "suffix",
@@ -47,7 +47,8 @@ verbosity, 2 will give full verbosity. 0 or FALSE turns off all messages.}
 merged data frame
 }
 \description{
-apply built-in R merge but with additional features:
+Apply built-in R \code{\link[base]{merge}} but with additional features for
+safety and information.
 }
 \examples{
 df <- data.frame(a= c("1","2"), b = 1:2, stringsAsFactors = FALSE)

@@ -15,10 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with jwutil If not, see <http:#www.gnu.org/licenses/>.
 
-
-# increasing will (randomly) cover more test cases, but quickly slow down the
-# test suite.
-nums_in_tests <- 30
+n_rnd <- 30
 
 #' @title list all functions in a package
 #' @description List functions in a package
@@ -26,10 +23,8 @@ nums_in_tests <- 30
 #' @return character vector of functions in given package
 #' @export
 lsf <- function(pkg) {
-
   env_name <- paste("package", pkg, sep = ":")
   everything <- ls(pos = env_name, all.names = TRUE)
-
   funcs <- c()
   for (e in everything) {
     if (is.function(get(e, envir = as.environment(env_name), inherits = FALSE)))
@@ -50,7 +45,6 @@ numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   # drop any NA values. Very big numbers not representable by 32 bit integers,
   # give NA with warning. For test case generation, usually we will want to
   # remove NAs.
-
   suppressWarnings(flattenList(list(as.integer(x)),
                                list(as.double(x)),
                                na.rm = na.rm))
@@ -90,8 +84,9 @@ bad_input <- c(
 #'   discard 1, 1.1 pi/2 and 2
 #' @return vector length 5n+1 containing variety of difficult numbers for
 #'   testing purposes
+#' @importFrom stats runif
 #' @export
-random_test_numbers <- function(n = nums_in_tests,
+random_test_numbers <- function(n = n_rnd,
                                 min = NULL,
                                 max = NULL,
                                 hole = NULL) {
@@ -110,7 +105,6 @@ random_test_numbers <- function(n = nums_in_tests,
   #drop any generated numbers that didn't match the constraints
   if (!is.null(min)) x <- x[x >= min]
   if (!is.null(max)) x <- x[x <= max]
-
   #punch a hole in the range, if provided:
   if (!is.null(hole) && length(hole) == 2) {
     x <- x[!(x >= hole[1] & x <= hole[2])]
@@ -120,7 +114,7 @@ random_test_numbers <- function(n = nums_in_tests,
 
 #' @rdname random_test_numbers
 #' @export
-random_test_integers <- function(n = nums_in_tests,
+random_test_integers <- function(n = n_rnd,
                                  min = -.Machine$integer.max,
                                  max = .Machine$integer.max,
                                  hole = NULL) {
@@ -139,14 +133,14 @@ random_test_integers <- function(n = nums_in_tests,
 #'   dates from, defaults to 150 years.
 #' @return vector of POSIXlt datetimes or Dates
 #' @export
-random_test_dates <- function(n = nums_in_tests,
+random_test_dates <- function(n = n_rnd,
                               origin = as.Date("2000-01-01"),
                               dayspread = 365 * 150)
   as.Date(stats::runif(n, min = -dayspread, max = dayspread), origin)
 
 #' @rdname random_test_dates
 #' @export
-random_test_posixlt_datetimes <- function(n = nums_in_tests,
+random_test_posixlt_datetimes <- function(n = n_rnd,
                                           origin = as.Date("2000-01-01"),
                                           dayspread = 365 * 150) {
   as.POSIXlt(
@@ -159,7 +153,7 @@ random_test_posixlt_datetimes <- function(n = nums_in_tests,
 #' @param max_str_len integer scalar, maximum length of possible strings
 #'   created, as distinct from number of strings given by \code{n}
 #' @export
-random_test_letters <- function(n = nums_in_tests, max_str_len = 257) {
+random_test_letters <- function(n = n_rnd, max_str_len = 257) {
   x <- c()
   for (i in 1:n) {
     x[length(x) + 1] <- paste(

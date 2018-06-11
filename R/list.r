@@ -69,17 +69,18 @@ listTrimFlat  <-  function(x) {
 #'   different data types, but removes any depth
 #' @param ... list or any set of objects which will be made into a list, may
 #'   include lists and nested lists
-#' @param na.rm will drop NA values if TRUE
+#' @param na_rm will drop NA values if TRUE
 #' @return list without nested lists, objects with preserved data types
 #' @source
 #'   https://stackoverflow.com/questions/8139677/\
 #'   how-to-flatten-a-list-to-a-list-without-coercion
 #' @export
-flattenList <- function(..., na.rm = FALSE) {
+flattenList <- function(..., na_rm = FALSE) {
+  stopifnot(is.logical(na_rm) && length(na_rm) == 1L)
   x <- list(...)
   y <- list()
   rapply(x, function(x) y <- c(y, x))
-  if (na.rm) return(y[!is.na(y)])
+  if (na_rm) return(y[!is.na(y)])
   y
 }
 

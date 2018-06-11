@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.r
 \name{source_purl}
 \alias{source_purl}
-\title{extract code from knitr vignette and source it}
+\title{Extract code from knitr vignette and source it}
 \usage{
 source_purl(input, output = file.path(.tempdir(), paste0(basename(input),
   ".R")), documentation = 1L, ...)
@@ -21,5 +21,7 @@ headers to code; 2 means add all text chunks to code as roxygen comments}
 \item{...}{further parameters passed to \code{source}}
 }
 \description{
-extract code from knitr vignette and source it
+Extract code from knitr vignette and source it. This has the advantage in
+that it runs with code in \R session, whereas running vignettes normally
+requires the package to be installed.
 }

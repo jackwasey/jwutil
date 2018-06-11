@@ -6,13 +6,12 @@
 \alias{random_test_letters}
 \title{create extreme random numbers}
 \usage{
-random_test_numbers(n = nums_in_tests, min = NULL, max = NULL,
-  hole = NULL)
+random_test_numbers(n = n_rnd, min = NULL, max = NULL, hole = NULL)
 
-random_test_integers(n = nums_in_tests, min = -.Machine$integer.max,
+random_test_integers(n = n_rnd, min = -.Machine$integer.max,
   max = .Machine$integer.max, hole = NULL)
 
-random_test_letters(n = nums_in_tests, max_str_len = 257)
+random_test_letters(n = n_rnd, max_str_len = 257)
 }
 \arguments{
 \item{n}{integer number of each group to generate}

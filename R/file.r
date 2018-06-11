@@ -22,11 +22,9 @@
 #' @param url URL of a zip file
 #' @param file_name file name of the resource within the zip file
 #' @param save_path file path to save the first file from the zip
+#' @importFrom utils unzip
 #' @export
 unzip_single <- function(url, file_name, save_path) {
-  checkmate::assert_character(url, len = 1)
-  checkmate::assert_character(file_name, len = 1)
-  checkmate::assert_character(save_path, len = 1)
   zipfile <- tempfile()
   # using libcurl because it seems the internal method works inconsistently
   curl_cap <- capabilities("libcurl")
@@ -50,7 +48,6 @@ unzip_single <- function(url, file_name, save_path) {
     }
   } else
     stopifnot(file_name %in% files)
-
   ret <- file.copy(file.path(zipdir, file_name), save_path, overwrite = TRUE)
   unlink(zipdir, recursive = TRUE)
   ret
@@ -72,16 +69,14 @@ unzip_single <- function(url, file_name, save_path) {
 #' @export
 save_in_data_dir <- function(var_name, suffix = "", data_path = "data",
                              package_dir = getwd(), envir = parent.frame()) {
-  checkmate::assertString(suffix)
+  stopifnot(is.character(suffix) && length(suffix) == 1L)
+  stopifnot(is.character(var_name) && length(var_name) == 1L)
   stopifnot(exists(var_name, envir = envir))
   var_name <- as.character(substitute(var_name))
-  checkmate::assertString(var_name)
   stopifnot(exists(var_name, envir = envir))
-  save(list = var_name,
-       envir = envir,
+  save(list = var_name, envir = envir, compress = "xz",
        file = file.path(package_dir, data_path,
-                        strip(paste0(var_name, suffix, ".RData"))),
-       compress = "xz")
+                        strip(paste0(var_name, suffix, ".RData"))))
   message("Now reload package to enable updated/new data: ", var_name)
   invisible(get(var_name, envir = envir))
 }
@@ -89,8 +84,7 @@ save_in_data_dir <- function(var_name, suffix = "", data_path = "data",
 # tempdir optional hard stop, to make sure CRAN doesn't get polluted and throw
 # the package out
 .tempdir <- function(...) {
-  if (length(strsplit(utils::packageDescription("jwutil")$Version, "\\.")[[1]]) > 3) {
+  if (identical(Sys.getenv("NOT_CRAN"), "true"))
     stop("CRAN must not have residual temp files or directories")
-  }
   tempdir(...)
 }

@@ -11,6 +11,7 @@
 #'   readLines. The first argument to FUN will be the path of the extracted
 #'   \code{filename}
 #' @param \dots further arguments to FUN
+#' @importFrom utils download.file unzip
 #' @export
 read_zip_url <- function(url, filename = NULL, FUN = readLines, ...) {
   stopifnot(length(filename) <= 1)

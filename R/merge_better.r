@@ -1,5 +1,7 @@
-#' @title merge better
-#' @description apply built-in R merge but with additional features:
+#' Merge better
+#'
+#' Apply built-in R \code{\link[base]{merge}} but with additional features for
+#' safety and information.
 #' @param x data frame
 #' @param y data frame
 #' @param by.x field in x to merge on. Unlike \code{merge}, this is compulsory.
@@ -31,16 +33,15 @@ merge_better <- function(x, y, by.x, by.y,
                         renameAll = c("no", "suffix", "prefix"),
                         convert_factors = TRUE,
                         verbose = FALSE) {
-  checkmate::assertDataFrame(x)
-  checkmate::assertDataFrame(y)
-  checkmate::assertCharacter(by.x, min.len = 1, min.chars = 1)
-  checkmate::assertCharacter(by.y, min.len = 1, min.chars = 1)
-  checkmate::assertFlag(all.x)
-  checkmate::assertFlag(all.y)
+  stopifnot(is.data.frame(x), is.data.frame(y))
+  stopifnot(is.character(by.x), length(by.x) == 1L)
+  stopifnot(is.character(by.y), length(by.y) == 1L)
+  stopifnot(is.logical(all.x), length(all.x) == 1L)
+  stopifnot(is.logical(all.y), length(all.y) == 1L)
+  stopifnot(is.logical(convert_factors), length(convert_factors) == 1L)
+  stopifnot(is.logical(verbose), length(verbose) == 1L)
   renameConflict <- match.arg(renameConflict)
   renameAll <- match.arg(renameAll)
-  checkmate::assertFlag(convert_factors)
-  checkmate::assert(checkmate::checkFlag(verbose), checkmate::checkInt(verbose))
   verbose <- as.integer(verbose) # TRUE will become low verbosity
   # we don't want case sensitive names: we rely on case insensitivity, and it is
   # very common for the same data to have case-changes in the field name.

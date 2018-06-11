@@ -70,16 +70,16 @@ getDropped <- function(x, y)
 #' binary_col_names(dat, invert = TRUE)
 #' @export
 binary_col_names <- function(x, invert = FALSE) {
-  checkmate::assertDataFrame(x)
-  checkmate::assertFlag(invert)
+  stopifnot(is.data.frame(x))
+  stopifnot(is.logical(invert), length(invert) == 1L)
   names(x)[xor(vapply(x, function(y) all(y %in% c(0, 1)), logical(1)), invert)]
 }
 
 #' @rdname binary_col_names
 #' @export
 binary_cols <- function(x, invert = FALSE) {
-  checkmate::assertDataFrame(x)
-  checkmate::assertFlag(invert)
+  stopifnot(is.data.frame(x))
+  stopifnot(is.logical(invert), length(invert) == 1L)
   x[binary_col_names(x = x, invert = invert)]
 }
 
@@ -101,9 +101,8 @@ fillMissingCombs <- function(df) {
 #' @export
 jw_df_basics <- function(x, df_list) {
   stopifnot(xor(missing(x), missing(df_list)))
-  if (!missing(x))
-    df_list <- list(x)
-  checkmate::assertList(df_list, types = "data.frame", min.len = 1)
+  if (!missing(x)) df_list <- list(x)
+  stopifnot(is.list(df_list) && all(vapply(df_list, is.data.frame, logical(1))))
   out <- lapply(df_list, .jw_df_basics_impl)
   if (length(out) > 1)
     out
@@ -112,7 +111,7 @@ jw_df_basics <- function(x, df_list) {
 }
 
 .jw_df_basics_impl <- function(x) {
-  checkmate::assertDataFrame(x)
+  stopifnot(is.data.frame(x))
   n <- nrow(x)
   cl <- lapply(x, class)
   f <- vapply(x, is.factor, logical(1))

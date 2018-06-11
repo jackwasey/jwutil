@@ -21,8 +21,5 @@
 #' @aliases jwutil jwutil-package
 #' @useDynLib jwutil, .registration=TRUE
 #' @importFrom Rcpp evalCpp
-#' @importFrom utils download.file unzip read.delim object.size globalVariables
-#'   contrib.url compareVersion install.packages combn packageDescription
-#' @importFrom stats runif complete.cases as.formula
 #' @docType package
 NULL

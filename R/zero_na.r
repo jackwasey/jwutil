@@ -4,14 +4,14 @@
 #' \code{ignore}. Also does not replace \code{Date} or \code{POSIXt} fields.
 #' @param df data.frame
 #' @param cols names of columns to work on, default is all columns
-#' @param  ignore cahracter vector of columns names to ignore
+#' @param ignore cahracter vector of columns names to ignore
 #' @param verbose TRUE or FALSE
 #' @export
 zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE) {
-  checkmate::assertDataFrame(df)
-  checkmate::assertCharacter(cols)
-  checkmate::assertCharacter(ignore)
-  checkmate::assertFlag(verbose)
+  stopifnot(is.data.frame(df))
+  stopifnot(is.character(cols))
+  stopifnot(is.character(ignore))
+  stopifnot(is.logical(verbose))
   stopifnot(all(c(cols, ignore) %in% names(df)))
   gotNA <- getNAFields(df)
   for (n in gotNA[gotNA %nin% ignore]) {
