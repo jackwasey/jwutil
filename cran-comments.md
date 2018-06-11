@@ -1,4 +1,4 @@
-Adds C++ registration.
+Fixed problem with last submission, which was due to a mistake in my Windows test environment.
 
 # Test environments
 * Ubuntu 18.04 R 3.5.0, GCC 7.3, clang 6
