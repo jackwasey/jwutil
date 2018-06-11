@@ -23,4 +23,6 @@ filter_better <- function(x, expr, verbose = TRUE) {
   x[fltr, ]
 }
 
-# filterBetter <- filterBetter
+#' @describeIn filter_better Deprecated
+#' @export
+filterBetter <- filter_better

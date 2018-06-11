@@ -40,9 +40,7 @@ getNonNAFields <- function(dframe)
 #' @return numeric vector
 #' @export
 propNaPerField <- function(dframe)
-  vapply(dframe, function(v) {
-    countIsNa(v) / length(v)
-  }, numeric(1))
+  vapply(dframe, function(v) countIsNa(v) / length(v), numeric(1))
 
 #' @title drops rows with NA values in specified fields
 #' @description employs \code{\link[stats]{complete.cases}} which is fast
@@ -65,4 +63,3 @@ dropRowsWithNAField <- function(x, fld = names(x), verbose = FALSE) {
   cc <- stats::complete.cases(x[fld])
   droplevels(x[cc, ])
 }
-

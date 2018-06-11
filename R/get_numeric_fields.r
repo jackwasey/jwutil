@@ -32,6 +32,6 @@ get_numeric_field_names <- function(x, invert = FALSE) {
 #' @export
 get_numeric_fields <- function(x, invert = FALSE) {
   stopifnot(is.data.frame(x))
-  stopifnot(is.logical(invert), length(invert) == 1L)
+  stopifnot(is.logical(invert) && length(invert) == 1L)
   x[get_numeric_field_names(x = x, invert = invert)]
 }

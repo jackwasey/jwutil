@@ -2,9 +2,12 @@
 % Please edit documentation in R/filter_better.r
 \name{filter_better}
 \alias{filter_better}
+\alias{filterBetter}
 \title{filter data with diagnostics}
 \usage{
 filter_better(x, expr, verbose = TRUE)
+
+filterBetter(x, expr, verbose = TRUE)
 }
 \arguments{
 \item{x}{data frame}
@@ -21,3 +24,8 @@ filtered data frame
 applies an expression to a data frame, and gives information
   about the numbers of dropped rows.
 }
+\section{Functions}{
+\itemize{
+\item \code{filterBetter}: Deprecated
+}}
+

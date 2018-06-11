@@ -174,7 +174,7 @@ random_test_letters <- function(n = n_rnd, max_str_len = 257) {
 extreme_numbers <- c(
   .Machine$integer.max, -.Machine$integer.max,
   1L, -1L,
-  .Machine$double.xmin,.Machine$double.xmax,
+  .Machine$double.xmin, .Machine$double.xmax,
   -.Machine$double.xmin, -.Machine$double.xmax)
 
 #' @title alternative \code{expect_that} from \code{testthat} which permutes all
