@@ -29,18 +29,15 @@ env:
 warnings_are_errors: true
 
 r_binary_install:
- - testthat
- - Rcpp
  - knitr
+ - testthat
 
 r_install:
- - magrittr
  - lintr
- - testthat
+ - Rcpp
 
 install_github:
- - jimhester/covr
-# - jimhester/lintr
+ - r-lib/covr
 
 after_success:
  - Rscript -e 'covr::coveralls()'
