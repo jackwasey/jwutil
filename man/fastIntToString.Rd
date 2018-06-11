@@ -3,12 +3,9 @@
 \name{fastIntToString}
 \alias{fastIntToString}
 \alias{fastIntToStringStd}
-\alias{fastIntToStringRcpp}
 \title{Fast convert integer vector to character vector}
 \usage{
 fastIntToStringStd(x)
-
-fastIntToStringRcpp(x)
 }
 \arguments{
 \item{x}{vector of integers}
@@ -19,11 +16,6 @@ fastIntToStringRcpp(x)
 \description{
 Fast conversion from integer vector to character vector using C++
 }
-\section{Functions}{
-\itemize{
-\item \code{fastIntToStringRcpp}: Same using Rcpp
-}}
-
 \examples{
 \dontrun{
 pts <- generate_random_pts(1e7)

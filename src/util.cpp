@@ -37,8 +37,13 @@ std::vector<std::string> fastIntToStringStd(std::vector<int> x) {
   return out;
 }
 
-//' @describeIn fastIntToString Same using Rcpp
-//' @export
+//' @title Convert integers to strings as quickly as possible
+//' @description Have tried R, `sprintf` with \pkg{Rcpp} and C++ standard
+//' library. Doesn't do bounds checking, but limited by length of integers.
+//' @param x Vector of integers
+//' @return Vector of characters
+//' @md
+//' @keywords internal manip
 // [[Rcpp::export]]
 Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x) {
   size_t len = x.size();
