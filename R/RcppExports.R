@@ -84,8 +84,13 @@ fastIntToStringStd <- function(x) {
     .Call(`_jwutil_fastIntToStringStd`, x)
 }
 
-#' @describeIn fastIntToString Same using Rcpp
-#' @export
+#' @title Convert integers to strings as quickly as possible
+#' @description Have tried R, `sprintf` with \pkg{Rcpp} and C++ standard
+#' library. Doesn't do bounds checking, but limited by length of integers.
+#' @param x Vector of integers
+#' @return Vector of characters
+#' @md
+#' @keywords internal manip
 fastIntToStringRcpp <- function(x) {
     .Call(`_jwutil_fastIntToStringRcpp`, x)
 }

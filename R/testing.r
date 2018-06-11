@@ -243,11 +243,7 @@ expect_that_combine_first_arg <- function(object, condition,
   stopifnot(identical(unlist(args, recursive = TRUE),
                       unlist(args, recursive = FALSE)))
   stopifnot(length(arg_one) >= 2)
-
-  # get the combinations of arguments
   arg_one_combs <- permute(arg_one)
-
-  # now loop through all permutations
   for (comb in 1:dim(arg_one_combs)[1]) {
     e <- testthat::expect_that(
       object    = do.call(as.character(func_name),

@@ -60,12 +60,11 @@ strip <- function(x, pattern = " ", useBytes = TRUE) {
 #' @param x character vector of potential formula variables
 #' @return character vector of length x
 #' @export
-stripForFormula <- function(x) {
+strip_for_formula <- function(x) {
   res <- gsub(pattern = "[^[:alnum:]]", replacement = "", x)
   stopifnot(anyDuplicated(res) == 0)
   res
 }
-
 
 #' @title strip whitespace from ends of each string in given character vector
 #' @description slower than \code{strip}.
@@ -75,7 +74,7 @@ stripForFormula <- function(x) {
 trim <- function(x) {
   if (is.data.frame(x))
     stop("trimming data.frame gives unpredictable results.
-         Try trimming a column at a time using [s]apply.")
+         Try trimming a column at a time.")
   gsub("^\\s+|\\s+$", "", x)
 }
 
@@ -94,7 +93,7 @@ trim <- function(x) {
 #' @return list of character vectors, list length being the length of the inptu
 #'   text vector.
 #' @export
-strMultiMatch <- function(pattern, text, dropEmpty = FALSE, ...) {
+str_multi_match <- function(pattern, text, dropEmpty = FALSE, ...) {
   # unlist puts the name in the first position, which I don't think I ever want.
   result <- lapply(
     text, function(x) unlist(
@@ -110,35 +109,87 @@ strMultiMatch <- function(pattern, text, dropEmpty = FALSE, ...) {
   result[vapply(result, function(x) length(x) != 0), logical(1)]
 }
 
-#' @rdname strMultiMatch
-#' @description \code{strPaitMatch} differs in that there should only be two
-#'   pairs of parenthesis, then the first (by default) becomes the name, and the
-#'   second the value.
+#' @describeIn str_multi_match Deprecated
+#' @export
+strMultiMatch <- str_multi_match
+
+#' Match pairs of strings to get named vector
+#'
+#' Match a character vector against a regular expression with at least two
+#' parenthetic groupings, returning named vector.
+#' @param string vector of strings
+#' @param pattern vector of regular expression which should match exactly two
+#'   strings for each element in \code{stringr}. If \code{pos} is specified,
+#'   this rule is relaxed.
+#' @param pos optional pair of integers with positions of the first and second
+#'   desired matches, when multiple matches are made by the regular expression
 #' @param swap logical scalar, whether to swap the names and values. Default is
 #'   not to swap, so the first match becomes the name.
-#' @export
-strPairMatch <- function(pattern, text, swap = FALSE, dropEmpty = FALSE, ...) {
-  stopifnot(length(pattern) == 1)
-  stopifnot(length(text) > 0)
-  stopifnot(length(swap) == 1)
-  stopifnot(length(dropEmpty) == 1)
-  stopifnot(is.character(pattern))
-  stopifnot(is.character(text))
-  stopifnot(is.logical(swap))
-  stopifnot(is.logical(dropEmpty))
-  res <- strMultiMatch(pattern = pattern, text = text,
-                       dropEmpty = dropEmpty, ...)
-  stopifnot(all(vapply(res, function(x) length(x) == 2, integer(1))))
-  outNames <- vapply(X = res,
-                     FUN = "[",
-                     FUN.VALUE = character(1),
-                     ifelse(swap, 2, 1))
-  stopifnot(all(!is.na(outNames)))
-  out <- vapply(X = res,
-                FUN = "[",
-                FUN.VALUE = character(1),
-                ifelse(swap, 1, 2))
+#' @keywords internal
+str_pair_match <- function(string, pattern, pos, swap = FALSE, ...) {
+  stopifnot(is.character(string) && length(string) >= 1L)
+  stopifnot(is.logical(swap) && length(swap) == 1L)
+  pos_missing <- missing(pos)
+  if (pos_missing)
+    pos <- c(1L, 2L)
+  else
+    stopifnot(length(pos) == 2L, min(pos) >= 1L, all(!is.na(pos)))
+  res <- lapply(string,
+                function(x) unlist(
+                  regmatches(
+                    x = x,
+                    m = regexec(pattern = pattern, text = x, ...)
+                  )
+                )[-1]
+  )
+  res <- res[vapply(res, function(x) length(x) != 0, logical(1))]
+  res <- do.call(rbind, res)
+  if (pos_missing && ncol(res) > max(pos))
+    stop("the pair matching has three or more ress but needed two.
+         Use (?: to have a non-grouping regular expression parenthesis")
+  out_names <- res[, ifelse(swap, 2L, 1L)]
+  if (any(is.na(out_names)))
+    stop("didn't match some rows:", string[is.na(out_names)],
+         call. = FALSE)
+  out <- res[, ifelse(swap, 1L, 2L)]
   stopifnot(all(!is.na(out)))
-  names(out) <- outNames
-  out
+  setNames(out, out_names)
+}
+
+#' @describeIn str_pair_match Deprecated
+#' @export
+strPairMatch <- str_pair_match
+
+#' mimic the \code{R CMD check} test
+#'
+#' \code{R CMD check} is quick to tell you where \code{UTF-8} characters are not
+#' encoded, but gives no way of finding out which or where
+#' @examples
+#' \dontrun{
+#' sapply(icd9cm_hierarchy, icd:::get_non_ASCII)
+#' icd:::get_encodings(icd9cm_hierarchy)
+#' sapply(icd9cm_billable, icd:::get_non_ASCII)
+#' sapply(icd9cm_billable, icd:::get_encodings)
+#' }
+#' @keywords internal
+get_non_ASCII <- function(x)
+  x[is_non_ASCII(as_char_no_warn(x))]
+
+#' @rdname get_non_ASCII
+#' @keywords internal
+is_non_ASCII <- function(x)
+  is.na(iconv(as_char_no_warn(x), from = "latin1", to = "ASCII"))
+
+#' return all matches for regular expression
+#' @keywords internal manip
+str_match_all <- function(string, pattern, ...) {
+  string <- as.character(string)
+  regmatches(x = string, m = regexec(pattern = pattern, text = string, ...))
+}
+
+#' \code{stringr} does this, but here we have a small amount of base R code
+#' @keywords internal
+str_extract <- function(string, pattern, ...) {
+  vapply(regmatches(x = string, m = regexec(pattern = pattern, text = string, ...)),
+         FUN = `[[`, 1, FUN.VALUE = character(1L))
 }
