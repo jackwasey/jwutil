@@ -1,8 +1,6 @@
 // [[Rcpp::interfaces(r, cpp)]]
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+#include "jwomp.h"
 
 // [[Rcpp::export]]
 int getOmpMaxThreads() {

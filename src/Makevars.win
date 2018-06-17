@@ -1,3 +1,4 @@
-PKG_CFLAGS=-fopenmp
-PKG_CXXFLAGS=-fopenmp
-PKG_LIBS=-fopenmp
+CXX_STD = CXX11
+PKG_CFLAGS= -I. -fopenmp
+PKG_CXXFLAGS= -I. -fopenmp
+PKG_LIBS= -I. -fopenmp

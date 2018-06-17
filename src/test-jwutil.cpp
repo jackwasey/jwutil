@@ -2,10 +2,7 @@
 #include <testthat.h>
 #include <Rcpp.h>
 #include "util.h"
-#include "omp.h"
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+#include "jwomp.h"
 
 context("get OMP max threads") {
   test_that("max threads give a semi-sensible number") {
