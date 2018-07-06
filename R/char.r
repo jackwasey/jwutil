@@ -103,7 +103,7 @@ str_multi_match <- function(pattern, text, dropEmpty = FALSE, ...) {
           pattern = pattern,
           text = x, ...),
         ...)
-    )[ -1]
+    )[-1]
   )
   if (!dropEmpty) return(result)
   result[vapply(result, function(x) length(x) != 0), logical(1)]
@@ -125,9 +125,11 @@ strMultiMatch <- str_multi_match
 #'   desired matches, when multiple matches are made by the regular expression
 #' @param swap logical scalar, whether to swap the names and values. Default is
 #'   not to swap, so the first match becomes the name.
+#' @importFrom stats setNames
 #' @keywords internal
 str_pair_match <- function(string, pattern, pos, swap = FALSE, ...) {
   stopifnot(is.character(string) && length(string) >= 1L)
+  stopifnot(is.character(pattern) && length(pattern) == 1L)
   stopifnot(is.logical(swap) && length(swap) == 1L)
   pos_missing <- missing(pos)
   if (pos_missing)
@@ -153,7 +155,7 @@ str_pair_match <- function(string, pattern, pos, swap = FALSE, ...) {
          call. = FALSE)
   out <- res[, ifelse(swap, 1L, 2L)]
   stopifnot(all(!is.na(out)))
-  setNames(out, out_names)
+  stats::setNames(out, out_names)
 }
 
 #' @describeIn str_pair_match Deprecated
