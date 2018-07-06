@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.r
 \name{shuffle}
 \alias{shuffle}
-\title{shuffle}
+\title{Shuffle a vector}
 \usage{
 shuffle(x)
 }
@@ -14,6 +14,10 @@ list or vector of same length as input, (probably) in a different
   order
 }
 \description{
-randomly shuffle the order of a vector or list. This is to
-  improve quality of bad data to throw at functions when testing.
+Randomly shuffle the order of a vector or list. This is to improve quality of
+bad data to throw at functions when testing.
+}
+\examples{
+set.seed(1441)
+shuffle(LETTERS)
 }

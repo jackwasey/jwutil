@@ -3,7 +3,7 @@
 \name{drop_duplicate_fields}
 \alias{drop_duplicate_fields}
 \alias{dropDuplicateFields}
-\title{drop duplicate fields}
+\title{Drop fields with duplicate data}
 \usage{
 drop_duplicate_fields(df, verbose = FALSE)
 
@@ -19,12 +19,16 @@ messages}
 data frame without duplicate fields
 }
 \description{
-compares all data in each field to every other field, and drops
-  the latter match. Will find multiple matches. Doesn't do any type
-  conversions yet. This is purely by content, not by field name.
+Compares all data in each field to every other field, and drops the latter
+match. Will find multiple matches. Doesn't do any type conversions yet. This
+is purely by content, not by field name.
 }
 \section{Functions}{
 \itemize{
 \item \code{dropDuplicateFields}: Deprecated
 }}
 
+\examples{
+d <- data.frame(LETTERS, letters, letters)[1:10, ]
+drop_duplicate_fields(d)
+}

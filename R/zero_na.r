@@ -4,8 +4,15 @@
 #' \code{ignore}. Also does not replace \code{Date} or \code{POSIXt} fields.
 #' @param df data.frame
 #' @param cols names of columns to work on, default is all columns
-#' @param ignore cahracter vector of columns names to ignore
+#' @param ignore character vector of columns names to ignore
 #' @param verbose TRUE or FALSE
+#' @examples
+#' d <- data.frame(1:5, 6:10, 11:15)
+#' d[2, 3] <- NA
+#' d[5, 2] <- NA
+#' d[1, 1] <- NA
+#' print(d)
+#' zero_na(d)
 #' @export
 zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE) {
   stopifnot(is.data.frame(df))

@@ -350,52 +350,6 @@ test_that("Count cumulative non-NA values in times", {
 
 })
 
-test_that("allIsNumeric", {
-  expect_true(allIsNumeric(1))
-  expect_true(allIsNumeric(c(1, 2)))
-  expect_true(allIsNumeric(1.1))
-  expect_true(allIsNumeric(-1))
-  expect_true(allIsNumeric(pi))
-  expect_true(allIsNumeric(c(-1, 0, 0.1, pi)))
-  expect_true(allIsNumeric(zeroes))
-  expect_true(allIsNumeric(random_test_numbers()))
-  expect_true(allIsNumeric(extreme_numbers))
-  expect_true(allIsNumeric(NA_integer_))
-  expect_true(allIsNumeric(NA_real_))
-  expect_true(allIsNumeric(random_test_dates()))  # dates are typeof 'double'
-  expect_false(allIsNumeric(random_test_letters()))
-  expect_error(allIsNumeric(bad_input))
-})
-
-test_that("allIsInteger", {
-  expect_false(allIsInteger(NULL))
-  expect_true(allIsInteger(1))
-  expect_true(allIsInteger(integer(0)))
-  expect_true(allIsInteger(c(1, 2)))
-  expect_true(allIsInteger(-1))
-  expect_true(allIsInteger(zeroes))
-  expect_true(allIsInteger(random_test_integers()))
-  expect_true(allIsInteger(NA_integer_, na.rm = T))
-  expect_true(allIsInteger(NA_real_, na.rm = T))
-  expect_true(allIsInteger(NA_integer_))
-  expect_true(allIsInteger(NA_real_))
-  expect_true(allIsInteger(1.00000000005))
-  expect_true(allIsInteger(1.005, tol = 0.01))
-  expect_true(allIsInteger(c(1.005, NA_integer_), tol = 0.01, na.rm = T))
-  # I don't care what sort of NA is given:
-  expect_true(allIsInteger(c(1.005, NA_character_), tol = 0.01, na.rm = T))
-
-  expect_false(allIsInteger(random_test_numbers()))
-  expect_false(allIsInteger(pi))
-  expect_false(allIsInteger(1.000000002))
-  expect_false(allIsInteger(-0.1))
-  expect_false(allIsInteger("jack"))
-  expect_false(allIsInteger(random_test_letters()))
-  expect_false(allIsInteger(c(-1, 0, 0.1, pi)))
-
-  expect_error(allIsInteger(bad_input))
-})
-
 test_that("areIntegers", {
   expect_false(areIntegers(NULL))
   expect_true(areIntegers(1))
@@ -547,9 +501,9 @@ test_that("count non na pairs", {
 })
 
 test_that("list functions in a package", {
-  expect_true("runif" %in% lsp(stats))
-  expect_true(".checkMFClasses" %in% lsp(stats, all.names = TRUE))
-  expect_true("runif" %in% lsp(stats, pattern = "run"))
+  expect_true("runif" %in% lsp("stats"))
+  expect_true(".checkMFClasses" %in% lsp("stats", all.names = TRUE))
+  expect_true("runif" %in% lsp("stats", pattern = "run"))
 })
 
 test_that("shuffle reorders a vector", {

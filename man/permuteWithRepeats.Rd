@@ -2,16 +2,34 @@
 % Please edit documentation in R/util.r
 \name{permuteWithRepeats}
 \alias{permuteWithRepeats}
-\title{generate all permutations of input, reusing values in each result row}
+\title{Generate all permutations of input, reusing values in each result row}
 \usage{
-permuteWithRepeats(x)
+permuteWithRepeats(x, unique = TRUE)
 }
 \arguments{
 \item{x}{list or vector}
+
+\item{unique}{logical, if \code{TRUE}, the default, only unique results are
+returned}
 }
 \value{
 data frame, each row being one permutation
 }
 \description{
-systematically permute the input vector or list
+Expand the given vector into all possible values in each location, with or
+without duplicates.
+}
+\examples{
+ltr <- c("a", "b", "c")
+x <- permuteWithRepeats(ltr, unique = FALSE)
+print(x)
+stopifnot(nrow(x) == length(ltr)^length(ltr))
+# duplicate results are dropped
+y <- permuteWithRepeats(c("X", "Y", "Y"))
+print(y)
+stopifnot(nrow(y) == 2^3)
+z <- permuteWithRepeats(c("X", "Y", "Y", "Y"))
+stopifnot(nrow(z) == 2^4)
+a <- permuteWithRepeats(c(1, 2, 3, 1))
+stopifnot(nrow(a) == 3^4)
 }

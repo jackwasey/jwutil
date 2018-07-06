@@ -2,12 +2,12 @@
 % Please edit documentation in R/util.r
 \name{lsp}
 \alias{lsp}
-\title{list all items in a package}
+\title{List all items in a package}
 \usage{
 lsp(package, all.names = TRUE, pattern)
 }
 \arguments{
-\item{package}{is the (unquoted) name of the package}
+\item{package}{character scalar: name of the package}
 
 \item{all.names}{= TRUE, set to FALSE to ignore items beginning with a period}
 
@@ -17,5 +17,9 @@ lsp(package, all.names = TRUE, pattern)
 character vector of package contents
 }
 \description{
-default to including (?private) functions beginning with '.'
+By default includes names beginning with '.'
+}
+\examples{
+lsp("jwutil")
+tail(lsp("base"), 30L)
 }

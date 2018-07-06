@@ -15,36 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with jwutil If not, see <http:#www.gnu.org/licenses/>.
 
-#' check whether character vector represents all numeric values
-#'
-#' check whether all the items of input vector are numeric without throwing
-#' warning derived from Hmsic package
-#' @param x is a character vector to be tested
-#' @param extras is a vector of character strings which are counted as NA
-#'   values, defaults to '.' and 'NA'. Also allow \code{NA}.
-#' @return logical scalar
-#' @export
-allIsNumeric <- function(x, extras = c(".", "NA", NA)) {
-  xs <- x[x %nin% c("", extras)]
-  suppressWarnings(!any(is.na(as.numeric(xs))))
-}
-
-#' check whether vector represents all integer values, not that the same as
-#' \code{is.integer}
-#'
-#' check whether all the items of input vector are integer as.integer
-#' @param x is a vector to be tested
-#' @param tol single numeric, default if less than 1e-9 from an integer then
-#'   considered an integer.
-#' @param na.rm single logical, passed on to \code{all}
-#' @return logical scalar
-#' @export
-allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
-  all(  # don't count NA as false automatically
-    areIntegers(x, tol = tol, na.ignore = TRUE),
-    na.rm = na.rm
-  )
-
 #' convert factor or vector to numeric without warnings
 #'
 #' correctly converts factors to vectors, and then converts to
@@ -59,25 +29,30 @@ allIsInteger <- function(x, tol =  1e-9, na.rm = TRUE)
 #' @return numeric vector, may have NA values
 #' @aliases asIntegerNoWarn
 #' @export
-asNumericNoWarn <- function(x) {
+as_numeric_nowarn <- function(x) {
   if (is.factor(x)) x <- levels(x)[x]
   suppressWarnings(as.numeric(x))
 }
+asNumericNoWarn <- as_numeric_nowarn
 
-#' @rdname asNumericNoWarn
+#' @rdname as_numeric_nowarn
 #' @export
-asIntegerNoWarn <- function(x)
+as_integer_nowarn <- function(x)
   as.integer(asNumericNoWarn(x))
+asIntegerNoWarn <- as_integer_nowarn
 
-
-#' @rdname asNumericNoWarn
+#' @rdname as_numeric_nowarn
 #' @param tol tolerance when considering if two numbers are integers, default
 #'   1e-9
 #' @param na.ignore logical, if TRUE will pass through NA values, otherwise,
 #'   they are marked FALSE.
 #' @return logical vector
+#' @examples
+#' stopifnot(areIntegers("1"))
+#' stopifnot(!allIsInteger(c("-1", "0", "0.1")))
+#' stopifnot(allIsInteger(c(10, -25)))
 #' @export
-areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
+is_integerish <- function(x, tol = 1e-9, na.ignore = FALSE) {
   if (is.null(x)) return(FALSE)
   stopifnot(is.numeric(tol), is.logical(na.ignore))
   stopifnot(length(tol) <= 1, length(na.ignore) <= 1)
@@ -91,25 +66,37 @@ areIntegers <- function(x, tol = 1e-9, na.ignore = FALSE) {
     i[nas] <- NA_integer_
   i
 }
+areIntegers <- is_integerish
 
-#' @title which elements of a vector are numeric
-#' @description test without throwing a warning
-#' @param x vector
+#' Which elements of a character vector are numeric
+#'
+#' Takes a character vector and returns a logical vector of the same length,
+#' indicating which values are numeric. `NA` is considered non-numeric. `NA` is
+#' never returned from this function.
+#' @param x character vector
 #' @param extras character vector containing acceptable alternatives to numeric
 #'   values which will result in returning \code{TRUE} for that element. Default
 #'   is \code{c(".", "NA", NA)}.
 #' @return logical vector of same length as input
+#' @md
 #' @examples
 #' areNumeric(c("1","2","3"))
 #' areNumeric(c("1L", "2.2"))
 #' areNumeric(c("NA", NA, ".", "", "-1.9"))
 #' @export
-areNumeric <- function(x, extras = c(".", "NA", NA)) {
+is_numeric_str <- function(x, extras = c(".", "NA", NA)) {
   if (is.null(x)) return(FALSE)
   old <- options(warn = -1)
   on.exit(options(old))
   x[x %in% c("", extras)] <- NA
   !is.na(as.numeric(x))
+}
+
+#' @describeIn is_numeric_str Deprecated
+#' @export
+areNumeric <- function(...) {
+  warning("Deprecated, use is_numeric_str")
+  is_numeric_str(...)
 }
 
 #' @title inverse of \%in\%
@@ -121,7 +108,6 @@ areNumeric <- function(x, extras = c(".", "NA", NA)) {
 #' @export
 "%nin%" <- function(x, table)
   match(x, table, nomatch = 0) == 0
-
 
 #' @title count non-numeric elements
 #' @description counts the number of non-numeric elements in a vector, without
@@ -158,27 +144,6 @@ countIsNa <- function(x)
 propIsNa <- function(x)
   if (length(x)) countIsNa(x) / length(x) else 0L
 
-#' @title count which combinations of fields have at least one non-NA
-#' @description cycles through the given data frame twice, and applies logical
-#'   OR to all elements of each column it then counts how many of these pairs
-#'   are not-na, i.e. have at least one non-NA value TODO: tests
-#' @param d data.frame
-#' @return matrix with nrow and ncol being the number of fields in the given
-#'   dataframe
-#' @export
-countNonNaPairs <- function(d) {
-  stop("needs thinking through")
-  apply(!is.na(d),
-        MARGIN = 2,
-        FUN = function(y) {
-          apply(is.na(d),
-                MARGIN = 2,
-                FUN = function(x, y) sum(x | y),
-                y)
-        }
-  )
-}
-
 #' @title running totals of number of non-NA values in consecutive fields
 #' @description counts non-NA fields in first field, then progreses through
 #'   fields, OR new field and saves running total for each field TODO: tests
@@ -199,15 +164,18 @@ countNonNaCumulative <- function(d) {
   )
 }
 
-#' @title list all items in a package
-#' @description default to including (?private) functions beginning with '.'
-#' @param package is the (unquoted) name of the package
+#' List all items in a package
+#'
+#' By default includes names beginning with '.'
+#' @param package character scalar: name of the package
 #' @param all.names = TRUE, set to FALSE to ignore items beginning with a period
 #' @param pattern = optional pattern to match
 #' @return character vector of package contents
+#' @examples
+#' lsp("jwutil")
+#' tail(lsp("base"), 30L)
 #' @export
 lsp <- function(package, all.names = TRUE, pattern) {
-  package <- deparse(substitute(package))
   ls(
     pos = paste("package", package, sep = ":"),
     all.names = all.names,
@@ -249,7 +217,7 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
   # this is a data error, not a programming error, stop
   if (any(dts < as.Date("1850-01-01"), na.rm = TRUE))
     stop("some dates are before 1850: ", dts[dts < as.Date("1850-01-01")])
-    # could alternatively set NA, warn and continue.
+  # could alternatively set NA, warn and continue.
   # Let NA be valid:
   if (!all(isValidTime(tms, na.rm = TRUE))) {
     warning(sprintf("%d invalid time(s) received, replacing with NA",
@@ -283,34 +251,71 @@ isValidTime <- function(tms, na.rm = FALSE) {
   grepl("^[[:space:]]*([01]?[0-9]|2[0-3])?:?[0-5]?[0-9][[:space:]]*$", tms)
 }
 
-#' @title shuffle
-#' @description randomly shuffle the order of a vector or list. This is to
-#'   improve quality of bad data to throw at functions when testing.
+#' Shuffle a vector
+#'
+#' Randomly shuffle the order of a vector or list. This is to improve quality of
+#' bad data to throw at functions when testing.
 #' @param x list or vector
 #' @return list or vector of same length as input, (probably) in a different
 #'   order
+#' @examples
+#' set.seed(1441)
+#' shuffle(LETTERS)
 #' @export
 shuffle <- function(x)
   sample(x = x, size = length(x), replace = FALSE, prob = NULL)
 
-#' @title generate all permutations of input, reusing values in each result row
-#' @description systematically permute the input vector or list
+#' Generate all permutations of input, reusing values in each result row
+#'
+#' Expand the given vector into all possible values in each location, with or
+#' without duplicates.
 #' @param x list or vector
+#' @param unique logical, if `TRUE`, the default, only unique results are
+#'   returned
 #' @return data frame, each row being one permutation
+#' @md
+#' @examples
+#' ltr <- c("a", "b", "c")
+#' x <- permuteWithRepeats(ltr, unique = FALSE)
+#' print(x)
+#' stopifnot(nrow(x) == length(ltr)^length(ltr))
+#' # duplicate results are dropped
+#' y <- permuteWithRepeats(c("X", "Y", "Y"))
+#' print(y)
+#' stopifnot(nrow(y) == 2^3)
+#' z <- permuteWithRepeats(c("X", "Y", "Y", "Y"))
+#' stopifnot(nrow(z) == 2^4)
+#' a <- permuteWithRepeats(c(1, 2, 3, 1))
+#' stopifnot(nrow(a) == 3^4)
 #' @export
-permuteWithRepeats <- function(x) {
+permuteWithRepeats <- function(x, unique = TRUE) {
   stopifnot(length(x) < 8)
-  expand.grid(rep(list(unlist(x)), times = length(unlist(x))))
+  y <- expand.grid(rep(list(unlist(x)), times = length(unlist(x))))
+  if (unique) {
+    y <- unique(y)
+    rownames(y) <- NULL
+  }
+  y
 }
 
-#' @title generate all permutations of input
-#' @description systematically permute the input vector or list, which is very
-#'   slow for long x. Am amazed something this simple isn't either in base R, or
-#'   in a straightforward form in a package.
+#' Generate all permutations of input
 #'
-#'   TODO: limit to a certain cut-off, after which we randomly sample
+#' Systematically permute the input vector or list, which is very slow for long
+#' x. Am amazed something this simple isn't either in base R, or in a
+#' straightforward form in a package.
+#'
+#' TODO: limit to a certain cut-off, after which we randomly sample
 #' @param x list or vector
 #' @return data frame, each row being one permutation
+#' @examples
+#' ltr <- c("a", "b", "c", "d")
+#' x <- permute(ltr)
+#' print(x)
+#' stopifnot(nrow(x) == factorial(length(ltr)))
+#' ltr <- c("a", "b", "b")
+#' x <- permute(ltr)
+#' print(x)
+#' stopifnot(nrow(x) == factorial(length(ltr)))
 #' @export
 permute <- function(x) {
   if (is.null(x)) return()
@@ -464,7 +469,7 @@ buildLinearFormula <- build_formula
 #' @export
 invwhich <- function(which, len = max(which)) {
   stopifnot(all(which > 0))
-  stopifnot(allIsInteger(which))
+  stopifnot(all(is_integerish(which)))
   stopifnot(length(len) > 0)
   stopifnot(identical(areIntegers(len), TRUE))
   is.element(seq_len(len), which)
@@ -542,7 +547,8 @@ ls.objects <- function(env = parent.frame(), pattern, order.by,
 #' @param n scalar integer, number of objects to show
 #' @export
 lsos <- function(..., n = 10)
-  ls.objects(env = parent.frame(), ..., order.by = "Size", decreasing = TRUE, head = TRUE, n = n)
+  ls.objects(env = parent.frame(), ...,
+             order.by = "Size", decreasing = TRUE, head = TRUE, n = n)
 
 #' @title is the object a \code{Date}
 #' @description copied from lubridate

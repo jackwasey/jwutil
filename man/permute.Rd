@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.r
 \name{permute}
 \alias{permute}
-\title{generate all permutations of input}
+\title{Generate all permutations of input}
 \usage{
 permute(x)
 }
@@ -13,9 +13,20 @@ permute(x)
 data frame, each row being one permutation
 }
 \description{
-systematically permute the input vector or list, which is very
-  slow for long x. Am amazed something this simple isn't either in base R, or
-  in a straightforward form in a package.
-
-  TODO: limit to a certain cut-off, after which we randomly sample
+Systematically permute the input vector or list, which is very slow for long
+x. Am amazed something this simple isn't either in base R, or in a
+straightforward form in a package.
+}
+\details{
+TODO: limit to a certain cut-off, after which we randomly sample
+}
+\examples{
+ltr <- c("a", "b", "c", "d")
+x <- permute(ltr)
+print(x)
+stopifnot(nrow(x) == factorial(length(ltr)))
+ltr <- c("a", "b", "b")
+x <- permute(ltr)
+print(x)
+stopifnot(nrow(x) == factorial(length(ltr)))
 }

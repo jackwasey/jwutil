@@ -11,11 +11,19 @@ zero_na(df, cols = names(df), ignore = character(), verbose = FALSE)
 
 \item{cols}{names of columns to work on, default is all columns}
 
-\item{ignore}{cahracter vector of columns names to ignore}
+\item{ignore}{character vector of columns names to ignore}
 
 \item{verbose}{TRUE or FALSE}
 }
 \description{
 Zero NA values in a data.frame, including \code{cols} and exluding
 \code{ignore}. Also does not replace \code{Date} or \code{POSIXt} fields.
+}
+\examples{
+d <- data.frame(1:5, 6:10, 11:15)
+d[2, 3] <- NA
+d[5, 2] <- NA
+d[1, 1] <- NA
+print(d)
+zero_na(d)
 }

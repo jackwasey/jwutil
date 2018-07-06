@@ -3,21 +3,27 @@
 \name{logical_to_binary}
 \alias{logical_to_binary}
 \alias{logicalToBinary}
-\title{Encode TRUE as 1, and FALSE as 0 (integers)}
+\title{Convert logical columns of data frame to 0s and 1s}
 \usage{
 logical_to_binary(x)
 
 logicalToBinary(x)
 }
 \arguments{
-\item{x}{dataframe which may contain logical fields}
+\item{x}{data frame which may contain logical fields}
 }
 \value{
 data frame without logical fields
 }
 \description{
-When saving data as text files for distribution, printing large amounts of
-text containing TRUE and FALSE is inefficient. Convert to binary takes more
-\R memory, but allows more compact output
+Encode TRUE as 1, and FALSE as 0 (integers)
+}
+\examples{
+d <- data.frame(a = c(TRUE, FALSE, TRUE),
+                b = c(FALSE, TRUE, FALSE),
+                c = c(-1, 0, 1),
+                d = c("not", "logical", "values")
+                )
+logical_to_binary(d)
 }
 \keyword{manip}
