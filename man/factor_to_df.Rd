@@ -41,11 +41,11 @@ n <- 10
 m <- 20
 l <- LETTERS[seq_len(n)]
 set.seed(1441)
-f <- factor(sample(l, m, replace = T), levels = l)
+f <- factor(sample(l, m, replace = TRUE), levels = l)
 g <- factor_to_df(f, drop_empty = FALSE)
 print(g)
 stopifnot(nrow(g) == m, ncol(g) == n)
-factor_to_df_logical(
+factor_to_df(
   shuffle(factor(shuffle(LETTERS[1:10]))),
   prefix = "")
 factor_to_df(factor(c(NA, 1, 2, 3)))

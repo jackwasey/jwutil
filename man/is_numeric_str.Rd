@@ -7,7 +7,7 @@
 \usage{
 is_numeric_str(x, extras = c(".", "NA", NA))
 
-areNumeric(...)
+areNumeric(x, extras = c(".", "NA", NA))
 }
 \arguments{
 \item{x}{character vector}

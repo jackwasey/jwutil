@@ -48,9 +48,7 @@ asIntegerNoWarn <- as_integer_nowarn
 #'   they are marked FALSE.
 #' @return logical vector
 #' @examples
-#' stopifnot(areIntegers("1"))
-#' stopifnot(!allIsInteger(c("-1", "0", "0.1")))
-#' stopifnot(allIsInteger(c(10, -25)))
+#' stopifnot(is_integerish("1"))
 #' @export
 is_integerish <- function(x, tol = 1e-9, na.ignore = FALSE) {
   if (is.null(x)) return(FALSE)
@@ -66,6 +64,9 @@ is_integerish <- function(x, tol = 1e-9, na.ignore = FALSE) {
     i[nas] <- NA_integer_
   i
 }
+
+#' @describeIn as_numeric_nowarn Deprecated
+#' @export
 areIntegers <- is_integerish
 
 #' Which elements of a character vector are numeric
@@ -94,9 +95,9 @@ is_numeric_str <- function(x, extras = c(".", "NA", NA)) {
 
 #' @describeIn is_numeric_str Deprecated
 #' @export
-areNumeric <- function(...) {
+areNumeric <- function(x, extras = c(".", "NA", NA)) {
   warning("Deprecated, use is_numeric_str")
-  is_numeric_str(...)
+  is_numeric_str(x, extras)
 }
 
 #' @title inverse of \%in\%
@@ -356,7 +357,8 @@ combn_subset <- function(x) {
 #'
 #' The optimization function is called with the data frame `x` and the names of
 #' each combination of the names of `x`'s columns. An example of real-world
-#' usage is to automate selection of columns according to the optimization function.
+#' usage is to automate selection of columns according to the optimization
+#' function.
 #' @param x data frame
 #' @param fun function which takes parameters `x = data.frame, n = columns`
 #' @template verbose

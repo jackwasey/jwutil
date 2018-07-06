@@ -5,6 +5,7 @@
 \alias{asIntegerNoWarn}
 \alias{as_integer_nowarn}
 \alias{is_integerish}
+\alias{areIntegers}
 \title{convert factor or vector to numeric without warnings}
 \usage{
 as_numeric_nowarn(x)
@@ -12,6 +13,8 @@ as_numeric_nowarn(x)
 as_integer_nowarn(x)
 
 is_integerish(x, tol = 1e-09, na.ignore = FALSE)
+
+areIntegers(x, tol = 1e-09, na.ignore = FALSE)
 }
 \arguments{
 \item{x}{is a vector, probably of numbers of characters}
@@ -38,8 +41,11 @@ correctly converts factors to vectors, and then converts to
 "are" functions return a value for each input, where is "allIs" functions
   return a single logical.
 }
+\section{Functions}{
+\itemize{
+\item \code{areIntegers}: Deprecated
+}}
+
 \examples{
-stopifnot(areIntegers("1"))
-stopifnot(!allIsInteger(c("-1", "0", "0.1")))
-stopifnot(allIsInteger(c(10, -25)))
+stopifnot(is_integerish("1"))
 }

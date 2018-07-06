@@ -17,7 +17,8 @@ messages}
 \description{
 The optimization function is called with the data frame \code{x} and the names of
 each combination of the names of \code{x}'s columns. An example of real-world
-usage is to automate selection of columns according to the optimization function.
+usage is to automate selection of columns according to the optimization
+function.
 }
 \examples{
 j <- data.frame(a = 1:5, b = 6:2, c = c(0, 2, 4, 6, 8))
