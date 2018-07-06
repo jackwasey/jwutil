@@ -556,8 +556,6 @@ is.Date <- function(x)
 #'
 #' Extract code from knitr vignette and `source` it.
 #' @param input path to file as single character string
-#' @param output output file path, defaults to a file in a temporary name based
-#'   on `input`
 #' @param documentation single integer value passed on to `knitr::purl`. An
 #'   integer specifying the level of documentation to go the tangled script: 0
 #'   means pure code (discard all text chunks); 1 (default) means add the chunk
@@ -566,7 +564,8 @@ is.Date <- function(x)
 #' @md
 #' @export
 source_purl <- function(input, documentation = 1L, ...) {
-  withr::local_tempfile("output")
+  output <- tempfile()
+  on.exit(unlink(output))
   stopifnot(is.integer(documentation) && length(documentation) == 1L)
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
   source(output, ...)

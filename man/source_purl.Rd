@@ -15,9 +15,6 @@ means pure code (discard all text chunks); 1 (default) means add the chunk
 headers to code; 2 means add all text chunks to code as roxygen comments}
 
 \item{...}{further parameters passed to \code{source}}
-
-\item{output}{output file path, defaults to a file in a temporary name based
-on \code{input}}
 }
 \description{
 Extract code from knitr vignette and \code{source} it.
