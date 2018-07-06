@@ -15,3 +15,8 @@ list of vectors with all combinations of x and its subsets
 \description{
 all unique combinations of a vector and all its non-zero subsets
 }
+\examples{
+combn_subset(c("a", "b"))
+combn_subset(c(10, 20, 30))
+combn_subset(NULL)
+}

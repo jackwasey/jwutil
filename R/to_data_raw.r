@@ -22,7 +22,7 @@ unzip_to_data_raw <- function(url, file_name, force = FALSE, verbose = FALSE,
   stopifnot(is.character(url) && length(url) == 1L)
   stopifnot(is.character(file_name) && length(file_name) == 1L)
   stopifnot(is.logical(offline) && length(offline) == 1L)
-  if (!dir.exists(data_raw_path)) data_raw_path <- .tempdir()
+  stopifnot(dir.exists(data_raw_path))
   file_path <- file.path(data_raw_path, make.names(file_name))
   if (verbose) {
     message("file path = ", file_path)
@@ -39,14 +39,14 @@ unzip_to_data_raw <- function(url, file_name, force = FALSE, verbose = FALSE,
 
 #' @rdname unzip_to_data_raw
 #' @export
-download_to_data_raw <- function(
-  url,
-  file_name = regmatches(url, regexpr("[^/]*$", url)),
-  offline = TRUE, data_raw_path = "data-raw") {
+download_to_data_raw <- function(url,
+                                 file_name =
+                                   regmatches(url, regexpr("[^/]*$", url)),
+                                 offline = TRUE, data_raw_path = "data-raw") {
   stopifnot(is.character(url) && length(url) == 1L)
   stopifnot(is.character(file_name) && length(file_name) == 1L)
   stopifnot(is.logical(offline) && length(offline) == 1L)
-  if (!dir.exists(data_raw_path)) data_raw_path <- .tempdir()
+  stopifnot(dir.exists(data_raw_path))
   save_path <- file.path(data_raw_path, file_name)
   f_info <- list(file_path = save_path, file_name = file_name)
   if (file.exists(save_path)) return(f_info)

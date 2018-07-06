@@ -13,7 +13,5 @@ rm_r(x, envir = parent.frame())
 }
 \description{
 search through environments until the variables in the list
-  \code{x} are all gone. This doesn't delete functions. No barrier to
-  infinite recursion, but \code{rm} should be able to delete anything that
-  \code{exists} can see.
+  \code{x} are all gone. This doesn't delete functions.
 }

@@ -80,11 +80,3 @@ save_in_data_dir <- function(var_name, suffix = "", data_path = "data",
   message("Now reload package to enable updated/new data: ", var_name)
   invisible(get(var_name, envir = envir))
 }
-
-# tempdir optional hard stop, to make sure CRAN doesn't get polluted and throw
-# the package out
-.tempdir <- function(...) {
-  if (identical(Sys.getenv("NOT_CRAN"), "true"))
-    stop("CRAN must not have residual temp files or directories")
-  tempdir(...)
-}

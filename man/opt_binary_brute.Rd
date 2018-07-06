@@ -2,18 +2,28 @@
 % Please edit documentation in R/util.r
 \name{opt_binary_brute}
 \alias{opt_binary_brute}
-\title{optimizes a function for all combinations of all subsets}
+\title{selects columns from a data frame using an optimization function}
 \usage{
-opt_binary_brute(x, fun = opt_binary_fun, verbose = TRUE)
+opt_binary_brute(x, fun = opt_binary_fun, verbose = FALSE)
 }
 \arguments{
 \item{x}{data frame}
 
-\item{fun}{function which takes parameters x = data.frame, n = columns}
+\item{fun}{function which takes parameters \code{x = data.frame, n = columns}}
 
 \item{verbose}{single logical value, if \code{TRUE} then produce verbose
 messages}
 }
 \description{
-takes a data frame and optimization function
+The optimization function is called with the data frame \code{x} and the names of
+each combination of the names of \code{x}'s columns. An example of real-world
+usage is to automate selection of columns according to the optimization function.
+}
+\examples{
+j <- data.frame(a = 1:5, b = 6:2, c = c(0, 2, 4, 6, 8))
+opt_binary_brute(j)
+j[1, 1] = NA
+j[1:4, 2] = NA
+my_opt_fun <- function(x, n) sum(!unlist(lapply(x, is.na)))
+opt_binary_brute(j, fun = my_opt_fun)
 }

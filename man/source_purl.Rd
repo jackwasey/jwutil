@@ -4,14 +4,10 @@
 \alias{source_purl}
 \title{Extract code from knitr vignette and source it}
 \usage{
-source_purl(input, output = file.path(.tempdir(), paste0(basename(input),
-  ".R")), documentation = 1L, ...)
+source_purl(input, documentation = 1L, ...)
 }
 \arguments{
 \item{input}{path to file as single character string}
-
-\item{output}{output file path, defaults to a file in a temporary name based
-on \code{input}}
 
 \item{documentation}{single integer value passed on to \code{knitr::purl}. An
 integer specifying the level of documentation to go the tangled script: 0
@@ -19,9 +15,10 @@ means pure code (discard all text chunks); 1 (default) means add the chunk
 headers to code; 2 means add all text chunks to code as roxygen comments}
 
 \item{...}{further parameters passed to \code{source}}
+
+\item{output}{output file path, defaults to a file in a temporary name based
+on \code{input}}
 }
 \description{
-Extract code from knitr vignette and source it. This has the advantage in
-that it runs with code in \R session, whereas running vignettes normally
-requires the package to be installed.
+Extract code from knitr vignette and \code{source} it.
 }

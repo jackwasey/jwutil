@@ -332,6 +332,10 @@ permute <- function(x) {
 #' @param x vector to be subsetted and combined
 #' @importFrom  utils combn
 #' @return list of vectors with all combinations of x and its subsets
+#' @examples
+#' combn_subset(c("a", "b"))
+#' combn_subset(c(10, 20, 30))
+#' combn_subset(NULL)
 #' @export
 combn_subset <- function(x) {
   res <- list()
@@ -343,24 +347,35 @@ combn_subset <- function(x) {
   unique(res)
 }
 
-#' @title optimizes a function for all combinations of all subsets
-#' @description takes a data frame and optimization function
+#' selects columns from a data frame using an optimization function
+#'
+#' The optimization function is called with the data frame `x` and the names of
+#' each combination of the names of `x`'s columns. An example of real-world
+#' usage is to automate selection of columns according to the optimization function.
 #' @param x data frame
-#' @param fun function which takes parameters x = data.frame, n = columns
+#' @param fun function which takes parameters `x = data.frame, n = columns`
 #' @template verbose
+#' @md
+#' @examples
+#' j <- data.frame(a = 1:5, b = 6:2, c = c(0, 2, 4, 6, 8))
+#' opt_binary_brute(j)
+#' j[1, 1] = NA
+#' j[1:4, 2] = NA
+#' my_opt_fun <- function(x, n) sum(!unlist(lapply(x, is.na)))
+#' opt_binary_brute(j, fun = my_opt_fun)
 #' @export
-opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = TRUE) {
+opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = FALSE) {
   n <- names(x)
   all_cmbs <- combn_subset(n)
   best_min <- 1e9
-  best_min_by_len <- c(rep(best_min, times = length(n)))
-  best_cmb_by_len <- as.list(rep("", times = length(n)))
-  for (cmb in rev(all_cmbs)) {
+  best_min_by_len <- c(rep(best_min, times = length(n) - 1))
+  best_cmb_by_len <- as.list(rep("", times = length(n) - 1))
+  for (cmb in rev(all_cmbs)[-1]) {
     len_cmb <- length(cmb)
     optim <- fun(x, cmb)
     if (optim < best_min_by_len[len_cmb]) {
       if (verbose) message("best combination for length: ", len_cmb, " is ",
-                           paste(cmb, collapse = ", "), " and optim: ", optim)
+                           paste(cmb, collapse = ", "), ", optim = ", optim)
       best_min_by_len[len_cmb] <- optim
       best_cmb_by_len[[len_cmb]] <- cmb
     }
@@ -457,9 +472,7 @@ invwhich <- function(which, len = max(which)) {
 
 #' @title recursive remove
 #' @description search through environments until the variables in the list
-#'   \code{x} are all gone. This doesn't delete functions. No barrier to
-#'   infinite recursion, but \code{rm} should be able to delete anything that
-#'   \code{exists} can see.
+#'   \code{x} are all gone. This doesn't delete functions.
 #' @param x variables to annihilate
 #' @param envir environment to start at, defaults to calling frame.
 #' @export
@@ -529,7 +542,7 @@ ls.objects <- function(env = parent.frame(), pattern, order.by,
 #' @param n scalar integer, number of objects to show
 #' @export
 lsos <- function(..., n = 10)
-  ls.objects(..., order.by = "Size", decreasing = TRUE, head = TRUE, n = n)
+  ls.objects(env = parent.frame(), ..., order.by = "Size", decreasing = TRUE, head = TRUE, n = n)
 
 #' @title is the object a \code{Date}
 #' @description copied from lubridate
@@ -541,22 +554,19 @@ is.Date <- function(x)
 
 #' Extract code from knitr vignette and source it
 #'
-#' Extract code from knitr vignette and source it. This has the advantage in
-#' that it runs with code in \R session, whereas running vignettes normally
-#' requires the package to be installed.
+#' Extract code from knitr vignette and `source` it.
 #' @param input path to file as single character string
 #' @param output output file path, defaults to a file in a temporary name based
-#'   on \code{input}
-#' @param documentation single integer value passed on to \code{knitr::purl}. An
+#'   on `input`
+#' @param documentation single integer value passed on to `knitr::purl`. An
 #'   integer specifying the level of documentation to go the tangled script: 0
 #'   means pure code (discard all text chunks); 1 (default) means add the chunk
 #'   headers to code; 2 means add all text chunks to code as roxygen comments
 #' @param ... further parameters passed to \code{source}
+#' @md
 #' @export
-source_purl <- function(input,
-                        output = file.path(.tempdir(),
-                                           paste0(basename(input), ".R")),
-                        documentation = 1L, ...) {
+source_purl <- function(input, documentation = 1L, ...) {
+  withr::local_tempfile("output")
   stopifnot(is.integer(documentation) && length(documentation) == 1L)
   knitr::purl(input, output, quiet = TRUE, documentation = documentation)
   source(output, ...)
