@@ -5,13 +5,15 @@
 \alias{mergeBetter}
 \title{Merge better}
 \usage{
-merge_better(x, y, by.x, by.y, all.x = FALSE, all.y = FALSE, affix = NULL,
-  renameConflict = c("suffix", "prefix"), renameAll = c("no", "suffix",
-  "prefix"), convert_factors = TRUE, verbose = FALSE)
+merge_better(x, y, by.x, by.y, all.x = FALSE, all.y = FALSE,
+  affix = NULL, renameConflict = c("suffix", "prefix"),
+  renameAll = c("no", "suffix", "prefix"), convert_factors = TRUE,
+  verbose = FALSE)
 
-mergeBetter(x, y, by.x, by.y, all.x = FALSE, all.y = FALSE, affix = NULL,
-  renameConflict = c("suffix", "prefix"), renameAll = c("no", "suffix",
-  "prefix"), convert_factors = TRUE, verbose = FALSE)
+mergeBetter(x, y, by.x, by.y, all.x = FALSE, all.y = FALSE,
+  affix = NULL, renameConflict = c("suffix", "prefix"),
+  renameAll = c("no", "suffix", "prefix"), convert_factors = TRUE,
+  verbose = FALSE)
 }
 \arguments{
 \item{x}{data frame}

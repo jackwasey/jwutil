@@ -8,8 +8,8 @@
 random_test_dates(n = n_rnd, origin = as.Date("2000-01-01"),
   dayspread = 365 * 150)
 
-random_test_posixlt_datetimes(n = n_rnd, origin = as.Date("2000-01-01"),
-  dayspread = 365 * 150)
+random_test_posixlt_datetimes(n = n_rnd,
+  origin = as.Date("2000-01-01"), dayspread = 365 * 150)
 }
 \arguments{
 \item{n}{integer number to generate}

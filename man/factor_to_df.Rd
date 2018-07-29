@@ -8,8 +8,8 @@
 factor_to_df(fctr, prefix = deparse(substitute(fctr)), sep = "",
   drop_empty = TRUE, na_as_col = TRUE, verbose = FALSE)
 
-factorToDataframeLogical(fctr, prefix = deparse(substitute(fctr)), sep = "",
-  drop_empty = TRUE, na_as_col = TRUE, verbose = FALSE)
+factorToDataframeLogical(fctr, prefix = deparse(substitute(fctr)),
+  sep = "", drop_empty = TRUE, na_as_col = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{fctr}{factor}

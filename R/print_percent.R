@@ -18,7 +18,7 @@ percentize <- function(x) {
 #' Intended for succinctly printing summary data in a scientific publication.
 #' @param x numeric number
 #' @param n numeric total
-#' @param fmt `sprintf` format, default being `%%d (%%s)`
+#' @param fmt `sprintf` format, default being `%d (%s)`
 #' @examples
 #' npc(1, 100)
 #' npc(1, 1)
@@ -26,6 +26,7 @@ percentize <- function(x) {
 #' npc(1.321, 7.7432)
 #' npc(7239, 234897)
 #' npc(-10, 1000)
+#' @md
 #' @export
 npc <- function(x, n, fmt = "%d (%s)") {
   sprintf(fmt, as.integer(round(x)), percentize(x / n))

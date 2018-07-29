@@ -11,7 +11,7 @@ npc(x, n, fmt = "\%d (\%s)")
 
 \item{n}{numeric total}
 
-\item{fmt}{`sprintf` format, default being `%%d (%%s)`}
+\item{fmt}{\code{sprintf} format, default being \code{\%d (\%s)}}
 }
 \description{
 Intended for succinctly printing summary data in a scientific publication.

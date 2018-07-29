@@ -7,9 +7,11 @@
   the inputs to a function which should give the same result where n args >=2
   and the function is commutative.}
 \usage{
-expect_that_combine_all_args(object, condition, info = NULL, label = NULL)
+expect_that_combine_all_args(object, condition, info = NULL,
+  label = NULL)
 
-expect_that_combine_first_arg(object, condition, info = NULL, label = NULL)
+expect_that_combine_first_arg(object, condition, info = NULL,
+  label = NULL)
 }
 \arguments{
 \item{object}{object to test}

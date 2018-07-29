@@ -4,8 +4,8 @@
 \alias{affixFields}
 \title{update a set of data frame field names}
 \usage{
-affixFields(fields, affix, skip = NULL, renameHow = c("suffix", "prefix"),
-  sep = ".")
+affixFields(fields, affix, skip = NULL, renameHow = c("suffix",
+  "prefix"), sep = ".")
 }
 \arguments{
 \item{fields}{char vector}
