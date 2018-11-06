@@ -1,7 +1,8 @@
 #' Convert factor into a data.frame of logicals
 #'
 #' Convert a single factor into a data.frame with multiple true or false fields,
-#' one for each factor
+#' one for each factor. The `vtreat` package may be a better choice for more
+#' comprehensive data preparation.
 #' @param fctr factor
 #' @param prefix defaults to "f" to pre-pend the factor level when constructing
 #'   the data frame columns names

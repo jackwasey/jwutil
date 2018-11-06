@@ -34,7 +34,8 @@ data.frame with columns of logicals
 }
 \description{
 Convert a single factor into a data.frame with multiple true or false fields,
-one for each factor
+one for each factor. The `vtreat` package may be a better choice for more
+comprehensive data preparation.
 }
 \examples{
 n <- 10

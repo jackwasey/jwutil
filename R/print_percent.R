@@ -31,3 +31,17 @@ percentize <- function(x) {
 npc <- function(x, n, fmt = "%d (%s)") {
   sprintf(fmt, as.integer(round(x)), percentize(x / n))
 }
+
+#' Return percentage string to given significant figures
+#'
+#' From jwutil development version
+#' @param x numeric or integer values
+#' @param figures integer number of significant figures to format
+#' @param sep character used to separate number from percent symbol, default is
+#'   empty string
+#' @export
+percent_signif <- function(x, figures = 3, sep = "") {
+  signif(x * 100, digits = figures) %>%
+    formatC(digits = figures) %>%
+    trimws() %>% paste0("%", sep = sep)
+}
