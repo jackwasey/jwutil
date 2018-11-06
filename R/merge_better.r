@@ -118,6 +118,10 @@ merge_better <- function(x, y, by.x, by.y,
   }
   if (verbose) message(sprintf("merging using id: %s, and new id: %s\n",
                                by.x, by.y))
+  if (anyDuplicated(x[[by.x]]) &&
+      anyDuplicated(y[[by.y]]))
+    warning("duplicate keys in both x and y will result in Cartesian",
+    " expansion of the duplicates")
   m <- merge(x = x, by.x = by.x, all.x = all.x,
              y = y, by.y = by.y, all.y = all.y)
   stopifnot(anyDuplicated(names(m)) == 0)
