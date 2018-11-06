@@ -13,5 +13,5 @@ countIsNa(x)
 integer
 }
 \description{
-count the number of NAs in a vector
+count the number of NAs in a vector. also consider `base::anyNA`
 }
