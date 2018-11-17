@@ -18,21 +18,21 @@
 #' @title get NA field names from data frame
 #' @description Get the names of any columns in a data frame which have NA
 #'   values.
-#' @param dframe data.frame
+#' @param x data.frame
 #' @param na_ish Logical, if `TRUE`, also consider NA-like strings, using
 #'   `is_na_ish`
 #' @param extra_na passed on to `is_na_ish`
 #' @return vector of names of fields which contain any NA values, length zero if
 #'   no matches
 #' @export
-get_na_fields <- function(dframe, na_ish = FALSE, extra_na = NULL) {
-  stopifnot(is.data.frame(dframe))
-  na_fields <- vapply(dframe, anyNA, logical(1))
+get_na_fields <- function(x, na_ish = FALSE, extra_na = NULL) {
+  stopifnot(is.data.frame(x))
+  na_fields <- vapply(x, anyNA, logical(1))
   if (na_ish)
-    na_fields <- na_fields | vapply(dframe,
-                                    function(x) any(is_na_ish(x)),
+    na_fields <- na_fields | vapply(x,
+                                    function(y) any(is_na_ish(y)),
                                     logical(1))
-  names(dframe)[na_fields]
+  names(x)[na_fields]
 }
 
 #' @describeIn get_na_fields Deprecated
@@ -41,8 +41,8 @@ getNAFields <- get_na_fields
 
 #' @rdname get_na_fields
 #' @export
-get_non_na_fields <- function(dframe)
-  names(dframe)[names(dframe) %nin% getNAFields(dframe)]
+get_non_na_fields <- function(x)
+  names(x)[names(x) %nin% getNAFields(x)]
 
 #' @describeIn get_na_fields Deprecated
 #' @export
@@ -51,11 +51,11 @@ getNonNAFields <- get_non_na_fields
 #' @title return proportion of NA values per field
 #' @description Return proportion of values which are \code{NA} in each field of
 #'   the given data frame.
-#' @param dframe is a data frame
+#' @param x is a data frame
 #' @return numeric vector
 #' @export
-propNaPerField <- function(dframe)
-  vapply(dframe, function(v) countIsNa(v) / length(v), numeric(1))
+propNaPerField <- function(x)
+  vapply(x, function(v) countIsNa(v) / length(v), numeric(1))
 
 #' @title drops rows with NA values in specified fields
 #' @description employs \code{\link[stats]{complete.cases}} which is fast
@@ -69,9 +69,9 @@ propNaPerField <- function(dframe)
 #'   listed in fld.
 #' @importFrom stats complete.cases
 #' @export
- drop_rows_with_na <- function(x, fld = names(x), verbose = FALSE) {
-  stopifnot(is.character(fld))
+drop_rows_with_na <- function(x, fld = names(x), verbose = FALSE) {
   stopifnot(is.data.frame(x))
+  stopifnot(is.character(fld))
   stopifnot(is.logical(verbose) && length(verbose == 1))
   if (verbose) message(sprintf("checking fields: %s for NA values",
                                paste(fld, sep = ", ")))
@@ -88,10 +88,12 @@ dropRowsWithNAField <- drop_rows_with_na
 #'
 #' Zero NA values in a data.frame, including \code{cols} and exluding
 #' \code{ignore}. Also does not replace \code{Date} or \code{POSIXt} fields.
-#' @param df data.frame
+#' @param x data.frame
 #' @param cols names of columns to work on, default is all columns
 #' @param ignore character vector of columns names to ignore
 #' @param verbose TRUE or FALSE
+#' @param na_ish Logical, default `TRUE` which will convert NA-like strings, too
+#' @param new_val `0`
 #' @examples
 #' d <- data.frame(1:5, 6:10, 11:15)
 #' d[2, 3] <- NA
@@ -100,27 +102,27 @@ dropRowsWithNAField <- drop_rows_with_na
 #' print(d)
 #' zero_na(d)
 #' d[1, 1] <- "NA"
-#' zero_na(d, na_sih = TRUE)
+#' zero_na(d, na_ish = TRUE)
 #' @export
-zero_na <- function(df, cols = names(df), ignore = character(), verbose = FALSE,
-                    na_ish = TRUE) {
-  stopifnot(is.data.frame(df))
+zero_na <- function(x, cols = names(x), ignore = character(), verbose = FALSE,
+                    na_ish = TRUE, new_val = 0) {
+  stopifnot(is.data.frame(x))
   stopifnot(is.character(cols))
   stopifnot(is.character(ignore))
   stopifnot(is.logical(verbose))
-  stopifnot(all(c(cols, ignore) %in% names(df)))
+  stopifnot(all(c(cols, ignore) %in% names(x)))
   stopifnot(is.logical(na_ish))
-  gotNA <- getNAFields(df)
+  gotNA <- getNAFields(x)
   for (n in gotNA[gotNA %nin% ignore]) {
-    x <- df[[n]]
+    y <- x[[n]]
     if (verbose)
       message(sprintf("zeroing NA values in %s", n))
-    if (!methods::is(x, "POSIXt") && !is.Date(x) && !is.factor(x)) {
-      df[is.na(x), n] <- 0
+    if (!methods::is(x, "POSIXt") && !is.Date(y) && !is.factor(y)) {
+      x[is.na(y), n] <- new_val
     } else if (verbose)
       message(sprintf("skipping factor or Date: %s", n))
   }
-  df
+  x
 }
 
 #' Determine whether a value is, or should be, `NA`
@@ -143,6 +145,10 @@ is_na_ish <- function(x, extra_na = NULL) {
 }
 
 #' Fix NA-like strings to be NA (or other value of choice)
+#' @param x data frame
+#' @param extra_na Additional values to consider equivalent to NA
+#' @param new_val New value to be used instead of NA-ish values, default is `NA`
+#' @md
 #' @examples
 #' df <- data.frame(a = c("NA", "n/a", 1, NA),
 #'                  b = c("three", "na", NaN, "  N/A "),
@@ -151,11 +157,11 @@ is_na_ish <- function(x, extra_na = NULL) {
 #' fix_na_ish(df)
 #' fix_na_ish(df, extra_na = "three", new_val = "0")
 #' @export
-fix_na_ish <- function(dframe, extra_na = NULL, new_val = NA) {
-  stopifnot(is.data.frame(dframe))
-  for (col_name in names(dframe)) {
-    col <- dframe[[col_name]]
-    dframe[is_na_ish(x = col, extra_na = extra_na), col_name] <- new_val
+fix_na_ish <- function(x, extra_na = NULL, new_val = NA) {
+  stopifnot(is.data.frame(x))
+  for (col_name in names(x)) {
+    col <- x[[col_name]]
+    x[is_na_ish(x = col, extra_na = extra_na), col_name] <- new_val
   }
-  dframe
+  x
 }

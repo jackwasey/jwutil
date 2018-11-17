@@ -41,7 +41,11 @@ npc <- function(x, n, fmt = "%d (%s)") {
 #'   empty string
 #' @export
 percent_signif <- function(x, figures = 3, sep = "") {
-  signif(x * 100, digits = figures) %>%
-    formatC(digits = figures) %>%
-    trimws() %>% paste0("%", sep = sep)
+  paste0(
+    trimws(
+      formatC(
+        signif(x * 100, digits = figures),
+        digits = figures)
+    ),
+    "%", sep = sep)
 }

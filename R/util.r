@@ -130,7 +130,7 @@ countNumeric <- function(x)
   length(x) - countNotNumeric(x)
 
 #' @title count NA in vector
-#' @description count the number of NAs in a vector
+#' @description count the number of NAs in a vector. also consider `base::anyNA`
 #' @param x vector
 #' @return integer
 #' @export
@@ -639,3 +639,53 @@ reqinst <- function(pkgs) {
     library(pkg, character.only = TRUE)
   }
 }
+
+#' Get the first/only argument of the last run command
+#'
+#' This is experimental and writes to the calling frame, which, if in
+#' interactive mode, is probably the global environment. We write to a horrible
+#' and unusual (although well-known) variable name, which will avoid name
+#' conflicts.
+#' @return Returns the evaluated value of the first argument to first argument
+#'   of the previous R command, if it was a function call with parentheses.
+#'   Primarily, the function is invoked for its side effect of adding of
+#'   modifying `!$` in the global environment.
+#' @keywords internal
+#' @references
+#' \url{http://kevinushey.github.io/blog/2015/02/02/rprofile-essentials/}
+#' @md
+bang_dollar <- function() {
+  stopifnot(interactive())
+  hf <- tempfile()
+  utils::savehistory(hf)
+  h <- readLines(hf)
+  unlink(hf)
+  last_cmd <- h[[length(h) - 1]]
+  end_cmd <- sub(".*\\(", "", last_cmd)
+  first_arg <- sub("[,)].*", "", end_cmd)
+  res <- eval(first_arg, envir = parent.frame())
+  assign(".bangdollar", res, envir = parent.frame())
+  invisible(res)
+}
+
+`!$` <- function() {
+  stopifnot(interactive())
+  hf <- tempfile()
+  utils::savehistory(hf)
+  h <- readLines(hf)
+  unlink(hf)
+  last_cmd <- h[[length(h) - 1]]
+  end_cmd <- sub(".*\\(", "", last_cmd)
+  first_arg <- sub("[,)].*", "", end_cmd)
+  if (length(first_arg) == 0) return()
+  res <- eval(first_arg, envir = parent.frame())
+  #invisible(res)
+  res
+}
+
+# bang_dollar_setup <- function() {
+#   `!$` <- NA
+#   class(`!$`) <- "__bangdollar__"
+#   print.__bangdollar__ <- function(...) print(bang_dollar())
+#   assign("print.__bangdollar__")
+# }

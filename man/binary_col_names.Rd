@@ -9,8 +9,7 @@
 \usage{
 binary_col_names(x, invert = FALSE)
 
-two_cat_col_names(dframe, invert = FALSE, ignore_na = FALSE,
-  trim = TRUE)
+two_cat_col_names(x, invert = FALSE, ignore_na = FALSE, trim = TRUE)
 
 binary_cols(x, invert = FALSE)
 

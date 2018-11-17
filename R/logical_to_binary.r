@@ -36,8 +36,11 @@ logicalToBinary <- logical_to_binary
 #' then the function stops with an error message. `NA` values are counted,
 #' unless `ignore_na` is `TRUE`. When they are considered, `na_val`
 #' indicates whether they are attributed `TRUE` or `FALSE`.
-#' @param df input data frame
+#' @param x input data frame
+#' @param ignore_na logical
+#' @param na_val Single value to use in place of `NA``, default is `FALSE`
 #' @return data frame with two categories columns replaced by logical columns
+#' @md
 #' @examples
 #' df <- data.frame(a = c("y", "n", "y", "y", "n"),
 #'                  b = c(FALSE, TRUE, FALSE, TRUE, TRUE),
@@ -52,9 +55,9 @@ logicalToBinary <- logical_to_binary
 #' stopifnot(identical(res$b, c(FALSE, TRUE, FALSE, TRUE, TRUE)))
 #' two_cat_to_logical(df, ignore_na = TRUE)
 #' @export
-two_cat_to_logical <- function(df, ignore_na = FALSE, na_val = FALSE) {
-  tcn <- two_cat_col_names(df, ignore_na = ignore_na)
-  nr <- nrow(df)
+two_cat_to_logical <- function(x, ignore_na = FALSE, na_val = FALSE) {
+  tcn <- two_cat_col_names(x, ignore_na = ignore_na)
+  nr <- nrow(x)
   true_vals <- list("Y", "y", "Yes", "YES", "yes", "1", 1L, 1.0, TRUE, -1L, -1.0)
   false_vals <- list("N", "n", "No", "NO", "no", "0", 0L, 0.0, FALSE)
   if (!ignore_na) {
@@ -63,9 +66,9 @@ two_cat_to_logical <- function(df, ignore_na = FALSE, na_val = FALSE) {
     else
       false_vals <- c(false_vals, NA)
   }
-  can_convert <- sapply(df[tcn],
-                        function(x)
-                          all(match(trimws(x), c(true_vals, false_vals)) > 0L, na.rm = TRUE)
+  can_convert <- sapply(x[tcn],
+                        function(y)
+                          all(match(trimws(y), c(true_vals, false_vals)) > 0L, na.rm = TRUE)
   )
   if (!all(can_convert)) {
     message("Cannot convert the following columns:")
@@ -74,8 +77,8 @@ two_cat_to_logical <- function(df, ignore_na = FALSE, na_val = FALSE) {
   }
   for (col_name in tcn) {
     new_vec <- rep(TRUE, nr)
-    new_vec[trimws(df[[col_name]]) %in% false_vals] <- FALSE
-    df[[col_name]] <- new_vec
+    new_vec[trimws(x[[col_name]]) %in% false_vals] <- FALSE
+    x[[col_name]] <- new_vec
   }
-  df
+  x
 }

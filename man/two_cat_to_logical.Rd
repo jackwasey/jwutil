@@ -4,19 +4,23 @@
 \alias{two_cat_to_logical}
 \title{Take dataframe, and convert any columns with just two categories into logical}
 \usage{
-two_cat_to_logical(df, ignore_na = FALSE, na_val = FALSE)
+two_cat_to_logical(x, ignore_na = FALSE, na_val = FALSE)
 }
 \arguments{
-\item{df}{input data frame}
+\item{x}{input data frame}
+
+\item{ignore_na}{logical}
+
+\item{na_val}{Single value to use in place of \code{NA``, default is }FALSE`}
 }
 \value{
 data frame with two categories columns replaced by logical columns
 }
 \description{
 E.g. "Yes" would be converted to TRUE, "0" to FALSE, etc. If heuristics fail,
-then the function stops with an error message. `NA` values are counted,
-unless `ignore_na` is `TRUE`. When they are considered, `na_val`
-indicates whether they are attributed `TRUE` or `FALSE`.
+then the function stops with an error message. \code{NA} values are counted,
+unless \code{ignore_na} is \code{TRUE}. When they are considered, \code{na_val}
+indicates whether they are attributed \code{TRUE} or \code{FALSE}.
 }
 \examples{
 df <- data.frame(a = c("y", "n", "y", "y", "n"),

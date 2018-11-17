@@ -93,16 +93,16 @@ binary_col_names <- function(x, invert = FALSE) {
 #' stopifnot(two_cat_col_names(df) == "z")
 #' stopifnot(two_cat_col_names(df, ignore_na = TRUE) == "x")
 #' @export
-two_cat_col_names <- function(dframe, invert = FALSE,
+two_cat_col_names <- function(x, invert = FALSE,
                               ignore_na = FALSE, trim = TRUE) {
-  stopifnot(is.data.frame(dframe))
+  stopifnot(is.data.frame(x))
   stopifnot(is.logical(invert), length(invert) == 1L)
-  is_two_cat <- vapply(dframe,
+  is_two_cat <- vapply(x,
                        FUN = function(y) {
                          if (is.character(y)) y <- trimws(y)
                          length(unique(y)) == 2L + (anyNA(y) && ignore_na)
-                         }, FUN.VALUE = logical(1))
-  names(dframe)[xor(is_two_cat, invert)]
+                       }, FUN.VALUE = logical(1))
+  names(x)[xor(is_two_cat, invert)]
 }
 
 #' @describeIn binary_col_names Get the data frame containing just the binary

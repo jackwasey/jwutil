@@ -7,16 +7,16 @@
 \alias{getNonNAFields}
 \title{get NA field names from data frame}
 \usage{
-get_na_fields(dframe, na_ish = FALSE, extra_na = NULL)
+get_na_fields(x, na_ish = FALSE, extra_na = NULL)
 
-getNAFields(dframe, na_ish = FALSE, extra_na = NULL)
+getNAFields(x, na_ish = FALSE, extra_na = NULL)
 
-get_non_na_fields(dframe)
+get_non_na_fields(x)
 
-getNonNAFields(dframe)
+getNonNAFields(x)
 }
 \arguments{
-\item{dframe}{data.frame}
+\item{x}{data.frame}
 
 \item{na_ish}{Logical, if `TRUE`, also consider NA-like strings, using
 `is_na_ish`}

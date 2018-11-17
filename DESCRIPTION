@@ -1,6 +1,6 @@
 Package: jwutil
 Title: Tools for Data Manipulation and Testing
-Version: 1.2.1.9000
+Version: 1.2.2
 Authors@R: 
     person(given = "Jack O. Wasey",
            role = c("aut", "cre", "cph"),
@@ -33,6 +33,6 @@ Encoding: UTF-8
 LinkingTo: 
     Rcpp,
     testthat
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 VignetteBuilder: 
     knitr

@@ -4,17 +4,21 @@
 \alias{zero_na}
 \title{Zero NA values in a data.frame}
 \usage{
-zero_na(df, cols = names(df), ignore = character(), verbose = FALSE,
-  na_ish = TRUE)
+zero_na(x, cols = names(x), ignore = character(), verbose = FALSE,
+  na_ish = TRUE, new_val = 0)
 }
 \arguments{
-\item{df}{data.frame}
+\item{x}{data.frame}
 
 \item{cols}{names of columns to work on, default is all columns}
 
 \item{ignore}{character vector of columns names to ignore}
 
 \item{verbose}{TRUE or FALSE}
+
+\item{na_ish}{Logical, default `TRUE` which will convert NA-like strings, too}
+
+\item{new_val}{`0`}
 }
 \description{
 Zero NA values in a data.frame, including \code{cols} and exluding
@@ -28,5 +32,5 @@ d[1, 1] <- NA
 print(d)
 zero_na(d)
 d[1, 1] <- "NA"
-zero_na(d, na_sih = TRUE)
+zero_na(d, na_ish = TRUE)
 }

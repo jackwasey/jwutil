@@ -4,7 +4,14 @@
 \alias{fix_na_ish}
 \title{Fix NA-like strings to be NA (or other value of choice)}
 \usage{
-fix_na_ish(dframe, extra_na = NULL, new_val = NA)
+fix_na_ish(x, extra_na = NULL, new_val = NA)
+}
+\arguments{
+\item{x}{data frame}
+
+\item{extra_na}{Additional values to consider equivalent to NA}
+
+\item{new_val}{New value to be used instead of NA-ish values, default is \code{NA}}
 }
 \description{
 Fix NA-like strings to be NA (or other value of choice)

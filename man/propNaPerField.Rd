@@ -4,10 +4,10 @@
 \alias{propNaPerField}
 \title{return proportion of NA values per field}
 \usage{
-propNaPerField(dframe)
+propNaPerField(x)
 }
 \arguments{
-\item{dframe}{is a data frame}
+\item{x}{is a data frame}
 }
 \value{
 numeric vector
