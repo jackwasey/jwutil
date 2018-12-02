@@ -26,6 +26,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jack O. Wasey \email{jack@jackwasey.com} [copyright holder]
+\strong{Maintainer}: Jack O. Wasey \email{jack@jackwasey.com} (0000-0003-3738-4637) [copyright holder]
 
 }

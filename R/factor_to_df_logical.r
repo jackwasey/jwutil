@@ -41,7 +41,7 @@ factor_to_df <- function(fctr, prefix = deparse(substitute(fctr)),
     warning("factorToCols: factor passed to factorCols contains NA")
   if (drop_empty)
     fctr <- factor(fctr)
-  stopifnot(length(levels(fctr)) > 0)
+  stopifnot(nlevels(fctr) > 0)
   stopifnot(length(fctr) > 0)
   if (na_as_col) {
     if (drop_empty)
@@ -54,13 +54,13 @@ factor_to_df <- function(fctr, prefix = deparse(substitute(fctr)),
     }
     levels(fctr)[is.na(levels(fctr))] <- "NA"
   }
-  if (length(levels(fctr)) == 1) {
+  if (nlevels(fctr) == 1) {
     if (verbose) message("only one factor level, returning all TRUE")
     df <- data.frame(fctr)
     names(df) <- prefix
     return(df)
   }
-  if (length(levels(fctr)) == 2) {
+  if (nlevels(fctr) == 2) {
     if (verbose)
       message("two factor levels: returning TRUE/FALSE for first level")
     df <- data.frame(fctr == levels(fctr)[1])
