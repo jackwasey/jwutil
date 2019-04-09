@@ -28,26 +28,32 @@ unzip_single <- function(url, file_name, save_path) {
   zipfile <- tempfile()
   # using libcurl because it seems the internal method works inconsistently
   curl_cap <- capabilities("libcurl")
-  if (length(curl_cap) > 0 && curl_cap)
+  if (length(curl_cap) > 0 && curl_cap) {
     method <- "libcurl"
-  else
+  } else {
     method <- "auto"
-  dl_code <- utils::download.file(url = url, destfile = zipfile,
-                                  quiet = TRUE, method = method, mode = "wb")
+  }
+  dl_code <- utils::download.file(
+    url = url, destfile = zipfile,
+    quiet = TRUE, method = method, mode = "wb"
+  )
   stopifnot(dl_code == 0)
   zipdir <- tempfile() # i do want tempfile, so I get an empty new directory
   dir.create(zipdir)
-  utils::unzip(zipfile, exdir = zipdir)  # files="" so extract all
+  utils::unzip(zipfile, exdir = zipdir) # files="" so extract all
   files <- list.files(zipdir)
   if (is.null(file_name)) {
     if (length(files) == 1) {
       file_name <- files
     } else {
-      stop("multiple files in zip, but no file name specified: ",
-           paste(files, collapse = ", "))
+      stop(
+        "multiple files in zip, but no file name specified: ",
+        paste(files, collapse = ", ")
+      )
     }
-  } else
+  } else {
     stopifnot(file_name %in% files)
+  }
   ret <- file.copy(file.path(zipdir, file_name), save_path, overwrite = TRUE)
   unlink(zipdir, recursive = TRUE)
   ret
@@ -74,9 +80,13 @@ save_in_data_dir <- function(var_name, suffix = "", data_path = "data",
   stopifnot(exists(var_name, envir = envir))
   var_name <- as.character(substitute(var_name))
   stopifnot(exists(var_name, envir = envir))
-  save(list = var_name, envir = envir, compress = "xz",
-       file = file.path(package_dir, data_path,
-                        strip(paste0(var_name, suffix, ".RData"))))
+  save(
+    list = var_name, envir = envir, compress = "xz",
+    file = file.path(
+      package_dir, data_path,
+      strip(paste0(var_name, suffix, ".RData"))
+    )
+  )
   message("Now reload package to enable updated/new data: ", var_name)
   invisible(get(var_name, envir = envir))
 }

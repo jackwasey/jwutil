@@ -22,17 +22,17 @@
 #'   verbosity, 2 will give full verbosity. 0 or FALSE turns off all messages.
 #' @return merged data frame
 #' @examples
-#' df <- data.frame(a= c("1","2"), b = 1:2, stringsAsFactors = FALSE)
-#' eg <- data.frame(a= c("1","3"), b = 3:4, stringsAsFactors = FALSE)
+#' df <- data.frame(a = c("1", "2"), b = 1:2, stringsAsFactors = FALSE)
+#' eg <- data.frame(a = c("1", "3"), b = 3:4, stringsAsFactors = FALSE)
 #' mergeBetter(x = df, y = eg, by.x = "a", by.y = "a", verbose = TRUE)
 #' @export
 merge_better <- function(x, y, by.x, by.y,
-                        all.x = FALSE, all.y = FALSE,
-                        affix = NULL,
-                        renameConflict = c("suffix", "prefix"),
-                        renameAll = c("no", "suffix", "prefix"),
-                        convert_factors = TRUE,
-                        verbose = FALSE) {
+                         all.x = FALSE, all.y = FALSE,
+                         affix = NULL,
+                         renameConflict = c("suffix", "prefix"),
+                         renameAll = c("no", "suffix", "prefix"),
+                         convert_factors = TRUE,
+                         verbose = FALSE) {
   stopifnot(is.data.frame(x), is.data.frame(y))
   stopifnot(is.character(by.x), length(by.x) == 1L)
   stopifnot(is.character(by.y), length(by.y) == 1L)
@@ -50,52 +50,65 @@ merge_better <- function(x, y, by.x, by.y,
   x_name <- deparse(substitute(x))
   y_name <- deparse(substitute(y))
   # guess a good affix: `y` might be an expression and not suitable
-  if (is.null(affix))
+  if (is.null(affix)) {
     affix <- make.names(y_name)
+  }
   # convert factors of keys only # TODO: as.integer may be appropriate
   # sometimes/often. TODO: tests for this. Ultimately may be better to
   # use data.table, and just index these columns properly.
-  if (convert_factors)
+  if (convert_factors) {
     for (by_col in c(by.x, by.y))
       if (is.factor(x[[by_col]])) x[[by_col]] <- as_char_no_warn(x[[by_col]])
+  }
   if (verbose) {
     # this would be more efficient with data table or sql type query
     comb_key_x <- apply(x[by.x], 1, paste, collapse = "j")
     comb_key_y <- apply(y[by.y], 1, paste, collapse = "j")
     left_missing <- sum(comb_key_x %nin% comb_key_y)
-    right_missing  <- sum(comb_key_y %nin% comb_key_x)
+    right_missing <- sum(comb_key_y %nin% comb_key_x)
     if (right_missing + left_missing > 0) {
       message(sprintf(ifelse(all.y,
-                             "keeping %d out of %d unmatched from %s",
-                             "dropping %d out of %d from %s"
+        "keeping %d out of %d unmatched from %s",
+        "dropping %d out of %d from %s"
       ), right_missing, nrow(y), y_name, y_name))
       message(sprintf(ifelse(all.x,
-                             "keeping %d out of %d unmatched from %s",
-                             "dropping %d out of %d from %s"
+        "keeping %d out of %d unmatched from %s",
+        "dropping %d out of %d from %s"
       ), left_missing, nrow(x), x_name, x_name))
-    } else
+    } else {
       message("Keys match exactly, so dropping no rows.")
+    }
   }
   # find duplicate field names, ignoring the field we are merging on.
   dupes_x <- names(x)[tolower(names(x)) %in% tolower(names(y)) &
-                        tolower(names(x)) %nin% tolower(by.x) &
-                        tolower(names(x)) %nin% tolower(by.y)]
+    tolower(names(x)) %nin% tolower(by.x) &
+    tolower(names(x)) %nin% tolower(by.y)]
   # drop identical fields unless an explicit rename has been requested.
   if (length(dupes_x) > 0 && renameAll == "no") {
-    if (verbose)
-      message(sprintf("%s field names duplicated in %s: %s", x_name, y_name,
-                      paste(dupes_x, collapse = ", ")))
-    if (verbose > 1)
-      message(sprintf("Adding %s to rename conflicts in %s: %s", y_name,
-                      renameConflict))
+    if (verbose) {
+      message(sprintf(
+        "%s field names duplicated in %s: %s", x_name, y_name,
+        paste(dupes_x, collapse = ", ")
+      ))
+    }
+    if (verbose > 1) {
+      message(sprintf(
+        "Adding %s to rename conflicts in %s: %s", y_name,
+        renameConflict
+      ))
+    }
     dropFields <- c()
     for (xdup in dupes_x) {
-      #rematch y - this is unsatisfying but simplifies the logic.
+      # rematch y - this is unsatisfying but simplifies the logic.
       match_x_in_y <- match(tolower(xdup), tolower(names(y)))
-      stopifnot(length(match_x_in_y) == 1)  # two conflicts with that name!
+      stopifnot(length(match_x_in_y) == 1) # two conflicts with that name!
       ydup <- names(y)[match_x_in_y]
-      if (verbose > 1) message("checking whether '", xdup,
-                               "' (matching '", ydup, "') has duplicated data.")
+      if (verbose > 1) {
+        message(
+          "checking whether '", xdup,
+          "' (matching '", ydup, "') has duplicated data."
+        )
+      }
       isAllEqual <- all.equal(x[[xdup]], y[[ydup]])
 
       # all.equal returns true or a char vector, so work around
@@ -105,25 +118,38 @@ merge_better <- function(x, y, by.x, by.y,
       } else {
         if (verbose > 1) message("renaming non-identical field:", ydup)
         names(y)[which(names(y) == ydup)] <-
-          affixFields(fields = ydup,
-                      affix = affix,
-                      renameHow = renameConflict)
+          affixFields(
+            fields = ydup,
+            affix = affix,
+            renameHow = renameConflict
+          )
       }
     }
     # drop the fields: best not to do while looping through the data frames.
     for (dropField in dropFields) y[dropField] <- NULL
   } else if (renameAll != "no") {
-    names(y) <- affixFields(fields = names(y), skip = by.y,
-                            affix = affix, renameHow = renameAll)
+    names(y) <- affixFields(
+      fields = names(y), skip = by.y,
+      affix = affix, renameHow = renameAll
+    )
   }
-  if (verbose) message(sprintf("merging using id: %s, and new id: %s\n",
-                               by.x, by.y))
+  if (verbose) {
+    message(sprintf(
+      "merging using id: %s, and new id: %s\n",
+      by.x, by.y
+    ))
+  }
   if (anyDuplicated(x[[by.x]]) &&
-      anyDuplicated(y[[by.y]]))
-    warning("duplicate keys in both x and y will result in Cartesian",
-    " expansion of the duplicates")
-  m <- merge(x = x, by.x = by.x, all.x = all.x,
-             y = y, by.y = by.y, all.y = all.y)
+    anyDuplicated(y[[by.y]])) {
+    warning(
+      "duplicate keys in both x and y will result in Cartesian",
+      " expansion of the duplicates"
+    )
+  }
+  m <- merge(
+    x = x, by.x = by.x, all.x = all.x,
+    y = y, by.y = by.y, all.y = all.y
+  )
   stopifnot(anyDuplicated(names(m)) == 0)
   m
 }

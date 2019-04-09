@@ -27,8 +27,9 @@ lsf <- function(pkg) {
   everything <- ls(pos = env_name, all.names = TRUE)
   funcs <- c()
   for (e in everything) {
-    if (is.function(get(e, envir = as.environment(env_name), inherits = FALSE)))
+    if (is.function(get(e, envir = as.environment(env_name), inherits = FALSE))) {
       funcs <- append(funcs, e)
+    }
   }
   funcs
 }
@@ -46,8 +47,9 @@ numbers_to_long_and_float <- function(..., na.rm = TRUE) {
   # give NA with warning. For test case generation, usually we will want to
   # remove NAs.
   suppressWarnings(flattenList(list(as.integer(x)),
-                               list(as.double(x)),
-                               na.rm = na.rm))
+    list(as.double(x)),
+    na.rm = na.rm
+  ))
 }
 
 #' @title zeroes
@@ -91,7 +93,8 @@ random_test_numbers <- function(n = n_rnd,
                                 max = NULL,
                                 hole = NULL) {
   x <-
-    c(0,
+    c(
+      0,
       pi,
       sqrt(2),
       stats::runif(n),
@@ -99,13 +102,15 @@ random_test_numbers <- function(n = n_rnd,
       stats::runif(n, min = 0, max = 1),
       stats::runif(n, max = ifelse(is.null(max), .Machine$double.xmax, max)),
       stats::runif(n, min = ifelse(is.null(max), -.Machine$double.xmax, min)),
-      stats::runif(n, min = -n * .Machine$double.xmin,
-                   max =   n * .Machine$double.xmin)
+      stats::runif(n,
+        min = -n * .Machine$double.xmin,
+        max = n * .Machine$double.xmin
+      )
     )
-  #drop any generated numbers that didn't match the constraints
+  # drop any generated numbers that didn't match the constraints
   if (!is.null(min)) x <- x[x >= min]
   if (!is.null(max)) x <- x[x <= max]
-  #punch a hole in the range, if provided:
+  # punch a hole in the range, if provided:
   if (!is.null(hole) && length(hole) == 2) {
     x <- x[!(x >= hole[1] & x <= hole[2])]
   }
@@ -121,7 +126,10 @@ random_test_integers <- function(n = n_rnd,
   x <- suppressWarnings(
     unique(
       as.integer(
-        random_test_numbers(n = n, min = min, max = max, hole = hole))))
+        random_test_numbers(n = n, min = min, max = max, hole = hole)
+      )
+    )
+  )
   x[!is.na(x)]
 }
 
@@ -160,8 +168,10 @@ random_test_letters <- function(n = n_rnd, max_str_len = 257) {
       sample(
         c(LETTERS, letters),
         stats::runif(n = 1, min = 1, max = max_str_len),
-        replace = TRUE),
-      collapse = "")
+        replace = TRUE
+      ),
+      collapse = ""
+    )
   }
   x
 }
@@ -175,7 +185,8 @@ extreme_numbers <- c(
   .Machine$integer.max, -.Machine$integer.max,
   1L, -1L,
   .Machine$double.xmin, .Machine$double.xmax,
-  -.Machine$double.xmin, -.Machine$double.xmax)
+  -.Machine$double.xmin, -.Machine$double.xmax
+)
 
 #' @title alternative \code{expect_that} from \code{testthat} which permutes all
 #'   the inputs to a function which should give the same result where n args >=2
@@ -188,8 +199,10 @@ extreme_numbers <- c(
 #'   testthat::expect_that_combine
 #' @inheritParams testthat::expect_that
 #' @examples
-#'  expect_that_combine_all_args(sum(1, 2, 3),
-#'   testthat::equals(6))
+#' expect_that_combine_all_args(
+#'   sum(1, 2, 3),
+#'   testthat::equals(6)
+#' )
 #' @return testthat result
 #' @examples
 #' \dontrun{
@@ -206,8 +219,10 @@ expect_that_combine_all_args <- function(object, condition,
   args <- as.list(cl[-1])
   arg_names <- names(args)
   # can only handle flat lists of arguments when permuting
-  stopifnot(identical(unlist(args, recursive = TRUE),
-                      unlist(args, recursive = FALSE)))
+  stopifnot(identical(
+    unlist(args, recursive = TRUE),
+    unlist(args, recursive = FALSE)
+  ))
   stopifnot(length(args) >= 2)
   arg_combs <- permute(unlist(args))
   arg_name_combs <- permute(arg_names)
@@ -216,9 +231,9 @@ expect_that_combine_all_args <- function(object, condition,
     arg_list <- as.list(arg_combs[comb, ])
     names(arg_list) <- arg_name_combs[comb, ]
     e <- testthat::expect_that(
-      object    = do.call(as.character(func_name), arg_list),
+      object = do.call(as.character(func_name), arg_list),
       condition = condition,
-      info      = paste0(
+      info = paste0(
         info, "args = ",
         paste(arg_combs[comb, ], collapse = " ", sep = ","),
         sprintf(" (test iteration %d)", comb)
@@ -237,25 +252,31 @@ expect_that_combine_first_arg <- function(object, condition,
   # TODO: see above
   func_name <- cl[[1]]
   args <- as.list(cl[-1])
-  arg_one <- eval(args[[1]])  # c(1,2,3) has len 4 because not evaluated yet
+  arg_one <- eval(args[[1]]) # c(1,2,3) has len 4 because not evaluated yet
   # can only handle flat lists of arguments when permuting? Does this apply when
   # working on first argument only?
-  stopifnot(identical(unlist(args, recursive = TRUE),
-                      unlist(args, recursive = FALSE)))
+  stopifnot(identical(
+    unlist(args, recursive = TRUE),
+    unlist(args, recursive = FALSE)
+  ))
   stopifnot(length(arg_one) >= 2)
   arg_one_combs <- permute(arg_one)
   for (comb in 1:dim(arg_one_combs)[1]) {
     e <- testthat::expect_that(
-      object    = do.call(as.character(func_name),
-                          c(list(arg_one_combs[comb, ]),
-                            args[-1])),
+      object = do.call(
+        as.character(func_name),
+        c(
+          list(arg_one_combs[comb, ]),
+          args[-1]
+        )
+      ),
       condition = condition,
-      info      = paste0(
+      info = paste0(
         info, "arg_one = ",
         paste(arg_one_combs[comb, ], collapse = " ", sep = ","),
         sprintf(" (test iteration %d)", comb)
       ),
-      label     = label
+      label = label
     )
   }
   invisible(e)

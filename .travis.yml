@@ -8,7 +8,7 @@ r:
 
 os:
   - linux
-#  - osx
+  - osx
 
 matrix:
   fast_finish: true
@@ -20,11 +20,9 @@ matrix:
 
 env:
   global:
-    - R_CHECK_CRAN_INCOMING_=FALSE _R_CHECK_FORCE_SUGGESTS_=FALSE
+    - R_CHECK_CRAN_INCOMING_=FALSE
+    - _R_CHECK_FORCE_SUGGESTS_=FALSE
     - LINTR_COMMENT_BOT=false
-  matrix:
-    - CFLAGS="-Og -Werror -Wall -Wextra -pedantic" CXXFLAGS="-Og -Werror -Wall -Wextra -pedantic"
-    - CFLAGS="-O3 -march=native" CXXFLAGS="-O3 -march=native"
 
 warnings_are_errors: true
 

@@ -15,11 +15,13 @@ filter_better <- function(x, expr, verbose = TRUE) {
   fltr <- eval(sexpr, x)
   stopifnot(is.logical(fltr))
 
-  if (verbose) message(sprintf(
-    "Filtering %s with expression '%s' drops %d (%2.1f%%) of %d",
-    fn, deparse(sexpr),
-    sum(!fltr), 100 * sum(!fltr) / length(fltr), length(fltr)
-  ))
+  if (verbose) {
+    message(sprintf(
+      "Filtering %s with expression '%s' drops %d (%2.1f%%) of %d",
+      fn, deparse(sexpr),
+      sum(!fltr), 100 * sum(!fltr) / length(fltr), length(fltr)
+    ))
+  }
   x[fltr, ]
 }
 

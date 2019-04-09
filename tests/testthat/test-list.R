@@ -20,8 +20,6 @@ test_that("trim a list", {
   expect_identical(listTrim(c(NA, cl)), cl)
   expect_identical(listTrim(c(NA, cl, NA)), cl)
   expect_identical(listTrim(c(list(NULL), NA, cl)), cl)
-
-
 })
 
 test_that("is a list flat", {

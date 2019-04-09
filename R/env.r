@@ -51,9 +51,10 @@ vec_to_lookup_pair <-
 "%eine%" <- function(x, table) {
   stopifnot(is.environment(x) && is.environment(table))
   vapply(ls(name = x),
-         function(y) !is.null(table[[y]]),
-         FUN.VALUE = logical(1L),
-         USE.NAMES = FALSE)
+    function(y) !is.null(table[[y]]),
+    FUN.VALUE = logical(1L),
+    USE.NAMES = FALSE
+  )
 }
 
 #' @describeIn eine search vector of values in an environment

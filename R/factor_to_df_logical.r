@@ -25,7 +25,8 @@
 #' stopifnot(nrow(g) == m, ncol(g) == n)
 #' factor_to_df(
 #'   shuffle(factor(shuffle(LETTERS[1:10]))),
-#'   prefix = "")
+#'   prefix = ""
+#' )
 #' factor_to_df(factor(c(NA, 1, 2, 3)))
 #' factor_to_df(factor(c(NA, 1, 2, 3)), na_as_col = FALSE)
 #' @export
@@ -37,19 +38,22 @@ factor_to_df <- function(fctr, prefix = deparse(substitute(fctr)),
   stopifnot(is.character(sep) && length(sep) == 1L)
   stopifnot(is.logical(na_as_col) && length(na_as_col) == 1)
   stopifnot(is.logical(verbose) && length(verbose) == 1)
-  if (verbose && sum(is.na(fctr)) > 0)
+  if (verbose && sum(is.na(fctr)) > 0) {
     warning("factorToCols: factor passed to factorCols contains NA")
-  if (drop_empty)
+  }
+  if (drop_empty) {
     fctr <- factor(fctr)
+  }
   stopifnot(nlevels(fctr) > 0)
   stopifnot(length(fctr) > 0)
   if (na_as_col) {
-    if (drop_empty)
+    if (drop_empty) {
       fctr <- factor(fctr, unique(fctr), exclude = NULL)
-    else {
+    } else {
       new_levels <- unique(levels(fctr))
-      if (anyNA(fctr))
+      if (anyNA(fctr)) {
         new_levels <- c(new_levels, NA)
+      }
       fctr <- factor(fctr, new_levels, exclude = NULL)
     }
     levels(fctr)[is.na(levels(fctr))] <- "NA"
@@ -61,15 +65,17 @@ factor_to_df <- function(fctr, prefix = deparse(substitute(fctr)),
     return(df)
   }
   if (nlevels(fctr) == 2) {
-    if (verbose)
+    if (verbose) {
       message("two factor levels: returning TRUE/FALSE for first level")
+    }
     df <- data.frame(fctr == levels(fctr)[1])
     names(df) <- paste(prefix, levels(fctr)[1], sep = sep)
     return(df)
   }
   df <- data.frame(tmp = logical(length = length(fctr)))
-  if (verbose)
+  if (verbose) {
     message("more than two factor levels")
+  }
   for (lev in levels(fctr)) {
     newColName <- paste(prefix, lev, sep = sep)
     if (verbose) message(sprintf("creating new column name: %s", newColName))

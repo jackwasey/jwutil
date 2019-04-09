@@ -28,10 +28,13 @@
 get_na_fields <- function(x, na_ish = FALSE, extra_na = NULL) {
   stopifnot(is.data.frame(x))
   na_fields <- vapply(x, anyNA, logical(1))
-  if (na_ish)
-    na_fields <- na_fields | vapply(x,
-                                    function(y) any(is_na_ish(y)),
-                                    logical(1))
+  if (na_ish) {
+    na_fields <- na_fields | vapply(
+      x,
+      function(y) any(is_na_ish(y)),
+      logical(1)
+    )
+  }
   names(x)[na_fields]
 }
 
@@ -73,8 +76,12 @@ drop_rows_with_na <- function(x, fld = names(x), verbose = FALSE) {
   stopifnot(is.data.frame(x))
   stopifnot(is.character(fld))
   stopifnot(is.logical(verbose) && length(verbose == 1))
-  if (verbose) message(sprintf("checking fields: %s for NA values",
-                               paste(fld, sep = ", ")))
+  if (verbose) {
+    message(sprintf(
+      "checking fields: %s for NA values",
+      paste(fld, sep = ", ")
+    ))
+  }
   cc <- stats::complete.cases(x[fld])
   base::droplevels(x[cc, ])
 }
@@ -115,12 +122,14 @@ zero_na <- function(x, cols = names(x), ignore = character(), verbose = FALSE,
   gotNA <- getNAFields(x)
   for (n in gotNA[gotNA %nin% ignore]) {
     y <- x[[n]]
-    if (verbose)
+    if (verbose) {
       message(sprintf("zeroing NA values in %s", n))
+    }
     if (!methods::is(x, "POSIXt") && !is.Date(y) && !is.factor(y)) {
       x[is.na(y), n] <- new_val
-    } else if (verbose)
+    } else if (verbose) {
       message(sprintf("skipping factor or Date: %s", n))
+    }
   }
   x
 }
@@ -150,9 +159,11 @@ is_na_ish <- function(x, extra_na = NULL) {
 #' @param new_val New value to be used instead of NA-ish values, default is `NA`
 #' @md
 #' @examples
-#' df <- data.frame(a = c("NA", "n/a", 1, NA),
-#'                  b = c("three", "na", NaN, "  N/A "),
-#'                  stringsAsFactors = FALSE)
+#' df <- data.frame(
+#'   a = c("NA", "n/a", 1, NA),
+#'   b = c("three", "na", NaN, "  N/A "),
+#'   stringsAsFactors = FALSE
+#' )
 #' df
 #' fix_na_ish(df)
 #' fix_na_ish(df, extra_na = "three", new_val = "0")

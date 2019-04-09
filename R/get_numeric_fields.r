@@ -24,8 +24,10 @@ get_numeric_char_field_names <- function(x, invert = FALSE, attrition = 0.05) {
 get_numeric_field_names <- function(x, invert = FALSE) {
   stopifnot(is.data.frame(x))
   stopifnot(is.logical(invert), length(invert) == 1L)
-  names(x)[vapply(x, FUN.VALUE = logical(1),
-                  function(y) xor(is.numeric(y), invert))]
+  names(x)[vapply(x,
+    FUN.VALUE = logical(1),
+    function(y) xor(is.numeric(y), invert)
+  )]
 }
 
 #' @rdname get_numeric_char_field_names

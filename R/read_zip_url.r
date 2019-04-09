@@ -22,18 +22,24 @@ read_zip_url <- function(url, filename = NULL, FUN = readLines, ...) {
   zipdir <- tempfile()
   on.exit(unlink(zipfile, recursive = TRUE), add = TRUE)
   dir.create(zipdir)
-  utils::unzip(zipfile, exdir = zipdir)  # files="" so extract all
+  utils::unzip(zipfile, exdir = zipdir) # files="" so extract all
   files <- list.files(zipdir, recursive = TRUE)
   if (is.null(filename)) {
-    if (length(files) == 1)
+    if (length(files) == 1) {
       filename <- files
-    else
-      stop("multiple files in zip, but no filename specified: ",
-           paste(files, collapse = ", "))
-  } else
+    } else {
+      stop(
+        "multiple files in zip, but no filename specified: ",
+        paste(files, collapse = ", ")
+      )
+    }
+  } else {
     stopifnot(filename %in% files)
-  do.call(FUN, args = c(list(file.path(zipdir, filename), warn = FALSE),
-                        list(...)))
+  }
+  do.call(FUN, args = c(
+    list(file.path(zipdir, filename), warn = FALSE),
+    list(...)
+  ))
 }
 
 #' @describeIn read_zip_url Deprecated

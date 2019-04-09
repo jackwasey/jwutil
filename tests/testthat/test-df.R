@@ -1,14 +1,16 @@
 context("data frame manipulation")
 
-f1 <-  factor(x = c(1, 2, 3, 1, 2, 3, 3, 2, 1))
+f1 <- factor(x = c(1, 2, 3, 1, 2, 3, 3, 2, 1))
 f2 <- factor(x = c(10, 20, 30, 10, 20, 30, 30, 20, 10))
 f3 <- factor(x = c("a", "b", "c", "d", "c", "b", "a"))
 f_one_level <- factor(x = c("jack", "jack"))
 f_two_levels <- factor(x = c("jack", "alfie", "jack", "alfie"))
 f_one_extra_level <- factor(c("jack", "jack"),
-                            levels = c("jack", "alfie", "liv"))
+  levels = c("jack", "alfie", "liv")
+)
 f_two_extra_level <- factor(c("jack", "alfie", "jack", "alfie"),
-                            levels = c("jack", "alfie", "liv"))
+  levels = c("jack", "alfie", "liv")
+)
 f.short <- factor(x = c(1))
 f.empty <- factor()
 dframe <- data.frame(f1, f2)
@@ -29,10 +31,14 @@ dfc[1, "b"] <- 999
 dfc[2, "c"] <- 888
 
 test_that("getNonFactorNames", {
-  expect_identical(sort(getNonFactorNames(vdf)),
-                   sort(getNonFactorNames(fdv1)))
-  expect_identical(sort(getNonFactorNames(vdf)),
-                   sort(getNonFactorNames(fdv2)))
+  expect_identical(
+    sort(getNonFactorNames(vdf)),
+    sort(getNonFactorNames(fdv1))
+  )
+  expect_identical(
+    sort(getNonFactorNames(vdf)),
+    sort(getNonFactorNames(fdv2))
+  )
   expect_equal(getNonFactorNames(vdf), c("v1", "v2"))
   expect_equal(getNonFactorNames(fdv1), c("v2", "v1"))
   expect_equal(getNonFactorNames(mixed.df), c("v1"))
@@ -41,8 +47,10 @@ test_that("getNonFactorNames", {
 })
 
 test_that("getFactorNames", {
-  expect_identical(sort(getFactorNames(dframe)),
-                   sort(getFactorNames(fd)))
+  expect_identical(
+    sort(getFactorNames(dframe)),
+    sort(getFactorNames(fd))
+  )
   expect_identical(getFactorNames(dframe), c("f1", "f2"))
   expect_identical(getFactorNames(mixed.df), c("f2", "f1"))
   expect_identical(getFactorNames(vdf), character(0))
@@ -53,36 +61,47 @@ test_that("getFactorNames", {
   expect_equal(getFactorNames(data.frame(), NULL), NULL)
   options(old_warn)
 
-  expect_equal(getFactorNames(cbind(mixed.df, dframe)),
-               c("f2", "f1", "f1", "f2"))
+  expect_equal(
+    getFactorNames(cbind(mixed.df, dframe)),
+    c("f2", "f1", "f1", "f2")
+  )
 })
 
 test_that("factorToDataframeLogical works", {
-  expect_equal(dim(factorToDataframeLogical(
-    f1, prefix = "f1", verbose = FALSE
-  )),
-  c(9, 3))
+  expect_equal(
+    dim(factorToDataframeLogical(
+      f1,
+      prefix = "f1", verbose = FALSE
+    )),
+    c(9, 3)
+  )
   expect_is(factorToDataframeLogical(f1, prefix = "f1"), "data.frame")
   expect_true(all(vapply(
     factorToDataframeLogical(f1, prefix = "f1"),
     is.logical,
     FUN.VALUE = logical(1)
   )))
-
 })
 
 test_that("extra factor levels, 1,2 level factors", {
-  expect_that(dim(factorToDataframeLogical(f_two_extra_level)),
-              testthat::equals(c(4, 1)))
-  expect_that(dim(factorToDataframeLogical(f_one_extra_level)),
-              testthat::equals(c(2, 1)))
-  expect_that(dim(factorToDataframeLogical(f_two_levels)),
-              testthat::equals(c(4, 1)))
-  expect_that(dim(factorToDataframeLogical(f_one_level)),
-              testthat::equals(c(2, 1)))
+  expect_that(
+    dim(factorToDataframeLogical(f_two_extra_level)),
+    testthat::equals(c(4, 1))
+  )
+  expect_that(
+    dim(factorToDataframeLogical(f_one_extra_level)),
+    testthat::equals(c(2, 1))
+  )
+  expect_that(
+    dim(factorToDataframeLogical(f_two_levels)),
+    testthat::equals(c(4, 1))
+  )
+  expect_that(
+    dim(factorToDataframeLogical(f_one_level)),
+    testthat::equals(c(2, 1))
+  )
 
   # for two-level factors, we keep the first level, drop the second.
-
 })
 
 test_that("factorToDataframeLogical works for NA factor levels", {
@@ -160,7 +179,6 @@ test_that("drop rows with NA values in given fields good data", {
   expect_identical(dropRowsWithNAField(carsna1, "dist"), carsna1)
   expect_identical(dropRowsWithNAField(carsna2, "dist"), cars[2:50, ])
   expect_identical(dropRowsWithNAField(carsna3, "dist"), cars[2:50, ])
-
 })
 
 test_that("get NA and non-NA  fields", {
@@ -187,7 +205,6 @@ test_that("get NA and non-NA  fields", {
   expect_equal(propNaPerField(carsna1), c(speed = 0.02, dist = 0))
   expect_equal(propNaPerField(carsna2), c(speed = 0, dist = 0.02))
   expect_equal(propNaPerField(carsna3), c(speed = 0.02, dist = 0.02))
-
 })
 
 test_that("set diff on data frame indices before merging", {
@@ -195,33 +212,50 @@ test_that("set diff on data frame indices before merging", {
   expect_error(getDropped(1))
   expect_error(getDropped("two"))
 
-  expect_equal(getDropped(c("1", "2"), c("2", "3")),
-               list(missing_from_x = "3",
-                    missing_from_y = "1"))
-  expect_equal(getDropped(c(1L, 2L), c(2L, 3L)),
-               list(missing_from_x = 3L,
-                    missing_from_y = 1L))
-  expect_equal(getDropped(c(1.1, 2.2), c(2.2, 3.3)),
-               list(missing_from_x = 3.3,
-                    missing_from_y = 1.1))
+  expect_equal(
+    getDropped(c("1", "2"), c("2", "3")),
+    list(
+      missing_from_x = "3",
+      missing_from_y = "1"
+    )
+  )
+  expect_equal(
+    getDropped(c(1L, 2L), c(2L, 3L)),
+    list(
+      missing_from_x = 3L,
+      missing_from_y = 1L
+    )
+  )
+  expect_equal(
+    getDropped(c(1.1, 2.2), c(2.2, 3.3)),
+    list(
+      missing_from_x = 3.3,
+      missing_from_y = 1.1
+    )
+  )
 
   # both sides the same
-  expect_equal(getDropped(c("1", "2", "3"), c("1", "2", "3")),
-               list(
-                 missing_from_x = character(0),
-                 missing_from_y = character(0)
-               ))
-  expect_equal(getDropped(c(1, 2, 3), c(1, 2, 3)),
-               list(
-                 missing_from_x = numeric(0),
-                 missing_from_y = numeric(0)
-               ))
-  expect_equal(getDropped(c(1L, 2L, 3L), c(1L, 2L, 3L)),
-               list(
-                 missing_from_x = integer(0),
-                 missing_from_y = integer(0)
-               ))
-
+  expect_equal(
+    getDropped(c("1", "2", "3"), c("1", "2", "3")),
+    list(
+      missing_from_x = character(0),
+      missing_from_y = character(0)
+    )
+  )
+  expect_equal(
+    getDropped(c(1, 2, 3), c(1, 2, 3)),
+    list(
+      missing_from_x = numeric(0),
+      missing_from_y = numeric(0)
+    )
+  )
+  expect_equal(
+    getDropped(c(1L, 2L, 3L), c(1L, 2L, 3L)),
+    list(
+      missing_from_x = integer(0),
+      missing_from_y = integer(0)
+    )
+  )
 })
 
 test_that("affix fields bad inputs", {
@@ -232,34 +266,52 @@ test_that("affix fields bad inputs", {
 })
 
 test_that("affix good inputs", {
-  expect_equal(affixFields("a", affix = "x",
-                           renameHow = "prefix"),
-               "x.a")
-  expect_equal(affixFields(c("a", "b"), affix = "x",
-                           renameHow = "prefix"),
-               c("x.a", "x.b"))
-  expect_equal(affixFields(c("a", "b"), affix = "x",
-                           renameHow = "suffix"),
-               c("a.x", "b.x"))
-  expect_equal(affixFields(
-    c("a", "b"),
-    affix = "x",
-    renameHow = "prefix",
-    skip = "a"
-  ),
-  c("a", "x.b"))
-  expect_equal(affixFields(
-    c("a", "b"),
-    affix = "x",
-    renameHow = "prefix",
-    skip = "b"
-  ),
-  c("x.a", "b"))
-  expect_equal(affixFields(
-    c("a", "b"),
-    affix = "x",
-    renameHow = "prefix",
-    sep = "op"
-  ),
-  c("xopa", "xopb"))
+  expect_equal(
+    affixFields("a",
+      affix = "x",
+      renameHow = "prefix"
+    ),
+    "x.a"
+  )
+  expect_equal(
+    affixFields(c("a", "b"),
+      affix = "x",
+      renameHow = "prefix"
+    ),
+    c("x.a", "x.b")
+  )
+  expect_equal(
+    affixFields(c("a", "b"),
+      affix = "x",
+      renameHow = "suffix"
+    ),
+    c("a.x", "b.x")
+  )
+  expect_equal(
+    affixFields(
+      c("a", "b"),
+      affix = "x",
+      renameHow = "prefix",
+      skip = "a"
+    ),
+    c("a", "x.b")
+  )
+  expect_equal(
+    affixFields(
+      c("a", "b"),
+      affix = "x",
+      renameHow = "prefix",
+      skip = "b"
+    ),
+    c("x.a", "b")
+  )
+  expect_equal(
+    affixFields(
+      c("a", "b"),
+      affix = "x",
+      renameHow = "prefix",
+      sep = "op"
+    ),
+    c("xopa", "xopb")
+  )
 })

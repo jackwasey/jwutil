@@ -58,10 +58,11 @@ is_integerish <- function(x, tol = 1e-9, na.ignore = FALSE) {
   n <- asNumericNoWarn(x)
   i <- abs(n - round(n)) < tol
   i[is.na(i)] <- FALSE
-  if (!na.ignore)
+  if (!na.ignore) {
     i[nas] <- FALSE
-  else
+  } else {
     i[nas] <- NA_integer_
+  }
   i
 }
 
@@ -81,7 +82,7 @@ areIntegers <- is_integerish
 #' @return logical vector of same length as input
 #' @md
 #' @examples
-#' areNumeric(c("1","2","3"))
+#' areNumeric(c("1", "2", "3"))
 #' areNumeric(c("1L", "2.2"))
 #' areNumeric(c("NA", NA, ".", "", "-1.9"))
 #' @export
@@ -155,13 +156,13 @@ propIsNa <- function(x)
 countNonNaCumulative <- function(d) {
   running <- rep(FALSE, dim(d)[1])
   apply(!is.na(d),
-        MARGIN = 2,
-        FUN = function(x, envir) {
-          #update running total of non-NA count
-          assign("running", running | x, envir = envir)
-          sum(running)
-        },
-        environment()
+    MARGIN = 2,
+    FUN = function(x, envir) {
+      # update running total of non-NA count
+      assign("running", running | x, envir = envir)
+      sum(running)
+    },
+    environment()
   )
 }
 
@@ -195,43 +196,59 @@ lsp <- function(package, all.names = TRUE, pattern) {
 #' @return vector of POSIXlt date-times
 #' @export
 add_time_to_date <- function(tms, dts, verbose = FALSE) {
-  if (length(dts) != length(tms))
+  if (length(dts) != length(tms)) {
     stop("must have matching lengths of date and time vectors.
          I got: %d and %d", length(dts), length(tms))
-  if (class(dts) %nin% c("Date", "character") && !is.na(dts))
-    stop(paste("date must be of class Date, character, but received: %s",
-               class(dts)))
+  }
+  if (class(dts) %nin% c("Date", "character") && !is.na(dts)) {
+    stop(paste(
+      "date must be of class Date, character, but received: %s",
+      class(dts)
+    ))
+  }
   # if a time part is given in the date field, this is an error
-  if (is.character(dts) && any(grepl(pattern = "\\S\\s\\S", dts)))
-    stop("suspect time is already given with date argument, \
+  if (is.character(dts) && any(grepl(pattern = "\\S\\s\\S", dts))) {
+    stop(
+      "suspect time is already given with date argument, \
          which invalidates this entire function. e.g. %s",
-         dts[grepl(pattern = "\\S\\s\\S", dts)][1])
+      dts[grepl(pattern = "\\S\\s\\S", dts)][1]
+    )
+  }
   # convert to Date (may already be Date, but that's fine) any conversion error
   # in any item will result in an error. an alternative strategy would be to
   # individually tryCatch converting each Date, returning warnings, NA, or
   # detailed error message. TODO
   dts <- as.Date(dts)
   # a single NA value could appear as type logical
-  if (class(tms) %nin% c("numeric", "integer", "character") && !is.na(tms))
-    stop("time must be numeric or character, but got class for times of '%s'.",
-         class(tms))
+  if (class(tms) %nin% c("numeric", "integer", "character") && !is.na(tms)) {
+    stop(
+      "time must be numeric or character, but got class for times of '%s'.",
+      class(tms)
+    )
+  }
   # this is a data error, not a programming error, stop
-  if (any(dts < as.Date("1850-01-01"), na.rm = TRUE))
+  if (any(dts < as.Date("1850-01-01"), na.rm = TRUE)) {
     stop("some dates are before 1850: ", dts[dts < as.Date("1850-01-01")])
+  }
   # could alternatively set NA, warn and continue.
   # Let NA be valid:
   if (!all(isValidTime(tms, na.rm = TRUE))) {
-    warning(sprintf("%d invalid time(s) received, replacing with NA",
-                    sum(isValidTime(tms, na.rm = TRUE))))
+    warning(sprintf(
+      "%d invalid time(s) received, replacing with NA",
+      sum(isValidTime(tms, na.rm = TRUE))
+    ))
     tms[!isValidTime(tms)] <- NA
   }
   if (is.character(tms)) tms <- gsub(":", "", tms, fixed = TRUE)
-  if (verbose) message(paste("working with times:", tms,
-                             collapse = ", ", sep = ", "), capture = TRUE)
+  if (verbose) {
+    message(paste("working with times:", tms,
+      collapse = ", ", sep = ", "
+    ), capture = TRUE)
+  }
   # convert to integer, then back to string later. THis is horrible.
   tms <- asIntegerNoWarn(tms)
   bad_range <- any(tms < 0 || tms > 2359)
-  if (!is.na(bad_range) && bad_range)  {
+  if (!is.na(bad_range) && bad_range) {
     warning("invalid times found. Setting to NA:", tms, capture = TRUE)
     tms[bad_range] <- NA
   }
@@ -320,13 +337,13 @@ permuteWithRepeats <- function(x, unique = TRUE) {
 #' @export
 permute <- function(x) {
   if (is.null(x)) return()
-  stopifnot(length(x) < 13)  # factorial size, so limit for sanity
+  stopifnot(length(x) < 13) # factorial size, so limit for sanity
   # break out of recursion:
   if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
   res <- c()
-  #take each one and place it first, then recurse the rest:
+  # take each one and place it first, then recurse the rest:
   for (element in 1:length(x)) {
-    sub_combs <- Recall(x[ -element])  # recurse
+    sub_combs <- Recall(x[-element]) # recurse
     new_combs <- cbind(x[element], sub_combs)
     res <- rbind(res, new_combs)
   }
@@ -366,8 +383,8 @@ combn_subset <- function(x) {
 #' @examples
 #' j <- data.frame(a = 1:5, b = 6:2, c = c(0, 2, 4, 6, 8))
 #' opt_binary_brute(j)
-#' j[1, 1] = NA
-#' j[1:4, 2] = NA
+#' j[1, 1] <- NA
+#' j[1:4, 2] <- NA
 #' my_opt_fun <- function(x, n) sum(!unlist(lapply(x, is.na)))
 #' opt_binary_brute(j, fun = my_opt_fun)
 #' @export
@@ -381,14 +398,20 @@ opt_binary_brute <- function(x, fun = opt_binary_fun, verbose = FALSE) {
     len_cmb <- length(cmb)
     optim <- fun(x, cmb)
     if (optim < best_min_by_len[len_cmb]) {
-      if (verbose) message("best combination for length: ", len_cmb, " is ",
-                           paste(cmb, collapse = ", "), ", optim = ", optim)
+      if (verbose) {
+        message(
+          "best combination for length: ", len_cmb, " is ",
+          paste(cmb, collapse = ", "), ", optim = ", optim
+        )
+      }
       best_min_by_len[len_cmb] <- optim
       best_cmb_by_len[[len_cmb]] <- cmb
     }
   }
-  list(best_min_by_len = best_min_by_len,
-       best_cmb_by_len = best_cmb_by_len)
+  list(
+    best_min_by_len = best_min_by_len,
+    best_cmb_by_len = best_cmb_by_len
+  )
 }
 
 # stupid example optimization metric function
@@ -423,12 +446,15 @@ platformIsMac <- function()
 #' @importFrom utils read.delim
 #' @export
 read_xlsx_linux <- function(file) {
-  if (platformIsWindows())
+  if (platformIsWindows()) {
     stop("can only convert XLSX on linux using xlsx2csv command")
+  }
   csvfile <- tempfile()
   on.exit(unlink(csvfile), add = TRUE)
-  system(paste0("xlsx2csv --delimiter=tab --dateformat=%m-%d-%y \"",
-                file, "\" > ", csvfile))
+  system(paste0(
+    "xlsx2csv --delimiter=tab --dateformat=%m-%d-%y \"",
+    file, "\" > ", csvfile
+  ))
   utils::read.delim(csvfile)
 }
 
@@ -442,7 +468,6 @@ read_xlsx_linux <- function(file) {
 #' @examples
 #' print(f <- build_formula(left = "A", right = c("B", "C")))
 #' class(f)
-#'
 #' build_formula(left = "Species", right = names(iris)[1:4])
 #' @export
 build_formula <- function(left, right) {
@@ -452,7 +477,8 @@ build_formula <- function(left, right) {
     paste(
       paste(left, collapse = "+"),
       paste(right, collapse = "+"),
-      sep = "~")
+      sep = "~"
+    )
   )
 }
 
@@ -486,9 +512,9 @@ invwhich <- function(which, len = max(which)) {
 rm_r <- function(x, envir = parent.frame()) {
   suppressWarnings({
     while (any(vapply(x, exists, logical(1),
-                      mode = "numeric", inherits = TRUE, envir = envir)))
+      mode = "numeric", inherits = TRUE, envir = envir
+    )))
       rm(list = x, envir = envir, inherits = TRUE)
-
   })
 }
 
@@ -534,10 +560,12 @@ ls.objects <- function(env = parent.frame(), pattern, order.by,
   }
   out <- data.frame(obj.type, obj.size, obj.rows, obj.cols)
   names(out) <- c("Type", "Size", "Len/Rows", "Columns")
-  if (!missing(order.by))
+  if (!missing(order.by)) {
     out <- out[order(out[[order.by]], decreasing = decreasing), ]
-  if (head)
+  }
+  if (head) {
     out <- head(out, n)
+  }
   out
 }
 
@@ -549,8 +577,10 @@ ls.objects <- function(env = parent.frame(), pattern, order.by,
 #' @param n scalar integer, number of objects to show
 #' @export
 lsos <- function(..., n = 10)
-  ls.objects(env = parent.frame(), ...,
-             order.by = "Size", decreasing = TRUE, head = TRUE, n = n)
+  ls.objects(
+    env = parent.frame(), ...,
+    order.by = "Size", decreasing = TRUE, head = TRUE, n = n
+  )
 
 #' @title is the object a \code{Date}
 #' @description copied from lubridate
@@ -585,18 +615,20 @@ source_purl <- function(input, documentation = 1L, ...) {
 #' version requirement.
 #' @source Based on ideas from
 #'   http://stackoverflow.com/questions/38686427/determine-minimum-r-version-for-all-package-dependencies
-#'
 #' @param pkg string with name of package to check
 #' @examples
-#' base <- c("base", "compiler", "datasets", "grDevices", "graphics",
-#' "grid", "methods", "parallel", "profile", "splines", "stats",
-#'  "stats4", "tcltk", "tools", "translations")
-#'
+#' base <- c(
+#'   "base", "compiler", "datasets", "grDevices", "graphics",
+#'   "grid", "methods", "parallel", "profile", "splines", "stats",
+#'   "stats4", "tcltk", "tools", "translations"
+#' )
 #' \dontrun{
 #' base_reqs <- lapply(base, min_r_version)
-#' contrib <- c("KernSmooth", "MASS", "Matrix", "boot",
-#' "class", "cluster", "codetools", "foreign", "lattice",
-#'  "mgcv", "nlme", "nnet", "rpart", "spatial", "survival")
+#' contrib <- c(
+#'   "KernSmooth", "MASS", "Matrix", "boot",
+#'   "class", "cluster", "codetools", "foreign", "lattice",
+#'   "mgcv", "nlme", "nnet", "rpart", "spatial", "survival"
+#' )
 #' contrib_reqs <- lapply(contrib, min_r_version)
 #' min_r_version("icd")
 #' }
@@ -605,7 +637,8 @@ source_purl <- function(input, documentation = 1L, ...) {
 #' @export
 min_r_version <- function(pkg) {
   avail <- utils::available.packages(
-    utils::contrib.url("https://cloud.r-project.org"))
+    utils::contrib.url("https://cloud.r-project.org")
+  )
   deps <- tools::package_dependencies(pkg, db = avail, recursive = TRUE)
   if (is.null(deps)) stop("package not found")
   pkgs <- deps[[1]]
@@ -632,10 +665,14 @@ min_r_version <- function(pkg) {
 reqinst <- function(pkgs) {
   for (pkg in pkgs) {
     if (suppressPackageStartupMessages(
-      !require(pkg, character.only = TRUE,
-               quietly = TRUE,
-               warn.conflicts = FALSE)))
+      !require(pkg,
+        character.only = TRUE,
+        quietly = TRUE,
+        warn.conflicts = FALSE
+      )
+    )) {
       utils::install.packages(pkg, quiet = TRUE)
+    }
     library(pkg, character.only = TRUE)
   }
 }
@@ -679,13 +716,5 @@ bang_dollar <- function() {
   first_arg <- sub("[,)].*", "", end_cmd)
   if (length(first_arg) == 0) return()
   res <- eval(first_arg, envir = parent.frame())
-  #invisible(res)
   res
 }
-
-# bang_dollar_setup <- function() {
-#   `!$` <- NA
-#   class(`!$`) <- "__bangdollar__"
-#   print.__bangdollar__ <- function(...) print(bang_dollar())
-#   assign("print.__bangdollar__")
-# }

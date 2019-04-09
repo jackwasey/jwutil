@@ -37,21 +37,23 @@
 #' \dontrun{
 #' requireNamespace("microbenchmark")
 #' requireNamespace("stringr")
-#' x <- random_string(25000);
+#' x <- random_string(25000)
 #' microbenchmark::microbenchmark(
 #'   gsub(x = x, pattern = "A", replacement = "", fixed = TRUE, useBytes = TRUE),
 #'   gsub(x = x, pattern = "A", replacement = "", fixed = TRUE, useBytes = TRUE, perl = TRUE),
 #'   gsub(x = x, pattern = "A", replacement = ""),
 #'   stringr::str_replace_all(x, "A", "")
-#'   )
+#' )
 #' }
 strip <- function(x, pattern = " ", useBytes = TRUE) {
   stopifnot(length(pattern) == 1)
   stopifnot(length(useBytes) == 1)
   stopifnot(is.character(pattern))
   stopifnot(is.logical(useBytes))
-  gsub(pattern = pattern, replacement = "", x = x,
-       fixed = TRUE, useBytes = useBytes)
+  gsub(
+    pattern = pattern, replacement = "", x = x,
+    fixed = TRUE, useBytes = useBytes
+  )
 }
 
 #' @title strip a string so that it can be used as a variable name in a formula.
@@ -72,9 +74,10 @@ strip_for_formula <- function(x) {
 #' @return character vector
 #' @export
 trim <- function(x) {
-  if (is.data.frame(x))
+  if (is.data.frame(x)) {
     stop("trimming data.frame gives unpredictable results.
          Try trimming a column at a time.")
+  }
   gsub("^\\s+|\\s+$", "", x)
 }
 
@@ -97,13 +100,15 @@ str_multi_match <- function(pattern, text, dropEmpty = FALSE, ...) {
   # unlist puts the name in the first position, which I don't think I ever want.
   result <- lapply(
     text, function(x) unlist(
-      regmatches(
-        x = x,
-        m = regexec(
-          pattern = pattern,
-          text = x, ...),
-        ...)
-    )[-1]
+        regmatches(
+          x = x,
+          m = regexec(
+            pattern = pattern,
+            text = x, ...
+          ),
+          ...
+        )
+      )[-1]
   )
   if (!dropEmpty) return(result)
   result[vapply(result, function(x) length(x) != 0), logical(1)]
@@ -132,27 +137,32 @@ str_pair_match <- function(string, pattern, pos, swap = FALSE, ...) {
   stopifnot(is.character(pattern) && length(pattern) == 1L)
   stopifnot(is.logical(swap) && length(swap) == 1L)
   pos_missing <- missing(pos)
-  if (pos_missing)
+  if (pos_missing) {
     pos <- c(1L, 2L)
-  else
+  } else {
     stopifnot(length(pos) == 2L, min(pos) >= 1L, all(!is.na(pos)))
-  res <- lapply(string,
-                function(x) unlist(
-                  regmatches(
-                    x = x,
-                    m = regexec(pattern = pattern, text = x, ...)
-                  )
-                )[-1]
+  }
+  res <- lapply(
+    string,
+    function(x) unlist(
+        regmatches(
+          x = x,
+          m = regexec(pattern = pattern, text = x, ...)
+        )
+      )[-1]
   )
   res <- res[vapply(res, function(x) length(x) != 0, logical(1))]
   res <- do.call(rbind, res)
-  if (pos_missing && ncol(res) > max(pos))
+  if (pos_missing && ncol(res) > max(pos)) {
     stop("the pair matching has three or more ress but needed two.
          Use (?: to have a non-grouping regular expression parenthesis")
+  }
   out_names <- res[, ifelse(swap, 2L, 1L)]
-  if (any(is.na(out_names)))
+  if (any(is.na(out_names))) {
     stop("didn't match some rows:", string[is.na(out_names)],
-         call. = FALSE)
+      call. = FALSE
+    )
+  }
   out <- res[, ifelse(swap, 1L, 2L)]
   stopifnot(all(!is.na(out)))
   stats::setNames(out, out_names)
@@ -193,5 +203,6 @@ str_match_all <- function(string, pattern, ...) {
 #' @keywords internal
 str_extract <- function(string, pattern, ...) {
   vapply(regmatches(x = string, m = regexec(pattern = pattern, text = string, ...)),
-         FUN = `[[`, 1, FUN.VALUE = character(1L))
+    FUN = `[[`, 1, FUN.VALUE = character(1L)
+  )
 }

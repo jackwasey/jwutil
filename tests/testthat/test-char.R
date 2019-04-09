@@ -42,13 +42,13 @@ test_that("strip whitespace", {
   expect_equal(strip("ja ck "), "jack")
   expect_equal(strip(" ja ck "), "jack")
   expect_equal(strip(" ja ck"), "jack")
-  expect_equal(strip(pattern = "  ", "jack  "),  "jack")
-  expect_equal(strip(pattern = "  ", "  jack  "),  "jack")
-  expect_equal(strip(pattern = "  ", "  jack"),  "jack")
-  expect_equal(strip(pattern = "  ", "ja  ck"),  "jack")
-  expect_equal(strip(pattern = "  ", "ja  ck  "),  "jack")
-  expect_equal(strip(pattern = "  ", "  ja  ck  "),  "jack")
-  expect_equal(strip(pattern = "  ", "  ja  ck"),  "jack")
+  expect_equal(strip(pattern = "  ", "jack  "), "jack")
+  expect_equal(strip(pattern = "  ", "  jack  "), "jack")
+  expect_equal(strip(pattern = "  ", "  jack"), "jack")
+  expect_equal(strip(pattern = "  ", "ja  ck"), "jack")
+  expect_equal(strip(pattern = "  ", "ja  ck  "), "jack")
+  expect_equal(strip(pattern = "  ", "  ja  ck  "), "jack")
+  expect_equal(strip(pattern = "  ", "  ja  ck"), "jack")
   expect_equal(strip("jack\t", pattern = "\t"), "jack")
   expect_equal(strip("\tjack\t", pattern = "\t"), "jack")
   expect_equal(strip("\tjack", pattern = "\t"), "jack")
@@ -71,20 +71,21 @@ test_that("strip characters so they can work in a formula", {
   expect_equal(strip_for_formula("ja ck "), "jack")
   expect_equal(strip_for_formula(" ja ck "), "jack")
   expect_equal(strip_for_formula(" ja ck"), "jack")
-  expect_equal(strip_for_formula("jack  "),  "jack")
-  expect_equal(strip_for_formula("  jack  "),  "jack")
-  expect_equal(strip_for_formula("  jack"),  "jack")
-  expect_equal(strip_for_formula("ja  ck"),  "jack")
-  expect_equal(strip_for_formula("ja  ck  "),  "jack")
-  expect_equal(strip_for_formula("  ja  ck  "),  "jack")
-  expect_equal(strip_for_formula("  ja  ck"),  "jack")
+  expect_equal(strip_for_formula("jack  "), "jack")
+  expect_equal(strip_for_formula("  jack  "), "jack")
+  expect_equal(strip_for_formula("  jack"), "jack")
+  expect_equal(strip_for_formula("ja  ck"), "jack")
+  expect_equal(strip_for_formula("ja  ck  "), "jack")
+  expect_equal(strip_for_formula("  ja  ck  "), "jack")
+  expect_equal(strip_for_formula("  ja  ck"), "jack")
   expect_equal(strip_for_formula("jack\t"), "jack")
   expect_equal(strip_for_formula("\tjack\t"), "jack")
   expect_equal(strip_for_formula("\tjack"), "jack")
   expect_equal(strip_for_formula("\tjac\tk"), "jack")
   expect_equal(
     strip_for_formula("\t+j-a#^&!*#(%!^$&#%!c\\&!(#)^*&^!~\t|||||k"),
-    "jack")
+    "jack"
+  )
   expect_equal(strip_for_formula(c(" jac k", "h ayley ")), c("jack", "hayley"))
 })
 
@@ -92,24 +93,38 @@ test_that("string pair match extraction", {
   expect_error(str_pair_match())
   expect_error(str_pair_match(pattern = "(abc)def(ghi)"))
   expect_error(str_pair_match(string = "bougie"))
-  expect_error(str_pair_match(pattern = c("(a)b(c)", "(d)e(f)"),
-                              string = "abc"))
-  expect_error(str_pair_match(pattern = c("(a)b(c)", "(d)e(f)"),
-                              string = c("abc", "def")))
+  expect_error(str_pair_match(
+    pattern = c("(a)b(c)", "(d)e(f)"),
+    string = "abc"
+  ))
+  expect_error(str_pair_match(
+    pattern = c("(a)b(c)", "(d)e(f)"),
+    string = c("abc", "def")
+  ))
 
   expect_error(str_pair_match(pattern = "[", string = "abc")) # invalid regex
   # only one parenthesis
   expect_error(str_pair_match(pattern = "(a).*", string = "abc"))
   expect_error(str_pair_match(pattern = ".*(j)", string = "abc"))
   expect_equal(str_pair_match(pattern = "(a*)b(c*)", string = "abc"), c(a = "c"))
-  expect_equal(str_pair_match(pattern = "([^mackarel]*)(spain)",
-                              string = "togospain"),
-               c(togo = "spain"))
-  expect_equal(str_pair_match(pattern = "([^mackarel]*)(spain)",
-                              string = c("togospain", "djiboutispain")),
-               c(togo = "spain", djibouti = "spain"))
-  expect_equal(str_pair_match(pattern = "(a*)b(c*)", string = c("abc", "aabcc")),
-               c(a = "c", aa = "cc"))
+  expect_equal(
+    str_pair_match(
+      pattern = "([^mackarel]*)(spain)",
+      string = "togospain"
+    ),
+    c(togo = "spain")
+  )
+  expect_equal(
+    str_pair_match(
+      pattern = "([^mackarel]*)(spain)",
+      string = c("togospain", "djiboutispain")
+    ),
+    c(togo = "spain", djibouti = "spain")
+  )
+  expect_equal(
+    str_pair_match(pattern = "(a*)b(c*)", string = c("abc", "aabcc")),
+    c(a = "c", aa = "cc")
+  )
 })
 
 test_that("str_pair_match error if more than two outputs", {

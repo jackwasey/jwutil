@@ -51,7 +51,8 @@ download_to_data_raw <- function(url,
   f_info <- list(file_path = save_path, file_name = file_name)
   if (file.exists(save_path)) return(f_info)
   if (offline) return()
-  if (utils::download.file(url = url, destfile = save_path, quiet = TRUE) != 0)
+  if (utils::download.file(url = url, destfile = save_path, quiet = TRUE) != 0) {
     stop(paste(url, " not downloaded successfully."))
+  }
   f_info
 }

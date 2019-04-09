@@ -45,7 +45,10 @@ percent_signif <- function(x, figures = 3, sep = "") {
     trimws(
       formatC(
         signif(x * 100, digits = figures),
-        digits = figures)
+        digits = figures
+      )
     ),
-    "%", sep = sep)
+    "%",
+    sep = sep
+  )
 }

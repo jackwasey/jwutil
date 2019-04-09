@@ -16,9 +16,12 @@ drop_duplicate_fields <- function(df, verbose = FALSE) {
   for (f in 1:(ncol(df) - 1)) {
     for (g in (f + 1):ncol(df)) {
       if (identical(all.equal(df[[f]], df[[g]]), TRUE)) {
-        if (verbose)
-          message(sprintf("found matching fields %s and %s. Dropping one.",
-                          names(df)[f], names(df)[g]))
+        if (verbose) {
+          message(sprintf(
+            "found matching fields %s and %s. Dropping one.",
+            names(df)[f], names(df)[g]
+          ))
+        }
         drop <- c(drop, names(df)[g])
       }
     }
