@@ -22,7 +22,7 @@ logical_to_binary <- function(x) {
     )
   }
   logical_fields <- names(x)[vapply(x, is.logical, logical(1))]
-  if (is.na(logical_fields) || length(logical_fields) == 0) return(x)
+  if (length(logical_fields) == 0) return(x)
   x[, logical_fields] <-
     vapply(
       X = x[, logical_fields],
