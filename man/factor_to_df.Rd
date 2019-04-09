@@ -48,7 +48,8 @@ print(g)
 stopifnot(nrow(g) == m, ncol(g) == n)
 factor_to_df(
   shuffle(factor(shuffle(LETTERS[1:10]))),
-  prefix = "")
+  prefix = ""
+)
 factor_to_df(factor(c(NA, 1, 2, 3)))
 factor_to_df(factor(c(NA, 1, 2, 3)), na_as_col = FALSE)
 }

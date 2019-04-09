@@ -19,11 +19,12 @@ data frame without logical fields
 Encode TRUE as 1, and FALSE as 0 (integers)
 }
 \examples{
-d <- data.frame(a = c(TRUE, FALSE, TRUE),
-                b = c(FALSE, TRUE, FALSE),
-                c = c(-1, 0, 1),
-                d = c("not", "logical", "values")
-                )
+d <- data.frame(
+  a = c(TRUE, FALSE, TRUE),
+  b = c(FALSE, TRUE, FALSE),
+  c = c(-1, 0, 1),
+  d = c("not", "logical", "values")
+)
 logical_to_binary(d)
 }
 \keyword{manip}

@@ -24,6 +24,5 @@ build simple linear formula from variable names given by two
 \examples{
 print(f <- build_formula(left = "A", right = c("B", "C")))
 class(f)
-
 build_formula(left = "Species", right = names(iris)[1:4])
 }

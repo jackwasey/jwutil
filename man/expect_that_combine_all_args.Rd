@@ -36,8 +36,10 @@ This makes a lot of assumptions, needs more testing. It can't
   testthat::expect_that_combine
 }
 \examples{
- expect_that_combine_all_args(sum(1, 2, 3),
-  testthat::equals(6))
+expect_that_combine_all_args(
+  sum(1, 2, 3),
+  testthat::equals(6)
+)
 \dontrun{
 expect_that_combine_all_args(stop("a", "b"), testthat::throws_error())
 expect_that_combine_all_args(sum(1, 2), testthat::equals(3))

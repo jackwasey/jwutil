@@ -23,13 +23,15 @@ unless \code{ignore_na} is \code{TRUE}. When they are considered, \code{na_val}
 indicates whether they are attributed \code{TRUE} or \code{FALSE}.
 }
 \examples{
-df <- data.frame(a = c("y", "n", "y", "y", "n"),
-                 b = c(FALSE, TRUE, FALSE, TRUE, TRUE),
-                 c = c(NA, NA, NA, NA, NA),
-                 d = c(NA, "yes", NA, NA, "yes"),
-                 e = c("y ", "n ", NA, "y ", "n "),
-                 f = c("YES   ", "NO     ", "NO    ", " YES", " NO "),
-                 stringsAsFactors = FALSE)
+df <- data.frame(
+  a = c("y", "n", "y", "y", "n"),
+  b = c(FALSE, TRUE, FALSE, TRUE, TRUE),
+  c = c(NA, NA, NA, NA, NA),
+  d = c(NA, "yes", NA, NA, "yes"),
+  e = c("y ", "n ", NA, "y ", "n "),
+  f = c("YES   ", "NO     ", "NO    ", " YES", " NO "),
+  stringsAsFactors = FALSE
+)
 df
 res <- two_cat_to_logical(df)
 stopifnot(identical(res$a, c(TRUE, FALSE, TRUE, TRUE, FALSE)))

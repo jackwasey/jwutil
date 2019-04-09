@@ -46,9 +46,10 @@ microbenchmark::microbenchmark(sort(u), str_sort(u))
 
 # without sorting is much faster:
 microbenchmark::microbenchmark(factor(pts$code),
-                               # factor_(pts$code),
-                               factor_nosort(pts$code),
-                               times = 25)
+  # factor_(pts$code),
+  factor_nosort(pts$code),
+  times = 25
+)
 }
 }
 \author{

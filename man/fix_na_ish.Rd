@@ -17,9 +17,11 @@ fix_na_ish(x, extra_na = NULL, new_val = NA)
 Fix NA-like strings to be NA (or other value of choice)
 }
 \examples{
-df <- data.frame(a = c("NA", "n/a", 1, NA),
-                 b = c("three", "na", NaN, "  N/A "),
-                 stringsAsFactors = FALSE)
+df <- data.frame(
+  a = c("NA", "n/a", 1, NA),
+  b = c("three", "na", NaN, "  N/A "),
+  stringsAsFactors = FALSE
+)
 df
 fix_na_ish(df)
 fix_na_ish(df, extra_na = "three", new_val = "0")

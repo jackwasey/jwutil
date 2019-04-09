@@ -40,22 +40,28 @@ categories therein, not including NA values. This would catch 0,1 "Yes",
 \item \code{binary_cols}: Get the data frame containing just the binary
 columns.
 
-\item \code{two_cat_cols}: Get the data frame containing only columns of input which have
-two categories
+\item \code{two_cat_cols}: Get the data frame containing only columns of
+input which have two categories
 }}
 
 \examples{
-dat <- data.frame(c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
-                  c(1L, 2L), c(0.1, 0.2), c("9", "8"))
-names(dat) <- c("char", "bin", "binfloat", "binint",
-                "int", "float", "charint")
+dat <- data.frame(
+  c("a", "b"), c(TRUE, FALSE), c(1, 0), c(1L, 0L),
+  c(1L, 2L), c(0.1, 0.2), c("9", "8")
+)
+names(dat) <- c(
+  "char", "bin", "binfloat", "binint",
+  "int", "float", "charint"
+)
 binary_cols(dat)
 binary_col_names(dat)
 binary_col_names(dat, invert = TRUE)
-df <- data.frame(x = c("A", "B", "A", "B"),
-                 y = letters[1:4],
-                 z = c("y", NA, "y", NA),
-                 stringsAsFactors = FALSE)
+df <- data.frame(
+  x = c("A", "B", "A", "B"),
+  y = letters[1:4],
+  z = c("y", NA, "y", NA),
+  stringsAsFactors = FALSE
+)
 two_cat_col_names(df)
 df[1, 1] <- NA
 df[2, 2] <- NA

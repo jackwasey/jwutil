@@ -23,8 +23,8 @@ function.
 \examples{
 j <- data.frame(a = 1:5, b = 6:2, c = c(0, 2, 4, 6, 8))
 opt_binary_brute(j)
-j[1, 1] = NA
-j[1:4, 2] = NA
+j[1, 1] <- NA
+j[1:4, 2] <- NA
 my_opt_fun <- function(x, n) sum(!unlist(lapply(x, is.na)))
 opt_binary_brute(j, fun = my_opt_fun)
 }
