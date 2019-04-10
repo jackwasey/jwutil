@@ -26,10 +26,12 @@ Imports:
 Suggests:
     knitr,
     methods,
+    pkgbuild,
     stats,
     testthat,
     tools,
-    utils
+    utils,
+    withr
 LinkingTo: 
     Rcpp,
     testthat

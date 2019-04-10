@@ -1,8 +1,4 @@
-# jwutil 1.2.1.9000
+# jwutil 1.2.2
 
-* Added a `NEWS.md` file to track changes to the package.
+* `jw_scan_build` will re-compile the current package source using LLVM static analyzer if clang and scan-build are available.
 * more functions moved to snake case
-
-# jwutil 1.2.1
-
-* CRAN release
