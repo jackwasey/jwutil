@@ -93,3 +93,22 @@ isFlat <- function(x) {
   stopifnot(is.list(x))
   !any(lapply(x, class) == "list")
 }
+
+#' Make a list using input argument names as names
+#' @param ... arguments whose names become list item names, and whose values
+#'   become the values in the list
+#' @examples
+#' a <- c(1, 2)
+#' b <- c("c", "d")
+#' stopifnot(
+#'   identical(
+#'     named_list(a, b),
+#'     list(a = a, b = b)
+#'   )
+#' )
+#' @export
+list_named <- function(...) {
+  x <- list(...)
+  names(x) <- as.character(match.call()[-1])
+  x
+}

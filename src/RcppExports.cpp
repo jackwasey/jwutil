@@ -178,6 +178,26 @@ RcppExport SEXP _jwutil_propRowSorted(SEXP xSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// stdlib_gnu
+bool stdlib_gnu();
+RcppExport SEXP _jwutil_stdlib_gnu() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(stdlib_gnu());
+    return rcpp_result_gen;
+END_RCPP
+}
+// stdlib_llvm
+bool stdlib_llvm();
+RcppExport SEXP _jwutil_stdlib_llvm() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(stdlib_llvm());
+    return rcpp_result_gen;
+END_RCPP
+}
 // fastIntToStringStd
 std::vector<std::string> fastIntToStringStd(std::vector<int> x);
 static SEXP _jwutil_fastIntToStringStd_try(SEXP xSEXP) {

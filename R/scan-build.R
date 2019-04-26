@@ -31,7 +31,7 @@ jw_scan_build <- function(path = ".",
   )
 }
 
-.links_gnu <- function(path) {
+.links_glib <- function(path) {
   any(
     grep(
       "libstdc",
@@ -48,12 +48,26 @@ jw_scan_build <- function(path = ".",
     )
   )
 }
-jw_check_std_lib <- function() {
+
+jw_check_cpplib_pkg <- function(pkg = "Rcpp") {
   rcpp_path <- system.file(
     "libs",
-    "Rcpp.so",
-    package = "Rcpp"
+    paste0(pkg, ".so"),
+    package = pkg
   )
-  rcpp_gnu <- .links_gnu(rcpp_path)
+  rcpp_glib <- .links_glib(rcpp_path)
   rcpp_libc <- .links_libc(rcpp_path)
+  if (rcpp_glib && rcpp_libc) stop("Both libstdc and libc detected!")
+  if (!rcpp_glib && !rcpp_libc) stop("Neither libstdc nor libc detected!")
+  if (rcpp_glib)
+    "glib"
+  else
+    "libc"
+}
+
+jw_check_cpplib_current <- function() {
+  Rcpp::sourceCpp(system.file("get_current_stdlib.cpp", package = "jwutil"),
+                  rebuild = TRUE,
+                  env = environment())
+  get_cpplib()
 }

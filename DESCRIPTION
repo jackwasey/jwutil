@@ -24,6 +24,8 @@ Depends:
 Imports:
     Rcpp
 Suggests:
+    clipr,
+    devtools,
     knitr,
     methods,
     pkgbuild,

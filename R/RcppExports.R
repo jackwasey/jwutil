@@ -59,6 +59,14 @@ propRowSorted <- function(x) {
     .Call(`_jwutil_propRowSorted`, x)
 }
 
+stdlib_gnu <- function() {
+    .Call(`_jwutil_stdlib_gnu`)
+}
+
+stdlib_llvm <- function() {
+    .Call(`_jwutil_stdlib_llvm`)
+}
+
 #' @name fastIntToString
 #' @title Fast convert integer vector to character vector
 #' @description Fast conversion from integer vector to character vector using C++

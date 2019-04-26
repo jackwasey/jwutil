@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - 2018  Jack O. Wasey
+# Copyright (C) 2014 - 2019  Jack O. Wasey
 #
 # This file is part of jwutil.
 #
@@ -156,13 +156,13 @@ propIsNa <- function(x)
 countNonNaCumulative <- function(d) {
   running <- rep(FALSE, dim(d)[1])
   apply(!is.na(d),
-    MARGIN = 2,
-    FUN = function(x, envir) {
-      # update running total of non-NA count
-      assign("running", running | x, envir = envir)
-      sum(running)
-    },
-    environment()
+        MARGIN = 2,
+        FUN = function(x, envir) {
+          # update running total of non-NA count
+          assign("running", running | x, envir = envir)
+          sum(running)
+        },
+        environment()
   )
 }
 
@@ -242,7 +242,7 @@ add_time_to_date <- function(tms, dts, verbose = FALSE) {
   if (is.character(tms)) tms <- gsub(":", "", tms, fixed = TRUE)
   if (verbose) {
     message(paste("working with times:", tms,
-      collapse = ", ", sep = ", "
+                  collapse = ", ", sep = ", "
     ), capture = TRUE)
   }
   # convert to integer, then back to string later. THis is horrible.
@@ -512,7 +512,7 @@ invwhich <- function(which, len = max(which)) {
 rm_r <- function(x, envir = parent.frame()) {
   suppressWarnings({
     while (any(vapply(x, exists, logical(1),
-      mode = "numeric", inherits = TRUE, envir = envir
+                      mode = "numeric", inherits = TRUE, envir = envir
     )))
       rm(list = x, envir = envir, inherits = TRUE)
   })
@@ -666,9 +666,9 @@ reqinst <- function(pkgs) {
   for (pkg in pkgs) {
     if (suppressPackageStartupMessages(
       !require(pkg,
-        character.only = TRUE,
-        quietly = TRUE,
-        warn.conflicts = FALSE
+               character.only = TRUE,
+               quietly = TRUE,
+               warn.conflicts = FALSE
       )
     )) {
       utils::install.packages(pkg, quiet = TRUE)
@@ -717,4 +717,21 @@ bang_dollar <- function() {
   if (length(first_arg) == 0) return()
   res <- eval(first_arg, envir = parent.frame())
   res
+}
+
+#' Take clipboard contents, and write sorted character vector back
+#' @param cl Name of class to give to data before sorting, default is
+#'   \code{NULL}.
+#' @export
+sort_clip_char <- function(cl = NULL) {
+  tf <- tempfile()
+  on.exit(unlink(tf))
+  unsorted <- eval(
+    parse(text = paste(clipr::read_clip(), collapse = "")
+    )
+  )
+  if (!is.null(cl)) class(x) <- cl
+  x <- sort(unsorted)
+  dput(file = tf, x)
+  clipr::write_clip(paste(readLines(tf)))
 }
