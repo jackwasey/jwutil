@@ -294,3 +294,25 @@ RcppExport SEXP _jwutil_RcppExport_registerCCallable() {
     R_RegisterCCallable("jwutil", "_jwutil_RcppExport_validate", (DL_FUNC)_jwutil_RcppExport_validate);
     return R_NilValue;
 }
+
+RcppExport SEXP run_testthat_tests();
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_jwutil_set_attr_in_place", (DL_FUNC) &_jwutil_set_attr_in_place, 3},
+    {"_jwutil_getOmpMaxThreads", (DL_FUNC) &_jwutil_getOmpMaxThreads, 0},
+    {"_jwutil_getOmpThreads", (DL_FUNC) &_jwutil_getOmpThreads, 0},
+    {"_jwutil_isRowSorted", (DL_FUNC) &_jwutil_isRowSorted, 1},
+    {"_jwutil_propRowSorted", (DL_FUNC) &_jwutil_propRowSorted, 1},
+    {"_jwutil_stdlib_gnu", (DL_FUNC) &_jwutil_stdlib_gnu, 0},
+    {"_jwutil_stdlib_llvm", (DL_FUNC) &_jwutil_stdlib_llvm, 0},
+    {"_jwutil_fastIntToStringStd", (DL_FUNC) &_jwutil_fastIntToStringStd, 1},
+    {"_jwutil_fastIntToStringRcpp", (DL_FUNC) &_jwutil_fastIntToStringRcpp, 1},
+    {"_jwutil_RcppExport_registerCCallable", (DL_FUNC) &_jwutil_RcppExport_registerCCallable, 0},
+    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 0},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_jwutil(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

@@ -24,10 +24,10 @@
 #' # this shows that stringr (which uses stringi) sort takes 50% longer than
 #' # built-in R sort.
 #' microbenchmark::microbenchmark(sort(u), str_sort(u))
-#'
+#' 
 #' # this shows that \code{factor_} is about 50% faster than \code{factor} for
 #' # big vectors of strings
-#'
+#' 
 #' # without sorting is much faster:
 #' microbenchmark::microbenchmark(factor(pts$code),
 #'   # factor_(pts$code),

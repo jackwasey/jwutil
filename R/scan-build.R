@@ -15,19 +15,22 @@ jw_scan_build <- function(path = ".",
   pkgbuild::clean_dll(path = path)
   exe <- paste(scan_build, clang)
   withr::with_makevars(
-    c("CXX" = exe,
+    c(
+      "CXX" = exe,
       "CXX11" = exe,
       "CXX14" = exe,
       "CXX17" = exe
     ), {
       pkgbuild::compile_dll(path = path)
-    })
+    }
+  )
 }
 
 .otool_l <- function(path) {
-  system2(command = "otool",
-          args = c("-L", path),
-          stdout = TRUE
+  system2(
+    command = "otool",
+    args = c("-L", path),
+    stdout = TRUE
   )
 }
 
@@ -59,15 +62,17 @@ jw_check_cpplib_pkg <- function(pkg = "Rcpp") {
   rcpp_libc <- .links_libc(rcpp_path)
   if (rcpp_glib && rcpp_libc) stop("Both libstdc and libc detected!")
   if (!rcpp_glib && !rcpp_libc) stop("Neither libstdc nor libc detected!")
-  if (rcpp_glib)
+  if (rcpp_glib) {
     "glib"
-  else
+  } else {
     "libc"
+  }
 }
 
 jw_check_cpplib_current <- function() {
   Rcpp::sourceCpp(system.file("get_current_stdlib.cpp", package = "jwutil"),
-                  rebuild = TRUE,
-                  env = environment())
+    rebuild = TRUE,
+    env = environment()
+  )
   get_cpplib()
 }

@@ -13,21 +13,20 @@
 #' @keywords internal
 #' @export
 pgo_bench <- function(
-  pkg_path = getwd(),
-  test_path = "tests/testthat",
-  prof_dir = file.path(pkg_path, "src/prof"),
-  iterations = 7,
-  quiet = TRUE,
-  reporter = ifelse(quiet, "silent", "check"),
-  clean = FALSE,
-  opt_level = "-O3",
-  cc = "clang",
-  cxx = "clang++",
-  brew = Sys.info()[["sysname"]] == "Darwin",
-  measure = c("real", "user", "system"),
-  ...
-) {
-  measure = match.arg(measure)
+                      pkg_path = getwd(),
+                      test_path = "tests/testthat",
+                      prof_dir = file.path(pkg_path, "src/prof"),
+                      iterations = 7,
+                      quiet = TRUE,
+                      reporter = ifelse(quiet, "silent", "check"),
+                      clean = FALSE,
+                      opt_level = "-O3",
+                      cc = "clang",
+                      cxx = "clang++",
+                      brew = Sys.info()[["sysname"]] == "Darwin",
+                      measure = c("real", "user", "system"),
+                      ...) {
+  measure <- match.arg(measure)
   llvm_bin_path <- "/usr/local/opt/llvm/bin"
   if (brew && dir.exists(llvm_bin_path)) {
     cc <- file.path(llvm_bin_path, cc)
@@ -42,22 +41,25 @@ pgo_bench <- function(
   if (!quiet) message("saving profiles to: ", prof_dir)
   if (clean) on.exit(unlink(prof_dir), add = TRUE)
   # clang doesn't take profie-dir
-  #gen_end <- paste0("-fprofile-generate -fprofile-dir=", prof_dir)
-  #use_end <- paste0("-fprofile-use -fprofile-dir=", prof_dir)
+  # gen_end <- paste0("-fprofile-generate -fprofile-dir=", prof_dir)
+  # use_end <- paste0("-fprofile-use -fprofile-dir=", prof_dir)
   # is this just the clang way?
-  gen_end <- paste0("-fprofile-generate=", prof_dir,
-                    " -Wno-unused-variable")
+  gen_end <- paste0(
+    "-fprofile-generate=", prof_dir,
+    " -Wno-unused-variable"
+  )
   use_end <- paste0("-fprofile-use=", prof_out)
   gen_end_ld <- gen_end
   use_end_ld <- use_end
   gen_flags <- paste(opt_level, gen_end)
   # -fprofile-correct may be needed for multi-threaded applications
   use_flags <- paste(opt_level, use_end)
-  mk_cc = c(
+  mk_cc <- c(
     CC = cc,
     CXX = cxx,
-    CXX11 = cxx)
-  mk_gen = c(
+    CXX11 = cxx
+  )
+  mk_gen <- c(
     mk_cc,
     CFLAGS = gen_flags,
     CXXFLAGS = gen_flags,
@@ -68,9 +70,9 @@ pgo_bench <- function(
     FCFLAGS = gen_flags,
     # LDFLAGS is ignored on windows and visa versa
     LDFLAGS = gen_end_ld
-    #SHLIB_LIBADD = gen_end_ld)
+    # SHLIB_LIBADD = gen_end_ld)
   )
-  mk_use = c(
+  mk_use <- c(
     mk_cc,
     CFLAGS = use_flags,
     CXXFLAGS = use_flags,
@@ -81,7 +83,7 @@ pgo_bench <- function(
     FCFLAGS = use_flags,
     # LDFLAGS is ignored on windows and visa versa
     LDFLAGS = use_end_ld
-    #SHLIB_LIBADD = use_end_ld
+    # SHLIB_LIBADD = use_end_ld
   )
 
   .fix_test_res <- function(tr) {
@@ -96,7 +98,8 @@ pgo_bench <- function(
         testthat::test_dir(
           path = test_path,
           reporter = reporter,
-          ...)
+          ...
+        )
       )
       if (!is.null(out)) {
         out[[measure]] <- out[[measure]] + o[[measure]]
@@ -112,39 +115,45 @@ pgo_bench <- function(
     pkgbuild::clean_dll()
     devtools::load_all(
       compile = TRUE,
-      quiet = quiet)
+      quiet = quiet
+    )
     iter_res()
   }
 
   do_gen <- function() {
     withr::with_makevars(
-      mk_gen,
-      {
+      mk_gen, {
         pkgbuild::clean_dll()
         devtools::load_all(
           compile = TRUE,
-          quiet = quiet)
+          quiet = quiet
+        )
         out <- iter_res()
-      })
-    system2("llvm-profdata",
-            paste0("merge",
-                   " -output=",
-                   prof_out,
-                   " ", prof_dir)
+      }
+    )
+    system2(
+      "llvm-profdata",
+      paste0(
+        "merge",
+        " -output=",
+        prof_out,
+        " ", prof_dir
+      )
     )
     out
   }
 
   do_use <- function() {
     withr::with_makevars(
-      mk_use,
-      {
+      mk_use, {
         pkgbuild::clean_dll()
         devtools::load_all(
           compile = TRUE,
-          quiet = quiet)
+          quiet = quiet
+        )
         iter_res()
-      })
+      }
+    )
   }
 
   pgo_pre <- do_pre()
