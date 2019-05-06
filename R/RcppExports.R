@@ -36,6 +36,10 @@ set_attr_in_place <- function(x, name, value) {
     invisible(.Call(`_jwutil_set_attr_in_place`, x, name, value))
 }
 
+get_cpplib <- function() {
+    .Call(`_jwutil_get_cpplib`)
+}
+
 getOmpMaxThreads <- function() {
     .Call(`_jwutil_getOmpMaxThreads`)
 }

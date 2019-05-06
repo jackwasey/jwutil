@@ -102,7 +102,7 @@ isFlat <- function(x) {
 #' b <- c("c", "d")
 #' stopifnot(
 #'   identical(
-#'     named_list(a, b),
+#'     list_named(a, b),
 #'     list(a = a, b = b)
 #'   )
 #' )

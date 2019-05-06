@@ -14,19 +14,13 @@ expect_that_combine_first_arg(object, condition, info = NULL,
   label = NULL)
 }
 \arguments{
-\item{object}{Object to test.
+\item{object}{See \code{\link[testthat]{expect_that}}.}
 
-Supports limited unquoting to make it easier to generate readable failures
-within a function or for loop. See \link{quasi_label} for more details.}
+\item{condition}{See \code{\link[testthat]{expect_that}}.}
 
-\item{condition}{a function that returns whether or not the condition
-is met, and if not, an error message to display.}
+\item{info}{See \code{\link[testthat]{expect_that}}.}
 
-\item{info}{Extra information to be included in the message. This argument
-is soft-deprecated and should not be used in new code. Instead see
-alternatives in \link{quasi_label}.}
-
-\item{label}{Used to customise failure messages. For expert use only.}
+\item{label}{See \code{\link[testthat]{expect_that}}.}
 }
 \value{
 testthat result

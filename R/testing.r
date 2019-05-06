@@ -197,7 +197,10 @@ extreme_numbers <- c(
 #'   this function to the testthat namespace. This means that it can call
 #'   internal testthat functions, but does not mean it appears as
 #'   testthat::expect_that_combine
-#' @inheritParams testthat::expect_that
+#' @param object See \code{\link[testthat]{expect_that}}.
+#' @param condition See \code{\link[testthat]{expect_that}}.
+#' @param info See \code{\link[testthat]{expect_that}}.
+#' @param label See \code{\link[testthat]{expect_that}}.
 #' @examples
 #' expect_that_combine_all_args(
 #'   sum(1, 2, 3),
@@ -211,8 +214,10 @@ extreme_numbers <- c(
 #' expect_that_combine_first_arg(sum(c(1, 2)), testthat::equals(3))
 #' }
 #' @export
-expect_that_combine_all_args <- function(object, condition,
-                                         info = NULL, label = NULL) {
+expect_that_combine_all_args <- function(object,
+                                         condition,
+                                         info = NULL,
+                                         label = NULL) {
   cl <- substitute(object)
   # TODO: I now want to test for whether there are multiple top-level symbols
   func_name <- cl[[1]]

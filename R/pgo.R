@@ -4,7 +4,7 @@
 #' the test suite is a proxy for some kind of benchmark. Obviously this is
 #' inadequate with most CRAN test-suites. However, the \code{test_that} path may
 #' be set to a directory of \pkg{testthat} tests, which are called by
-#' \code{\link[testthat]{testdir}}. Alternatively, environment variables or \R
+#' \code{\link[testthat]{test_dir}}. Alternatively, environment variables or \R
 #' options may be set to run computationally intensive tests which exercise the
 #' compiled code.
 #'

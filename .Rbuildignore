@@ -7,5 +7,5 @@
 ^cran-comments.md$
 ^wercker\.yml$
 ^reg\.r$
-
+default\.profdata$
 ^appveyor\.yml$

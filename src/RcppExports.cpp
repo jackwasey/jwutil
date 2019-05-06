@@ -44,6 +44,16 @@ RcppExport SEXP _jwutil_set_attr_in_place(SEXP xSEXP, SEXP nameSEXP, SEXP valueS
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// get_cpplib
+Rcpp::CharacterVector get_cpplib();
+RcppExport SEXP _jwutil_get_cpplib() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_cpplib());
+    return rcpp_result_gen;
+END_RCPP
+}
 // getOmpMaxThreads
 int getOmpMaxThreads();
 static SEXP _jwutil_getOmpMaxThreads_try() {
@@ -299,6 +309,7 @@ RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jwutil_set_attr_in_place", (DL_FUNC) &_jwutil_set_attr_in_place, 3},
+    {"_jwutil_get_cpplib", (DL_FUNC) &_jwutil_get_cpplib, 0},
     {"_jwutil_getOmpMaxThreads", (DL_FUNC) &_jwutil_getOmpMaxThreads, 0},
     {"_jwutil_getOmpThreads", (DL_FUNC) &_jwutil_getOmpThreads, 0},
     {"_jwutil_isRowSorted", (DL_FUNC) &_jwutil_isRowSorted, 1},

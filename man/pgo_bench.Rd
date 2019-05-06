@@ -2,23 +2,25 @@
 % Please edit documentation in R/pgo.R
 \name{pgo_bench}
 \alias{pgo_bench}
-\title{Compile and test package with and without profile guided optimization Running
-the test suite is a proxy for some kind of benchmark. Obviously this is
-inadequate with most CRAN test-suites. However, the \code{test_that} path may
-be set to a directory of \pkg{testthat} tests, which are called by
-\code{\link[testthat]{testdir}}.}
+\title{Compile and test package with and without profile guided optimization}
 \usage{
 pgo_bench(pkg_path = getwd(), test_path = "tests/testthat",
-  prof_dir = file.path(pkg_path, "src/prof"), iterations = 3,
-  reporter = "silent", clean = FALSE, opt_level = "-O3",
-  cc = "clang", cxx = "clang++", brew = Sys.info()[["sysname"]] ==
-  "Darwin", ...)
+  prof_dir = file.path(pkg_path, "src/prof"), iterations = 7,
+  quiet = TRUE, reporter = ifelse(quiet, "silent", "check"),
+  clean = FALSE, opt_level = "-O3", cc = "clang", cxx = "clang++",
+  brew = Sys.info()[["sysname"]] == "Darwin", measure = c("real",
+  "user", "system"), ...)
 }
 \description{
-Compile and test package with and without profile guided optimization Running
+Running
 the test suite is a proxy for some kind of benchmark. Obviously this is
 inadequate with most CRAN test-suites. However, the \code{test_that} path may
 be set to a directory of \pkg{testthat} tests, which are called by
-\code{\link[testthat]{testdir}}.
+\code{\link[testthat]{test_dir}}. Alternatively, environment variables or \R
+options may be set to run computationally intensive tests which exercise the
+compiled code.
+}
+\details{
+Do not use 'ccache'!
 }
 \keyword{internal}
