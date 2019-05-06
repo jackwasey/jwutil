@@ -2,8 +2,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::interfaces(r, cpp)]]
-
 //' @name fastIntToString
 //' @title Fast convert integer vector to character vector
 //' @description Fast conversion from integer vector to character vector using C++

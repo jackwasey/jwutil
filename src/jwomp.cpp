@@ -1,5 +1,3 @@
-// [[Rcpp::interfaces(r, cpp)]]
-
 #include "jwomp.h"
 
 // [[Rcpp::export]]

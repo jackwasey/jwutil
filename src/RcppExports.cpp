@@ -2,48 +2,10 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include "jwutil_types.h"
-#include "../inst/include/jwutil.h"
 #include <Rcpp.h>
-#include <string>
-#include <set>
 
 using namespace Rcpp;
 
-// set_attr_in_place
-void set_attr_in_place(Rcpp::RObject& x, Rcpp::String name, SEXP value);
-static SEXP _jwutil_set_attr_in_place_try(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
-BEGIN_RCPP
-    Rcpp::traits::input_parameter< Rcpp::RObject& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::String >::type name(nameSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type value(valueSEXP);
-    set_attr_in_place(x, name, value);
-    return R_NilValue;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_set_attr_in_place(SEXP xSEXP, SEXP nameSEXP, SEXP valueSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_set_attr_in_place_try(xSEXP, nameSEXP, valueSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
 // get_cpplib
 Rcpp::CharacterVector get_cpplib();
 RcppExport SEXP _jwutil_get_cpplib() {
@@ -56,137 +18,45 @@ END_RCPP
 }
 // getOmpMaxThreads
 int getOmpMaxThreads();
-static SEXP _jwutil_getOmpMaxThreads_try() {
+RcppExport SEXP _jwutil_getOmpMaxThreads() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     rcpp_result_gen = Rcpp::wrap(getOmpMaxThreads());
     return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_getOmpMaxThreads() {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_getOmpMaxThreads_try());
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
+END_RCPP
 }
 // getOmpThreads
 int getOmpThreads();
-static SEXP _jwutil_getOmpThreads_try() {
+RcppExport SEXP _jwutil_getOmpThreads() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     rcpp_result_gen = Rcpp::wrap(getOmpThreads());
     return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_getOmpThreads() {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_getOmpThreads_try());
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
+END_RCPP
 }
 // isRowSorted
 LogicalVector isRowSorted(NumericMatrix x);
-static SEXP _jwutil_isRowSorted_try(SEXP xSEXP) {
+RcppExport SEXP _jwutil_isRowSorted(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(isRowSorted(x));
     return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_isRowSorted(SEXP xSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_isRowSorted_try(xSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
+END_RCPP
 }
 // propRowSorted
 double propRowSorted(NumericMatrix x);
-static SEXP _jwutil_propRowSorted_try(SEXP xSEXP) {
+RcppExport SEXP _jwutil_propRowSorted(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(propRowSorted(x));
     return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_propRowSorted(SEXP xSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_propRowSorted_try(xSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
+END_RCPP
 }
 // stdlib_gnu
 bool stdlib_gnu();
@@ -210,105 +80,30 @@ END_RCPP
 }
 // fastIntToStringStd
 std::vector<std::string> fastIntToStringStd(std::vector<int> x);
-static SEXP _jwutil_fastIntToStringStd_try(SEXP xSEXP) {
+RcppExport SEXP _jwutil_fastIntToStringStd(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<int> >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(fastIntToStringStd(x));
     return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_fastIntToStringStd(SEXP xSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_fastIntToStringStd_try(xSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
+END_RCPP
 }
 // fastIntToStringRcpp
 Rcpp::CharacterVector fastIntToStringRcpp(Rcpp::IntegerVector x);
-static SEXP _jwutil_fastIntToStringRcpp_try(SEXP xSEXP) {
+RcppExport SEXP _jwutil_fastIntToStringRcpp(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(fastIntToStringRcpp(x));
     return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _jwutil_fastIntToStringRcpp(SEXP xSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_jwutil_fastIntToStringRcpp_try(xSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
-
-// validate (ensure exported C++ functions exist before calling them)
-static int _jwutil_RcppExport_validate(const char* sig) { 
-    static std::set<std::string> signatures;
-    if (signatures.empty()) {
-        signatures.insert("void(*set_attr_in_place)(Rcpp::RObject&,Rcpp::String,SEXP)");
-        signatures.insert("int(*getOmpMaxThreads)()");
-        signatures.insert("int(*getOmpThreads)()");
-        signatures.insert("LogicalVector(*isRowSorted)(NumericMatrix)");
-        signatures.insert("double(*propRowSorted)(NumericMatrix)");
-        signatures.insert("std::vector<std::string>(*fastIntToStringStd)(std::vector<int>)");
-        signatures.insert("Rcpp::CharacterVector(*fastIntToStringRcpp)(Rcpp::IntegerVector)");
-    }
-    return signatures.find(sig) != signatures.end();
-}
-
-// registerCCallable (register entry points for exported C++ functions)
-RcppExport SEXP _jwutil_RcppExport_registerCCallable() { 
-    R_RegisterCCallable("jwutil", "_jwutil_set_attr_in_place", (DL_FUNC)_jwutil_set_attr_in_place_try);
-    R_RegisterCCallable("jwutil", "_jwutil_getOmpMaxThreads", (DL_FUNC)_jwutil_getOmpMaxThreads_try);
-    R_RegisterCCallable("jwutil", "_jwutil_getOmpThreads", (DL_FUNC)_jwutil_getOmpThreads_try);
-    R_RegisterCCallable("jwutil", "_jwutil_isRowSorted", (DL_FUNC)_jwutil_isRowSorted_try);
-    R_RegisterCCallable("jwutil", "_jwutil_propRowSorted", (DL_FUNC)_jwutil_propRowSorted_try);
-    R_RegisterCCallable("jwutil", "_jwutil_fastIntToStringStd", (DL_FUNC)_jwutil_fastIntToStringStd_try);
-    R_RegisterCCallable("jwutil", "_jwutil_fastIntToStringRcpp", (DL_FUNC)_jwutil_fastIntToStringRcpp_try);
-    R_RegisterCCallable("jwutil", "_jwutil_RcppExport_validate", (DL_FUNC)_jwutil_RcppExport_validate);
-    return R_NilValue;
+END_RCPP
 }
 
 RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_jwutil_set_attr_in_place", (DL_FUNC) &_jwutil_set_attr_in_place, 3},
     {"_jwutil_get_cpplib", (DL_FUNC) &_jwutil_get_cpplib, 0},
     {"_jwutil_getOmpMaxThreads", (DL_FUNC) &_jwutil_getOmpMaxThreads, 0},
     {"_jwutil_getOmpThreads", (DL_FUNC) &_jwutil_getOmpThreads, 0},
@@ -318,7 +113,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jwutil_stdlib_llvm", (DL_FUNC) &_jwutil_stdlib_llvm, 0},
     {"_jwutil_fastIntToStringStd", (DL_FUNC) &_jwutil_fastIntToStringStd, 1},
     {"_jwutil_fastIntToStringRcpp", (DL_FUNC) &_jwutil_fastIntToStringRcpp, 1},
-    {"_jwutil_RcppExport_registerCCallable", (DL_FUNC) &_jwutil_RcppExport_registerCCallable, 0},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 0},
     {NULL, NULL, 0}
 };

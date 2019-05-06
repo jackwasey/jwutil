@@ -1,15 +1,12 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::interfaces(r, cpp)]]
-
 //' @name isRowSorted
 //' @title is every row sorted?
 //' @description Quicky run through rows of a matrix looking for any
 //' non-ascending rows in C++
 //' @param x matrix, each row containing ordered or disordered numerics
 //' @export
-// [[Rcpp::interfaces(r, cpp)]]
 // [[Rcpp::export]]
 LogicalVector isRowSorted(NumericMatrix x) {
   const int nrow = x.nrow(), ncol = x.ncol();
