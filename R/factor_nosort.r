@@ -24,10 +24,10 @@
 #' # this shows that stringr (which uses stringi) sort takes 50% longer than
 #' # built-in R sort.
 #' microbenchmark::microbenchmark(sort(u), str_sort(u))
-#' 
+#'
 #' # this shows that \code{factor_} is about 50% faster than \code{factor} for
 #' # big vectors of strings
-#' 
+#'
 #' # without sorting is much faster:
 #' microbenchmark::microbenchmark(factor(pts$code),
 #'   # factor_(pts$code),
@@ -40,7 +40,9 @@
 #'   alphanumeric sorting will likely be completely wrong.
 #' @export
 factor_nosort <- function(x, levels = NULL, labels = levels) {
-  if (is.factor(x)) return(x)
+  if (is.factor(x)) {
+    return(x)
+  }
   if (is.null(levels)) levels <- unique.default(x)
   suppressWarnings(f <- match(x, levels))
   levels(f) <- as.character(labels)

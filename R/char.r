@@ -110,7 +110,9 @@ str_multi_match <- function(pattern, text, dropEmpty = FALSE, ...) {
         )
       )[-1]
   )
-  if (!dropEmpty) return(result)
+  if (!dropEmpty) {
+    return(result)
+  }
   result[vapply(result, function(x) length(x) != 0), logical(1)]
 }
 

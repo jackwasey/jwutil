@@ -80,7 +80,9 @@ flattenList <- function(..., na_rm = FALSE) {
   x <- list(...)
   y <- list()
   rapply(x, function(x) y <- c(y, x))
-  if (na_rm) return(y[!is.na(y)])
+  if (na_rm) {
+    return(y[!is.na(y)])
+  }
   y
 }
 

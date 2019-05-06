@@ -1,6 +1,6 @@
 #' Update github_install packages
 #'
-#' @return Returns invisibly the names of packages which need updating. THe
+#' @return Returns invisibly the names of packages which need updating. The
 #'   function outputs the commands to run to actually update them (by
 #'   reinstalling from github). Doesn't do this automatically because it would
 #'   mean bringing in a lot of dependencies.

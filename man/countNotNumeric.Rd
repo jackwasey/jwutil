@@ -7,7 +7,7 @@
 countNotNumeric(x)
 }
 \arguments{
-\item{x}{is usually a charcter vector}
+\item{x}{is usually a character vector}
 }
 \value{
 integer

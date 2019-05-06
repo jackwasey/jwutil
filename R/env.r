@@ -13,8 +13,9 @@ vec_to_env_true <-
 vec_to_env_count <-
   function(x, env = new.env(hash = TRUE, parent = baseenv())) {
     stopifnot(is.environment(env))
-    for (i in seq_along(x))
+    for (i in seq_along(x)) {
       env[[x[i]]] <- i
+    }
     env
   }
 
@@ -34,8 +35,9 @@ env_to_vec_flip <- function(env) {
 vec_to_lookup_pair <-
   function(x, env = new.env(hash = TRUE, parent = baseenv())) {
     stopifnot(is.environment(env))
-    for (i in seq_along(x))
+    for (i in seq_along(x)) {
       env[[x[i]]] <- i
+    }
     list(env = env, vec = x)
   }
 

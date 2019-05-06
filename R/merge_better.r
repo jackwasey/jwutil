@@ -57,8 +57,9 @@ merge_better <- function(x, y, by.x, by.y,
   # sometimes/often. TODO: tests for this. Ultimately may be better to
   # use data.table, and just index these columns properly.
   if (convert_factors) {
-    for (by_col in c(by.x, by.y))
+    for (by_col in c(by.x, by.y)) {
       if (is.factor(x[[by_col]])) x[[by_col]] <- as_char_no_warn(x[[by_col]])
+    }
   }
   if (verbose) {
     # this would be more efficient with data table or sql type query

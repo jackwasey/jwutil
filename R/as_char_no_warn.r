@@ -3,7 +3,9 @@
 #' @return character vector
 #' @export
 as_char_no_warn <- function(x) {
-  if (is.character(x)) return(x)
+  if (is.character(x)) {
+    return(x)
+  }
   old <- options(warn = -1)
   on.exit(options(old))
   if (is.integer(x)) {

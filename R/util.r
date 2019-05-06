@@ -51,7 +51,9 @@ asIntegerNoWarn <- as_integer_nowarn
 #' stopifnot(is_integerish("1"))
 #' @export
 is_integerish <- function(x, tol = 1e-9, na.ignore = FALSE) {
-  if (is.null(x)) return(FALSE)
+  if (is.null(x)) {
+    return(FALSE)
+  }
   stopifnot(is.numeric(tol), is.logical(na.ignore))
   stopifnot(length(tol) <= 1, length(na.ignore) <= 1)
   nas <- is.na(x)
@@ -87,7 +89,9 @@ areIntegers <- is_integerish
 #' areNumeric(c("NA", NA, ".", "", "-1.9"))
 #' @export
 is_numeric_str <- function(x, extras = c(".", "NA", NA)) {
-  if (is.null(x)) return(FALSE)
+  if (is.null(x)) {
+    return(FALSE)
+  }
   old <- options(warn = -1)
   on.exit(options(old))
   x[x %in% c("", extras)] <- NA
@@ -115,7 +119,7 @@ areNumeric <- function(x, extras = c(".", "NA", NA)) {
 #' @description counts the number of non-numeric elements in a vector, without
 #'   throwing warnings
 #' @details did have \code{extras = c(".", "NA"))}
-#' @param x is usually a charcter vector
+#' @param x is usually a character vector
 #' @return integer
 #' @export
 countNotNumeric <- function(x)
@@ -336,10 +340,14 @@ permuteWithRepeats <- function(x, unique = TRUE) {
 #' stopifnot(nrow(x) == factorial(length(ltr)))
 #' @export
 permute <- function(x) {
-  if (is.null(x)) return()
+  if (is.null(x)) {
+    return()
+  }
   stopifnot(length(x) < 13) # factorial size, so limit for sanity
   # break out of recursion:
-  if (length(x) == 2) return(rbind(x, c(x[2], x[1])))
+  if (length(x) == 2) {
+    return(rbind(x, c(x[2], x[1])))
+  }
   res <- c()
   # take each one and place it first, then recurse the rest:
   for (element in 1:length(x)) {
@@ -513,8 +521,9 @@ rm_r <- function(x, envir = parent.frame()) {
   suppressWarnings({
     while (any(vapply(x, exists, logical(1),
       mode = "numeric", inherits = TRUE, envir = envir
-    )))
+    ))) {
       rm(list = x, envir = envir, inherits = TRUE)
+    }
   })
 }
 
@@ -648,11 +657,16 @@ min_r_version <- function(pkg) {
   pkg_list <- avail[matches, "Depends"]
   vers <- grep("^R$|^R \\(.*\\)$", pkg_list, value = TRUE)
   vers <- gsub("[^0-9.]", "", vers)
-  if (length(vers) == 0) return("Not specified")
+  if (length(vers) == 0) {
+    return("Not specified")
+  }
   max_ver <- vers[1]
-  if (length(vers) == 1) return(max_ver)
-  for (v in 2:length(vers))
+  if (length(vers) == 1) {
+    return(max_ver)
+  }
+  for (v in 2:length(vers)) {
     if (utils::compareVersion(vers[v], max_ver) > 0) max_ver <- vers[v]
+  }
   max_ver
 }
 
@@ -714,7 +728,9 @@ bang_dollar <- function() {
   last_cmd <- h[[length(h) - 1]]
   end_cmd <- sub(".*\\(", "", last_cmd)
   first_arg <- sub("[,)].*", "", end_cmd)
-  if (length(first_arg) == 0) return()
+  if (length(first_arg) == 0) {
+    return()
+  }
   res <- eval(first_arg, envir = parent.frame())
   res
 }
