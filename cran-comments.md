@@ -1,4 +1,4 @@
-Feature and bug-fix update.
+Fixed bad URL from previous submisssion (version 1.2.2)
 
 # Test environments
 * Ubuntu 19.04 R 3.6, GCC 8.3, clang 8

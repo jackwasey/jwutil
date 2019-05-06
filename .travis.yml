@@ -15,14 +15,11 @@ matrix:
   allow_failures:
   - r: oldrel
   - os: osx
-  include:
-  - env: LINTR_COMMENT_BOT=true
 
 env:
   global:
     - R_CHECK_CRAN_INCOMING_=FALSE
     - _R_CHECK_FORCE_SUGGESTS_=FALSE
-    - LINTR_COMMENT_BOT=false
 
 warnings_are_errors: true
 
@@ -38,8 +35,7 @@ install_github:
  - r-lib/covr
 
 after_success:
- - Rscript -e 'covr::coveralls()'
- - Rscript -e 'lintr::lint_package()'
+ - Rscript -e 'covr::codecov()'
 
 notifications:
   email:
