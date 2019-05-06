@@ -8,3 +8,4 @@
 ^reg\.r$
 default\.profdata$
 ^appveyor\.yml$
+^CRAN-RELEASE$
